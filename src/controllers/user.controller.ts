@@ -27,8 +27,10 @@ export const registration: RequestHandler<
 		if (!login || !password) {
 			throw ApiError.BadRequest("Loading and password must be provided");
 		}
-		const response = await registrationUser(login, password, photo);
-		res.json(response);
+
+		await registrationUser(login, password, photo);
+
+		res.json({ resultCode: 0 });
 	} catch (e) {
 		next(e);
 	}
@@ -42,19 +44,19 @@ export const authentication: RequestHandler<
 		const refreshToken = req.cookies[COOKIE_NAME];
 
 		if (!refreshToken) {
-			debugger;
 			throw ApiError.UnAuthorization();
 		}
 
 		const user = checkToken(refreshToken);
 
 		if (!user) {
-			throw ApiError.UnAuthorization();
+			throw ApiError.BadRequest("Токен обновления не действительный");
 		}
 
-		const userData = await getUser(user!.userId);
-		console.log(userData);
+		const userData = await getUser(user.userId);
+
 		const tokens = createTokens(userData);
+
 		res.json({
 			...tokens,
 			user: userData,
@@ -94,7 +96,7 @@ export const login: RequestHandler<
 
 export const logout: RequestHandler = (_req, res) => {
 	res.clearCookie(COOKIE_NAME);
-	res.json();
+	res.json({ resultCode: 0 });
 };
 
 export const refresh: RequestHandler = (req, res, next) => {

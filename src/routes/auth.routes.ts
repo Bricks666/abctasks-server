@@ -13,6 +13,6 @@ authRoutes.get("/", authentication);
 authRoutes.put("/registration", registration);
 authRoutes.post("/login", login);
 authRoutes.delete("/logout", logout);
-authRoutes.delete("/refresh", refresh);
+authRoutes.get("/refresh", refresh);
 
 export { authRoutes };

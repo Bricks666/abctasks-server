@@ -13,6 +13,10 @@ export class ApiError extends Error {
 		return new ApiError(401, "Пользователь не авторизован");
 	}
 
+  public static NoAccess() {
+    return new ApiError(403, "У пользователя нет доступа")
+  }
+
 	public static BadRequest(error: string) {
 		return new ApiError(400, error);
 	}

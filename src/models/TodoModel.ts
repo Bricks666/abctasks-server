@@ -1,21 +1,21 @@
 import { HEX } from "../interfaces/common";
 
 export interface TodoModelShort {
-	todoId: number;
-	statusId: number;
-	groupId: number;
-	authorId: number;
-	content: string;
-	date: string;
-	isDone: boolean;
+	readonly todoId: number;
+	readonly statusId: number;
+	readonly groupId: number;
+	readonly authorId: number;
+	readonly content: string;
+	readonly date: string;
+	readonly isDone: boolean;
 }
 
 export interface TodoModelFull
 	extends Omit<TodoModelShort, "authorId" | "statusId" | "groupId"> {
-	authorName: string;
-	authorPhoto?: string | undefined;
-	groupName: string;
-	mainColor: HEX;
-	secondColor: HEX;
-	status: string;
+	readonly authorName: string;
+	readonly authorPhoto?: string | undefined;
+	readonly groupName: string;
+	readonly mainColor: HEX;
+	readonly secondColor: HEX;
+	readonly status: string;
 }

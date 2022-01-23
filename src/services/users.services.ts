@@ -20,17 +20,6 @@ export const registrationUser = async (
 		password: hashedPassword,
 		photo,
 	});
-
-	const createdUser: SecureUserModel = (
-		await todoDB.Users.getUsers({
-			filters: { login },
-			excludes: ["password"],
-		})
-	)[0];
-
-	return {
-		user: createdUser,
-	};
 };
 
 export const loginUser = async (login: string, password: string) => {

@@ -1,8 +1,8 @@
 import { HEX } from "../interfaces/common";
 
 export interface TodoGroupModel {
-	groupId: number;
-	groupName: string;
-	groupMainColor: HEX;
-	groupSecondColor: HEX;
+	readonly groupId: number;
+	readonly groupName: string;
+	readonly groupMainColor: HEX;
+	readonly groupSecondColor: HEX;
 }
