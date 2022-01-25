@@ -1,21 +1,28 @@
 import { HEX } from "../interfaces/common";
 
-export interface TodoModelShort {
+export enum TaskStatus {
+	DONE = "Done",
+	IN_PROGRESS = "In Progress",
+	REVIEW = "Review",
+	READY = "Ready",
+}
+
+export interface TaskModelShort {
 	readonly todoId: number;
-	readonly statusId: number;
+	readonly status: TaskStatus;
 	readonly groupId: number;
 	readonly authorId: number;
 	readonly content: string;
 	readonly date: string;
-	readonly isDone: boolean;
 }
 
-export interface TodoModelFull
-	extends Omit<TodoModelShort, "authorId" | "statusId" | "groupId"> {
+export interface TaskModelFull
+	extends Omit<TaskModelShort, "authorId" | "groupId"> {
 	readonly authorName: string;
 	readonly authorPhoto?: string | undefined;
 	readonly groupName: string;
 	readonly mainColor: HEX;
 	readonly secondColor: HEX;
-	readonly status: string;
 }
+
+export type TaskCreateModel = Omit<TaskModelShort, "todoId">;

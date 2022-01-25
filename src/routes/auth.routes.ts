@@ -1,18 +1,12 @@
 import { Router } from "express";
-import {
-	registration,
-	authentication,
-	login,
-	logout,
-	refresh,
-} from "../controllers";
+import { UsersController } from "../controllers";
 
 const authRoutes = Router();
 
-authRoutes.get("/", authentication);
-authRoutes.put("/registration", registration);
-authRoutes.post("/login", login);
-authRoutes.delete("/logout", logout);
-authRoutes.get("/refresh", refresh);
+authRoutes.get("/", UsersController.authentication);
+authRoutes.put("/registration", UsersController.registration);
+authRoutes.post("/login", UsersController.login);
+authRoutes.delete("/logout", UsersController.logout);
+authRoutes.get("/refresh", UsersController.refresh);
 
 export { authRoutes };

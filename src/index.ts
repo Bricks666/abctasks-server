@@ -2,9 +2,10 @@ import express, { json } from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import { PORT } from "./config";
-import { todoDB } from "./database";
 import { appRoutes } from "./routes";
 import { errorHandler } from "./middlewares";
+import { createConnection } from "mariadb-table-wrapper";
+import { TaskGroupsTable, TasksTable, UsersTable } from "./database";
 
 const app = express();
 
@@ -15,5 +16,17 @@ app.use("/", appRoutes);
 app.use(errorHandler);
 
 app.listen(PORT, async () => {
-	await todoDB.connect();
+	const connection = await createConnection({
+		user: "root",
+		password: "Root123",
+    initSql: ["use Todo;"]
+	});
+
+	const tables = [
+		UsersTable.init(connection),
+		TasksTable.init(connection),
+		TaskGroupsTable.init(connection),
+	];
+
+	await Promise.all(tables);
 });

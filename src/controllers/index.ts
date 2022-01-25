@@ -1,7 +1,2 @@
-export {
-	registration,
-	authentication,
-	login,
-	logout,
-	refresh,
-} from "./user.controller";
+export { UsersController } from "./user.controller";
+export { TasksController } from "./tasks.controller";

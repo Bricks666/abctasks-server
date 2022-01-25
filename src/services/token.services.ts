@@ -11,42 +11,43 @@ const PRIVATE_KEY = readFileSync(
 	resolve(__dirname, "../config/private_key.pem"),
 	"utf-8"
 );
+export class TokensService {
+	public static checkToken = (token: string) => {
+		try {
+			const user = verifyToken<VerifyUserModel>(token, PUBLIC_KEY);
+			if (!user) {
+				return null;
+			}
 
-export const checkToken = (token: string) => {
-	try {
-		const user = verifyToken<VerifyUserModel>(token, PUBLIC_KEY);
-		if (!user) {
-			throw new Error();
+			return user;
+		} catch (e) {
+			return null;
 		}
-
-		return user;
-	} catch (e) {
-		return null;
-	}
-};
-
-export const createTokens = (user: VerifyUserModel) => {
-	const accessToken = signToken(user, PRIVATE_KEY, {
-		algorithm: "RS256",
-		expiresIn: "10s",
-	});
-	const refreshToken = signToken(user, PRIVATE_KEY, {
-		algorithm: "RS256",
-		expiresIn: "14d",
-	});
-
-	return {
-		accessToken,
-		refreshToken,
 	};
-};
 
-export const refreshTokens = (refreshToken: string) => {
-	try {
-		const user = verifyToken<VerifyUserModel>(refreshToken, PUBLIC_KEY);
+	public static createTokens = (user: VerifyUserModel) => {
+		const accessToken = signToken(user, PRIVATE_KEY, {
+			algorithm: "RS256",
+			expiresIn: "10m",
+		});
+		const refreshToken = signToken(user, PRIVATE_KEY, {
+			algorithm: "RS256",
+			expiresIn: "14d",
+		});
 
-		return createTokens(user);
-	} catch (e) {
-		return null;
-	}
-};
+		return {
+			accessToken,
+			refreshToken,
+		};
+	};
+
+	public static refreshTokens = (refreshToken: string) => {
+		try {
+			const user = verifyToken<VerifyUserModel>(refreshToken, PUBLIC_KEY);
+
+			return TokensService.createTokens(user);
+		} catch (e) {
+			return null;
+		}
+	};
+}

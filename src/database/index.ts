@@ -1,3 +1,3 @@
-import { TodoDatabase } from "../../../database/dist";
-
-export const todoDB = new TodoDatabase({ user: "root", password: "Root123" });
+export { TaskGroupsTable } from "./TaskGroups";
+export { TasksTable } from "./Tasks";
+export { UsersTable } from "./Users";

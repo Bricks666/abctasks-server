@@ -1,6 +1,6 @@
 import { HEX } from "../interfaces/common";
 
-export interface TodoGroupModel {
+export interface TaskGroupModel {
 	readonly groupId: number;
 	readonly groupName: string;
 	readonly groupMainColor: HEX;
