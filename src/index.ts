@@ -19,13 +19,14 @@ app.listen(PORT, async () => {
 	const connection = await createConnection({
 		user: "root",
 		password: "Root123",
-    initSql: ["use Todo;"]
+		initSql: ["CREATE DATABASE IF NOT EXISTS  Todo;", "use Todo;"],
+		checkDuplicate: false,
 	});
 
 	const tables = [
 		UsersTable.init(connection),
-		TasksTable.init(connection),
 		TaskGroupsTable.init(connection),
+		TasksTable.init(connection),
 	];
 
 	await Promise.all(tables);

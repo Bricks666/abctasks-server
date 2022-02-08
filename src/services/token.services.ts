@@ -28,7 +28,7 @@ export class TokensService {
 	public static createTokens = (user: VerifyUserModel) => {
 		const accessToken = signToken(user, PRIVATE_KEY, {
 			algorithm: "RS256",
-			expiresIn: "10m",
+			expiresIn: "10s",
 		});
 		const refreshToken = signToken(user, PRIVATE_KEY, {
 			algorithm: "RS256",
@@ -45,7 +45,9 @@ export class TokensService {
 		try {
 			const user = verifyToken<VerifyUserModel>(refreshToken, PUBLIC_KEY);
 
-			return TokensService.createTokens(user);
+			return TokensService.createTokens({
+				userId: user.userId,
+			});
 		} catch (e) {
 			return null;
 		}

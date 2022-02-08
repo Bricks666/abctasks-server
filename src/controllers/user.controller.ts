@@ -52,7 +52,7 @@ export class UsersController {
 
 			const userData = await UserService.getUser(user.userId);
 
-			const tokens = TokensService.createTokens(userData);
+			const tokens = TokensService.createTokens({ userId: user.userId });
 
 			res.json({
 				...tokens,
@@ -93,11 +93,15 @@ export class UsersController {
 
 	public static refresh: RequestHandler = (req, res, next) => {
 		try {
-			const refreshToken = req.headers.authorization?.split(" ")[1];
+			const refreshToken = req.cookies[COOKIE_NAME];
 			if (!refreshToken) {
 				throw ApiError.UnAuthorization();
 			}
 			const response = TokensService.refreshTokens(refreshToken);
+
+			if (!response) {
+				throw ApiError.UnAuthorization();
+			}
 			res.json(response);
 		} catch (e) {
 			next(e);

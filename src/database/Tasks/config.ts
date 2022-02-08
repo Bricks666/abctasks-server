@@ -42,7 +42,7 @@ export const tasksConfig: TableConfig<TaskModelShort> = {
 			isNotNull: true,
 		},
 		date: {
-			type: SQLTypes.DATE,
+			type: SQLTypes.DATETIME,
 			isNotNull: true,
 		},
 	},

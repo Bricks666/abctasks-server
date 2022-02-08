@@ -81,4 +81,34 @@ export class TasksController {
 			next(e);
 		}
 	};
+
+	public static deleteTask: RequestHandler = async (req, res, next) => {
+		try {
+			const user: VerifyUserModel = req.body.user;
+
+			if (!user) {
+				throw ApiError.BadRequest("User must be provided");
+			}
+
+			const { id } = req.params;
+
+			if (!id) {
+				throw ApiError.BadRequest(
+					"Content, status and groupId must be provided"
+				);
+			}
+
+			if (!["Done", "In Progress", "Ready", "Review"].includes(status)) {
+				throw ApiError.BadRequest(
+					"Status may be only Done, In Progress, Ready or Review"
+				);
+			}
+
+			const newTask = await TasksService.deleteTask(+id);
+
+			res.json({ task: newTask });
+		} catch (e) {
+			next(e);
+		}
+	};
 }

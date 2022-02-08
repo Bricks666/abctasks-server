@@ -71,14 +71,9 @@ export class TasksService {
 		return taskProgress;
 	};
 	public static getTaskGroups = async (userId: number) => {
-		const taskGroupIds = (
-			await TasksTable.select<{ groupId: number }>({
-				filters: { authorId: userId },
-				includes: ["groupId"],
-			})
-		).map((task) => task.groupId);
 		return await TaskGroupsTable.select({
-			filters: { groupId: taskGroupIds },
+			filters: { ownerId: userId },
+			excludes: ["ownerId"],
 		});
 	};
 	public static createTask = async (
@@ -87,7 +82,7 @@ export class TasksService {
 		status: TaskStatus,
 		groupId: number
 	) => {
-		const addedDate = new Date().toString();
+		const addedDate = new Date().toISOString().slice(0, -5);
 
 		const newTask: TaskCreateModel = {
 			date: addedDate,
@@ -98,8 +93,17 @@ export class TasksService {
 		};
 
 		await TasksTable.insert(newTask);
-		return await TasksTable.select({
+		return await TasksTable.selectOne({
 			filters: { date: addedDate, authorId: userId },
+			joinedTable: {
+				enable: true,
+				joinTable: ["users"],
+			},
+		});
+	};
+	public static deleteTask = async (taskId: number) => {
+		await TasksTable.delete({
+			todoId: taskId,
 		});
 	};
 }

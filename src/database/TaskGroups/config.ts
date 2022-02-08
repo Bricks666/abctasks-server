@@ -28,6 +28,17 @@ export const taskGroupsConfig: TableConfig<TaskGroupModel> = {
 			isNotNull: true,
 			stringLen: 9,
 		},
+		ownerId: {
+			type: SQLTypes.SMALLINT,
+			isNotNull: true,
+			isUnsigned: true,
+		},
 	},
 	safeCreating: true,
+	foreignKeys: {
+		ownerId: {
+			field: "userId",
+			tableName: "users",
+		},
+	},
 };

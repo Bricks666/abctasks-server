@@ -42,7 +42,7 @@ export class UserService {
 			userId: user.userId,
 			photo: user.photo,
 		};
-		const tokens = TokensService.createTokens(secureUser);
+		const tokens = TokensService.createTokens({ userId: user.userId });
 
 		return {
 			user: secureUser,

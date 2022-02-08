@@ -5,4 +5,5 @@ export interface TaskGroupModel {
 	readonly groupName: string;
 	readonly groupMainColor: HEX;
 	readonly groupSecondColor: HEX;
+  readonly ownerId: number
 }
