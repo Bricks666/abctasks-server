@@ -84,12 +84,25 @@ export class TasksController {
 
 	public static deleteTask: RequestHandler = async (req, res, next) => {
 		try {
-			const user: VerifyUserModel = req.body.user;
+			const { id } = req.params;
 
-			if (!user) {
-				throw ApiError.BadRequest("User must be provided");
+			if (!id) {
+				throw ApiError.BadRequest(
+					"Content, status and groupId must be provided"
+				);
 			}
 
+			const newTask = await TasksService.deleteTask(+id);
+
+			res.json({ task: newTask });
+		} catch (e) {
+			next(e);
+		}
+	};
+
+	public static editTask: RequestHandler = async (req, res, next) => {
+		try {
+			const { content, groupId, status } = req.body;
 			const { id } = req.params;
 
 			if (!id) {
@@ -104,9 +117,12 @@ export class TasksController {
 				);
 			}
 
-			const newTask = await TasksService.deleteTask(+id);
-
-			res.json({ task: newTask });
+			const task = await TasksService.editTask(+id, {
+				content,
+				groupId,
+				status,
+			});
+			res.json({ task });
 		} catch (e) {
 			next(e);
 		}

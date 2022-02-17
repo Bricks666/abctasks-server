@@ -106,4 +106,11 @@ export class TasksService {
 			todoId: taskId,
 		});
 	};
+	public static editTask = async (
+		taskId: number,
+		newValues: Partial<TaskCreateModel>
+	) => {
+		await TasksTable.update(newValues, { todoId: taskId });
+		return await TasksTable.selectOne({ filters: { todoId: taskId } });
+	};
 }

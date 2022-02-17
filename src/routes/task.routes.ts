@@ -9,5 +9,6 @@ taskRoutes.get("/progress", accessVerify, TasksController.getTasksProgress);
 taskRoutes.get("/groups", accessVerify, TasksController.getTaskGroups);
 taskRoutes.put("/new", accessVerify, TasksController.createTask);
 taskRoutes.delete("/:id/delete", accessVerify, TasksController.deleteTask);
+taskRoutes.post("/:id/edit", accessVerify, TasksController.editTask);
 
 export { taskRoutes };

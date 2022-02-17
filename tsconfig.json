@@ -1,9 +1,5 @@
 {
-	"compileOnSave": true, //Будет компилировать при каждом сохранении ts
 	"compilerOptions": {
-		/* Projects */
-		"outDir": "./dist",
-
 		/* Language and Environment */
 		"target": "ES2017" /* Set the JavaScript language version for emitted JavaScript and include compatible library declarations. */,
 		"allowJs": true, //Компилировать ли файлы с JS тоже
@@ -13,28 +9,18 @@
 		"noEmitOnError": true, //Не создаст файл, при ошибки компиляции
 		"noUnusedLocals": true, //Показывать ошибку, если есть неиспользуемые локальные переменные
 		"noUnusedParameters": true, //Показывать ошибку, если есть неиспользуемые параметры
-
-		/* Modules */
-		"module": "commonjs" /* Specify what module code is generated. */,
-
-		/* JavaScript Support */
-
-		/* Emit */
-
+    "noEmit": false,
 		/* Interop Constraints */
 		"esModuleInterop": true /* Emit additional JavaScript to ease support for importing CommonJS modules. This enables `allowSyntheticDefaultImports` for type compatibility. */,
 		"moduleResolution": "node",
+    "sourceMap": true,
 		"forceConsistentCasingInFileNames": true /* Ensure that casing is correct in imports. */,
-
 		/* Type Checking */
 		"strict": true /* Enable all strict type-checking options. */,
-
 		/* Completeness */
 		"skipLibCheck": true /* Skip type checking all .d.ts files. */,
 		"declaration": true,
-		"experimentalDecorators": true,
-		"emitDecoratorMetadata": true
 	},
 	"include": ["src/**/*"],
-	"exclude": ["node_modules"]
+	"exclude": ["node_modules"],
 }
