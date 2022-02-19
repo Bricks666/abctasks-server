@@ -111,6 +111,12 @@ export class TasksService {
 		newValues: Partial<TaskCreateModel>
 	) => {
 		await TasksTable.update(newValues, { todoId: taskId });
-		return await TasksTable.selectOne({ filters: { todoId: taskId } });
+		return await TasksTable.selectOne({
+			filters: { todoId: taskId },
+			joinedTable: {
+				enable: true,
+				joinTable: ["users"],
+			},
+		});
 	};
 }

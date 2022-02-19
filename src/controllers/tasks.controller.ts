@@ -92,9 +92,9 @@ export class TasksController {
 				);
 			}
 
-			const newTask = await TasksService.deleteTask(+id);
+			await TasksService.deleteTask(+id);
 
-			res.json({ task: newTask });
+			res.json({ taskId: +id });
 		} catch (e) {
 			next(e);
 		}

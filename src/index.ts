@@ -15,7 +15,7 @@ app.use(json());
 app.use("/", appRoutes);
 app.use(errorHandler);
 
-app.listen(PORT, async () => {
+const server = app.listen(PORT, async () => {
 	const connection = await createConnection({
 		user: "root",
 		password: "Root123",
@@ -31,3 +31,5 @@ app.listen(PORT, async () => {
 
 	await Promise.all(tables);
 });
+
+console.log(server.connections);

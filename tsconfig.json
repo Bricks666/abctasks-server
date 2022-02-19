@@ -1,26 +1,32 @@
 {
 	"compilerOptions": {
+		"outDir": "./dist",
 		/* Language and Environment */
-		"target": "ES2017" /* Set the JavaScript language version for emitted JavaScript and include compatible library declarations. */,
+		"target": "ESNext" /* Set the JavaScript language version for emitted JavaScript and include compatible library declarations. */,
 		"allowJs": true, //Компилировать ли файлы с JS тоже
 		"checkJs": true, //Сообщать об ошибках в JS файлах
 		"alwaysStrict": true, //Компилировать ли с использование strict mode
-		"downlevelIteration": true, //Обеспечение полно поддержки интераторов и операторов ....
+		"downlevelIteration": true, //Обеспечение полно поддержки интераторов и операторов ...
 		"noEmitOnError": true, //Не создаст файл, при ошибки компиляции
 		"noUnusedLocals": true, //Показывать ошибку, если есть неиспользуемые локальные переменные
 		"noUnusedParameters": true, //Показывать ошибку, если есть неиспользуемые параметры
-    "noEmit": false,
+		"noEmit": false,
+
+		"module": "CommonJS",
 		/* Interop Constraints */
 		"esModuleInterop": true /* Emit additional JavaScript to ease support for importing CommonJS modules. This enables `allowSyntheticDefaultImports` for type compatibility. */,
 		"moduleResolution": "node",
-    "sourceMap": true,
 		"forceConsistentCasingInFileNames": true /* Ensure that casing is correct in imports. */,
 		/* Type Checking */
 		"strict": true /* Enable all strict type-checking options. */,
 		/* Completeness */
-		"skipLibCheck": true /* Skip type checking all .d.ts files. */,
+		"skipLibCheck": false /* Skip type checking all .d.ts files. */,
 		"declaration": true,
+		"baseUrl": "src",
+		"paths": {
+			"@/*": ["*"]
+		}
 	},
 	"include": ["src/**/*"],
-	"exclude": ["node_modules"],
+	"exclude": ["node_modules"]
 }

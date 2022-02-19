@@ -1,5 +1,5 @@
-import { RequestHandler } from "express";
-import { COOKIE_NAME } from "../config";
+import { CookieOptions, RequestHandler } from "express";
+import { COOKIE_NAME, COOKIE_TIME } from "../config";
 import { ResponseWithTokens, ResponseWithUser } from "../interfaces/responses";
 import { ApiError, TokensService, UserService } from "../services";
 
@@ -11,6 +11,7 @@ interface RegistrationRequestBody {
 interface LoginRequestBody {
 	readonly login: string;
 	readonly password: string;
+	readonly remember: boolean;
 }
 
 export class UsersController {
@@ -54,6 +55,13 @@ export class UsersController {
 
 			const tokens = TokensService.createTokens({ userId: user.userId });
 
+			res.cookie(COOKIE_NAME, tokens.refreshToken, {
+				httpOnly: true,
+				sameSite: "none",
+				secure: true,
+				maxAge: COOKIE_TIME,
+			});
+
 			res.json({
 				...tokens,
 				user: userData,
@@ -68,18 +76,24 @@ export class UsersController {
 		LoginRequestBody
 	> = async (req, res, next) => {
 		try {
-			const { login, password } = req.body;
+			const { login, password, remember } = req.body;
 
 			if (!login || !password) {
 				throw ApiError.BadRequest("Login and password must be provided");
 			}
 			const response = await UserService.loginUser(login, password);
 
-			res.cookie(COOKIE_NAME, response.refreshToken, {
+			const cookieOptions: CookieOptions = {
 				httpOnly: true,
 				sameSite: "none",
 				secure: true,
-			});
+			};
+
+			if (remember) {
+				cookieOptions.maxAge = COOKIE_TIME;
+			}
+
+			res.cookie(COOKIE_NAME, response.refreshToken, cookieOptions);
 
 			res.json(response);
 		} catch (e) {
@@ -97,12 +111,23 @@ export class UsersController {
 			if (!refreshToken) {
 				throw ApiError.UnAuthorization();
 			}
-			const response = TokensService.refreshTokens(refreshToken);
+			const tokens = TokensService.refreshTokens(refreshToken);
 
-			if (!response) {
+			if (!tokens) {
 				throw ApiError.UnAuthorization();
 			}
-			res.json(response);
+
+			res.cookie(COOKIE_NAME, tokens.refreshToken, {
+				httpOnly: true,
+				sameSite: "none",
+				secure: true,
+				maxAge: COOKIE_TIME,
+			});
+
+			if (!tokens) {
+				throw ApiError.UnAuthorization();
+			}
+			res.json(tokens);
 		} catch (e) {
 			next(e);
 		}
