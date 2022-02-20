@@ -28,7 +28,7 @@ export class TokensService {
 	public static createTokens = (user: VerifyUserModel) => {
 		const accessToken = signToken(user, PRIVATE_KEY, {
 			algorithm: "RS256",
-			expiresIn: "1m",
+			expiresIn: "10m",
 		});
 		const refreshToken = signToken(user, PRIVATE_KEY, {
 			algorithm: "RS256",

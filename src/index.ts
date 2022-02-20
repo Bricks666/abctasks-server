@@ -6,6 +6,7 @@ import { appRoutes } from "./routes";
 import { errorHandler } from "./middlewares";
 import { createConnection } from "mariadb-table-wrapper";
 import { TaskGroupsTable, TasksTable, UsersTable } from "./database";
+import { ActivitiesTable } from "./database/Activities";
 
 const app = express();
 
@@ -15,7 +16,7 @@ app.use(json());
 app.use("/", appRoutes);
 app.use(errorHandler);
 
-const server = app.listen(PORT, async () => {
+app.listen(PORT, async () => {
 	const connection = await createConnection({
 		user: "root",
 		password: "Root123",
@@ -27,9 +28,8 @@ const server = app.listen(PORT, async () => {
 		UsersTable.init(connection),
 		TaskGroupsTable.init(connection),
 		TasksTable.init(connection),
+		ActivitiesTable.init(connection),
 	];
 
 	await Promise.all(tables);
 });
-
-console.log(server.connections);

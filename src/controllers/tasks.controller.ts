@@ -1,6 +1,6 @@
 import { RequestHandler } from "express";
 import { VerifyUserModel } from "../models";
-import { ApiError, TasksService } from "../services";
+import { ActivitiesServices, ApiError, TasksService } from "../services";
 
 export class TasksController {
 	public static getTasks: RequestHandler = async (req, res, next) => {
@@ -75,6 +75,7 @@ export class TasksController {
 				status,
 				groupId
 			);
+			ActivitiesServices.newActivity(user.userId, "Creating");
 
 			res.json({ task: newTask });
 		} catch (e) {
@@ -84,6 +85,7 @@ export class TasksController {
 
 	public static deleteTask: RequestHandler = async (req, res, next) => {
 		try {
+			const user = req.body.user;
 			const { id } = req.params;
 
 			if (!id) {
@@ -94,6 +96,7 @@ export class TasksController {
 
 			await TasksService.deleteTask(+id);
 
+			ActivitiesServices.newActivity(user.userId, "Deleting");
 			res.json({ taskId: +id });
 		} catch (e) {
 			next(e);
@@ -102,7 +105,7 @@ export class TasksController {
 
 	public static editTask: RequestHandler = async (req, res, next) => {
 		try {
-			const { content, groupId, status } = req.body;
+			const { content, groupId, status, user } = req.body;
 			const { id } = req.params;
 
 			if (!id) {
@@ -122,6 +125,9 @@ export class TasksController {
 				groupId,
 				status,
 			});
+
+			ActivitiesServices.newActivity(user.userId, "Editing");
+
 			res.json({ task });
 		} catch (e) {
 			next(e);
