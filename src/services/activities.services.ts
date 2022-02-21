@@ -1,6 +1,7 @@
 import { ActivityModel, ActivityType } from "../models";
 import { ActivitiesTable } from "../database/Activities";
 import { newActivity } from "../packages/eventBus";
+import { getSQLDatetime } from "../utils";
 
 export class ActivitiesServices {
 	public static async getActivities(userId: number) {
@@ -15,7 +16,12 @@ export class ActivitiesServices {
 	}
 
 	public static async newActivity(userId: number, type: ActivityType) {
-		await ActivitiesTable.insert({ activistId: userId, activityType: type });
+		const addedAt = getSQLDatetime();
+		await ActivitiesTable.insert({
+			activistId: userId,
+			activityType: type,
+			addedAt,
+		});
 		const newActivities = await ActivitiesTable.selectOne({
 			filters: {
 				activistId: userId,
@@ -29,13 +35,13 @@ export class ActivitiesServices {
 	}
 
 	public static watchNewActivities(
-		_userId: number,
+		userId: number,
 		listener: (activity: ActivityModel) => unknown
 	) {
-		return newActivity.subscribe((_user, activity) => {
-			/* if (user === userId) { */
-			listener(activity as ActivityModel);
-			/* } */
+		return newActivity.subscribe((user, activity) => {
+			if (user === userId) {
+				listener(activity as ActivityModel);
+			}
 		});
 	}
 }

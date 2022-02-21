@@ -1,3 +1,4 @@
+import { getSQLDatetime } from "../utils";
 import { TaskGroupsTable, TasksTable } from "../database";
 import { TaskCreateModel, TaskStatus } from "../models";
 
@@ -82,7 +83,7 @@ export class TasksService {
 		status: TaskStatus,
 		groupId: number
 	) => {
-		const addedDate = new Date().toISOString().slice(0, -5);
+		const addedDate = getSQLDatetime();
 
 		const newTask: TaskCreateModel = {
 			date: addedDate,

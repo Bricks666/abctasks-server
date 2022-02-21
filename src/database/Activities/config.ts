@@ -23,6 +23,10 @@ export const config: TableConfig<ActivityModel> = {
 			isNotNull: true,
 			isUnsigned: true,
 		},
+		addedAt: {
+			type: SQLTypes.DATETIME,
+			isNotNull: true,
+		},
 	},
 	foreignKeys: {
 		activistId: {

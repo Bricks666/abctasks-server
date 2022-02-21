@@ -21,11 +21,7 @@
 		"strict": true /* Enable all strict type-checking options. */,
 		/* Completeness */
 		"skipLibCheck": false /* Skip type checking all .d.ts files. */,
-		"declaration": true,
-		"baseUrl": "src",
-		"paths": {
-			"@/*": ["*"]
-		}
+		"declaration": true
 	},
 	"include": ["src/**/*"],
 	"exclude": ["node_modules"]
