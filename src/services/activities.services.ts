@@ -7,7 +7,7 @@ export class ActivitiesServices {
 	public static async getActivities(userId: number) {
 		return await ActivitiesTable.select({
 			filters: {
-				activistId: userId,
+				activistId: { operator: "=", value: userId },
 			},
 			orderBy: {
 				activityId: "DESC",
@@ -24,8 +24,8 @@ export class ActivitiesServices {
 		});
 		const newActivities = await ActivitiesTable.selectOne({
 			filters: {
-				activistId: userId,
-				activityType: type,
+				activistId: { operator: "=", value: userId },
+				activityType: { operator: "=", value: type },
 			},
 			orderBy: {
 				activityId: "DESC",

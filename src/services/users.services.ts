@@ -9,7 +9,14 @@ export class UserService {
 		password: string,
 		photo?: string
 	) => {
-		const user = await UsersTable.select({ filters: { login } });
+		const user = await UsersTable.select({
+			filters: {
+				login: {
+					operator: "=",
+					value: login,
+				},
+			},
+		});
 		if (user[0]) {
 			throw ApiError.BadRequest("User already exists");
 		}
@@ -25,7 +32,14 @@ export class UserService {
 
 	public static loginUser = async (login: string, password: string) => {
 		const user: UserModel = (
-			await UsersTable.select({ filters: { login } })
+			await UsersTable.select({
+				filters: {
+					login: {
+						operator: "=",
+						value: login,
+					},
+				},
+			})
 		)[0];
 
 		if (!user) {
@@ -53,7 +67,7 @@ export class UserService {
 	public static getUser = async (userId: number) => {
 		const user = (
 			await UsersTable.select<SecureUserModel>({
-				filters: { userId },
+				filters: { userId: { operator: "=", value: userId } },
 				excludes: ["password"],
 			})
 		)[0];

@@ -1,6 +1,7 @@
 import { VerifyUserModel } from "../models";
 import { RequestHandler } from "express";
 import { ActivitiesServices } from "../services";
+import { createEventResponse } from "../utils";
 
 export class ActivitiesController {
 	public static getActivities: RequestHandler = async (req, res, next) => {
@@ -17,13 +18,13 @@ export class ActivitiesController {
 		try {
 			res.writeHead(200, {
 				Connection: "keep-alive",
-				"Content-type": "text/event-stream",
+				"Content-Type": "text/event-stream",
 				"Cache-Control": "no-cache",
 			});
 			const user: VerifyUserModel = req.body.user;
 			const unsubscribe = ActivitiesServices.watchNewActivities(
 				user.userId,
-				(activity) => res.write(`data: ${JSON.stringify(activity)}\n\n`)
+				(activity) => res.write(createEventResponse(activity))
 			);
 
 			res.once("close", unsubscribe);

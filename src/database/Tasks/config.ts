@@ -1,4 +1,4 @@
-import { SQLTypes, TableConfig } from "mariadb-table-wrapper";
+import { TableConfig } from "mariadb-table-wrapper";
 import { TaskModelShort, TaskStatus } from "../../models";
 import { TASK_GROUPS_TABLE } from "../TaskGroups";
 import { USERS_TABLE } from "../Users";
@@ -9,14 +9,14 @@ export const tasksConfig: TableConfig<TaskModelShort> = {
 	table: TASKS_TABLE,
 	fields: {
 		todoId: {
-			type: SQLTypes.SMALLINT,
+			type: "SMALLINT",
 			isPrimaryKey: true,
 			isAutoIncrement: true,
 			isNotNull: true,
 			isUnsigned: true,
 		},
 		status: {
-			type: SQLTypes.ENUM,
+			type: "ENUM",
 			isUnsigned: true,
 			isNotNull: true,
 			enumSetValues: [
@@ -27,22 +27,22 @@ export const tasksConfig: TableConfig<TaskModelShort> = {
 			],
 		},
 		groupId: {
-			type: SQLTypes.SMALLINT,
+			type: "SMALLINT",
 			isUnsigned: true,
 			isNotNull: true,
 		},
 		authorId: {
-			type: SQLTypes.SMALLINT,
+			type: "SMALLINT",
 			isNotNull: true,
 			isUnsigned: true,
 		},
 		content: {
-			type: SQLTypes.VARCHAR,
+			type: "VARCHAR",
 			stringLen: 128,
 			isNotNull: true,
 		},
 		date: {
-			type: SQLTypes.DATETIME,
+			type: "DATETIME",
 			isNotNull: true,
 		},
 	},

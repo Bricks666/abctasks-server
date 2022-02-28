@@ -4,11 +4,11 @@ import { VerifyUserModel } from "../models";
 import { signToken, verifyToken } from "../utils";
 
 const PUBLIC_KEY = readFileSync(
-	resolve(__dirname, "../config/public_key.pem"),
+	resolve(__dirname, "./config/public_key.pem"),
 	"utf-8"
 );
 const PRIVATE_KEY = readFileSync(
-	resolve(__dirname, "../config/private_key.pem"),
+	resolve(__dirname, "./config/private_key.pem"),
 	"utf-8"
 );
 export class TokensService {

@@ -1,18 +1,6 @@
 import { getSQLDatetime } from "../utils";
-import { TaskGroupsTable, TasksTable } from "../database";
-import { TaskCreateModel, TaskStatus } from "../models";
-
-interface GroupTotalTask {
-	readonly groupId: number;
-	readonly totalCount: number;
-}
-
-interface GroupDoneTask {
-	readonly groupId: number;
-	readonly doneCount: number;
-}
-
-type TaskProgress = GroupDoneTask & GroupTotalTask;
+import { TasksTable } from "../database";
+import { TaskCreateModel, TaskModelShort, TaskStatus } from "../models";
 
 export class TasksService {
 	public static getTasks = async (
@@ -22,7 +10,10 @@ export class TasksService {
 	) => {
 		return await TasksTable.select({
 			filters: {
-				authorId: userId,
+				authorId: {
+					operator: "=",
+					value: userId,
+				},
 			},
 			joinedTable: {
 				enable: true,
@@ -38,45 +29,29 @@ export class TasksService {
 			},
 		});
 	};
-	public static getTasksProgress = async (userId: number) => {
-		const tasksGroup = await TasksTable.select<GroupTotalTask>({
+	public static getTask = async (userId: number, taskId: number) => {
+		return await TasksTable.selectOne<TaskModelShort>({
 			filters: {
-				authorId: userId,
+				authorId: {
+					operator: "=",
+					value: userId,
+				},
+				todoId: {
+					operator: "=",
+					value: taskId,
+				},
 			},
-			includes: ["groupId"],
-			count: [["*", "totalCount"]],
-			groupBy: ["groupId"],
-		});
-		const doneTasks = await TasksTable.select<GroupDoneTask>({
-			filters: {
-				authorId: userId,
-				status: TaskStatus.DONE,
+			joinedTable: {
+				enable: true,
+				joinTable: ["users"],
 			},
-			includes: ["groupId"],
-			count: [["*", "doneCount"]],
-			groupBy: ["groupId"],
-		});
-
-		const taskProgress: TaskProgress[] = tasksGroup.map<TaskProgress>(
-			(total) => {
-				const doneGroup = doneTasks.find(
-					(group) => group.groupId === total.groupId
-				);
-				return {
-					...total,
-					doneCount: doneGroup?.doneCount || 0,
-				};
-			}
-		);
-
-		return taskProgress;
-	};
-	public static getTaskGroups = async (userId: number) => {
-		return await TaskGroupsTable.select({
-			filters: { ownerId: userId },
-			excludes: ["ownerId"],
+			excludes: {
+				users: ["password"],
+				todos: ["isDone", "authorId"],
+			},
 		});
 	};
+
 	public static createTask = async (
 		userId: number,
 		content: string,
@@ -94,8 +69,14 @@ export class TasksService {
 		};
 
 		await TasksTable.insert(newTask);
-		return await TasksTable.selectOne({
-			filters: { date: addedDate, authorId: userId },
+		return await TasksTable.selectOne<TaskModelShort>({
+			filters: {
+				date: {
+					operator: "=",
+					value: addedDate,
+				},
+				authorId: { operator: "=", value: userId },
+			},
 			joinedTable: {
 				enable: true,
 				joinTable: ["users"],
@@ -104,16 +85,18 @@ export class TasksService {
 	};
 	public static deleteTask = async (taskId: number) => {
 		await TasksTable.delete({
-			todoId: taskId,
+			todoId: { operator: "=", value: taskId },
 		});
 	};
 	public static editTask = async (
 		taskId: number,
 		newValues: Partial<TaskCreateModel>
 	) => {
-		await TasksTable.update(newValues, { todoId: taskId });
-		return await TasksTable.selectOne({
-			filters: { todoId: taskId },
+		await TasksTable.update(newValues, {
+			todoId: { operator: "=", value: taskId },
+		});
+		return await TasksTable.selectOne<TaskModelShort>({
+			filters: { todoId: { operator: "=", value: taskId } },
 			joinedTable: {
 				enable: true,
 				joinTable: ["users"],
