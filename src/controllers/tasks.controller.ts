@@ -1,5 +1,5 @@
 import { RequestHandler } from "express";
-import { VerifyUserModel } from "../models";
+import { TaskStatus, VerifyUserModel } from "../models";
 import {
 	ActivitiesServices,
 	ApiError,
@@ -49,7 +49,7 @@ export class TasksController {
 				groupId
 			);
 			ActivitiesServices.newActivity(user.userId, "Creating");
-			if (newTask?.groupId != null) {
+			if (newTask) {
 				ProgressServices.changeProgress(user.userId, newTask.groupId);
 			}
 
@@ -71,7 +71,7 @@ export class TasksController {
 			await TasksService.deleteTask(+id);
 
 			ActivitiesServices.newActivity(user.userId, "Deleting");
-			if (deletedTask?.groupId) {
+			if (deletedTask) {
 				ProgressServices.changeProgress(user.userId, deletedTask.groupId);
 			}
 			res.json({ taskId: +id });
@@ -94,7 +94,7 @@ export class TasksController {
 					"Status may be only Done, In Progress, Ready or Review"
 				);
 			}
-
+			const oldTaskState = await TasksService.getTask(user.userId, +id);
 			const task = await TasksService.editTask(+id, {
 				content,
 				groupId,
@@ -102,14 +102,19 @@ export class TasksController {
 			});
 
 			ActivitiesServices.newActivity(user.userId, "Editing");
-			if (task?.groupId !== groupId && task) {
-				ProgressServices.changeProgress(user.userId, task.groupId, groupId);
-			} else if (
-				[task?.status, status].includes("Done") &&
-				task?.status !== status &&
-				task
-			) {
-				ProgressServices.changeProgress(task.groupId);
+			if (task && oldTaskState) {
+				if (task?.groupId !== oldTaskState.groupId) {
+					ProgressServices.changeProgress(
+						user.userId,
+						task.groupId,
+						oldTaskState.groupId
+					);
+				} else if (
+					[task.status, oldTaskState.status].includes(TaskStatus.DONE) &&
+					task.status !== oldTaskState.status
+				) {
+					ProgressServices.changeProgress(user.userId, task.groupId);
+				}
 			}
 
 			res.json({ task });

@@ -7,6 +7,11 @@ import {
 } from "../models";
 import { changeProgress } from "../packages/eventBus";
 
+interface ChangeProgress {
+	readonly groupId: number;
+	readonly progress: TaskProgress | undefined;
+}
+
 export class ProgressServices {
 	public static getTasksProgress = async (userId: number) => {
 		const tasksGroup = await TasksTable.select<GroupTotalTask>({
@@ -48,15 +53,23 @@ export class ProgressServices {
 	/* Не используются, потому что нужно придумать, как говорить, что данный прогресс больше не отображается */
 	public static subscribeChangeProgress(
 		userId: number,
-		listener: (progress: TaskProgress[]) => unknown
+		listener: (progress: ChangeProgress[]) => unknown
 	) {
 		return changeProgress.subscribe(async (user, groupIds) => {
 			if (userId === user) {
-				const progress = (await this.getTasksProgress(userId)).filter(
-					(progress) => (groupIds as number[]).includes(progress.groupId)
-				);
-				if (progress) {
-					listener(progress);
+				const progresses: ChangeProgress[] = [];
+				const userProgresses = await this.getTasksProgress(userId);
+				(groupIds as number[]).forEach((groupId) => {
+					progresses.push({
+						groupId,
+						progress: userProgresses.find(
+							(progress) => progress.groupId === groupId
+						),
+					});
+				});
+
+				if (progresses.length) {
+					listener(progresses);
 				}
 			}
 		});
