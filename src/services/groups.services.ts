@@ -1,5 +1,6 @@
 import { TaskGroupsTable } from "../database";
 import { HEX } from "../interfaces/common";
+import { TaskGroupModel } from "../models";
 
 export class GroupsServices {
 	public static getTaskGroups = async (userId: number) => {
@@ -41,6 +42,55 @@ export class GroupsServices {
 			},
 			orderBy: {
 				groupId: "DESC",
+			},
+		});
+	};
+	public static deleteGroup = async (userId: number, groupId: number) => {
+		await TaskGroupsTable.delete({
+			ownerId: {
+				operator: "=",
+				value: userId,
+			},
+			groupId: {
+				operator: "=",
+				value: groupId,
+			},
+		});
+	};
+	public static editGroup = async (
+		userId: number,
+		groupId: number,
+		mainColor: HEX,
+		secondColor: HEX,
+		name: string
+	) => {
+		await TaskGroupsTable.update<Partial<TaskGroupModel>>(
+			{
+				groupMainColor: mainColor,
+				groupSecondColor: secondColor,
+				groupName: name,
+			},
+			{
+				groupId: {
+					operator: "=",
+					value: groupId,
+				},
+				ownerId: {
+					operator: "=",
+					value: userId,
+				},
+			}
+		);
+		return await TaskGroupsTable.selectOne({
+			filters: {
+				groupId: {
+					operator: "=",
+					value: groupId,
+				},
+				ownerId: {
+					operator: "=",
+					value: userId,
+				},
 			},
 		});
 	};

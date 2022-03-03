@@ -6,7 +6,7 @@ const groupsRouter = Router();
 
 groupsRouter.get("/", accessVerify, GroupsControllers.getTaskGroups);
 groupsRouter.put("/new", accessVerify, GroupsControllers.createTaskGroup);
-groupsRouter.post("/:id/edit", accessVerify);
-groupsRouter.delete("/:id/delete", accessVerify);
+groupsRouter.delete("/:id/delete", accessVerify, GroupsControllers.deleteGroup);
+groupsRouter.post("/:id/edit", accessVerify, GroupsControllers.editGroup);
 
 export { groupsRouter };

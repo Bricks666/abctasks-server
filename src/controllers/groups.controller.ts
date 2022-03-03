@@ -30,4 +30,32 @@ export class GroupsControllers {
 			next(e);
 		}
 	};
+
+	public static deleteGroup: RequestHandler = async (req, res, next) => {
+		try {
+			const user: VerifyUserModel = req.body.user;
+			const { id } = req.params;
+			await GroupsServices.deleteGroup(user.userId, +id);
+			res.json({ groupId: +id });
+		} catch (e) {
+			next(e);
+		}
+	};
+	public static editGroup: RequestHandler = async (req, res, next) => {
+		try {
+			const user: VerifyUserModel = req.body.user;
+			const { id } = req.params;
+			const { mainColor, secondColor, name } = req.body;
+			const group = await GroupsServices.editGroup(
+				user.userId,
+				+id,
+				mainColor,
+				secondColor,
+				name
+			);
+			res.json({ group });
+		} catch (e) {
+			next(e);
+		}
+	};
 }
