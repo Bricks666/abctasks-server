@@ -1,6 +1,6 @@
 import { RequestHandler } from "express";
 import { VerifyUserModel } from "../models";
-import { GroupsServices } from "../services";
+import { ActivitiesServices, GroupsServices } from "../services";
 
 export class GroupsControllers {
 	public static getTaskGroups: RequestHandler = async (req, res, next) => {
@@ -25,6 +25,8 @@ export class GroupsControllers {
 				secondColor
 			);
 
+			ActivitiesServices.newActivity(user.userId, "Group", "Created");
+
 			return res.json({ group });
 		} catch (e) {
 			next(e);
@@ -36,6 +38,7 @@ export class GroupsControllers {
 			const user: VerifyUserModel = req.body.user;
 			const { id } = req.params;
 			await GroupsServices.deleteGroup(user.userId, +id);
+			ActivitiesServices.newActivity(user.userId, "Group", "Deleted");
 			res.json({ groupId: +id });
 		} catch (e) {
 			next(e);
@@ -53,6 +56,7 @@ export class GroupsControllers {
 				secondColor,
 				name
 			);
+			ActivitiesServices.newActivity(user.userId, "Group", "Edited");
 			res.json({ group });
 		} catch (e) {
 			next(e);

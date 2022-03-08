@@ -13,17 +13,22 @@ export const config: TableConfig<ActivityModel> = {
 			isPrimaryKey: true,
 			isUnsigned: true,
 		},
+		activitySphere: {
+			type: "ENUM",
+			isNotNull: true,
+			enumSetValues: ["Group", "Task"],
+		},
 		activityType: {
 			type: "ENUM",
 			isNotNull: true,
-			enumSetValues: ["Editing", "Creating", "Deleting"],
+			enumSetValues: ["Edited", "Created", "Deleted"],
 		},
 		activistId: {
 			type: "SMALLINT",
 			isNotNull: true,
 			isUnsigned: true,
 		},
-		addedAt: {
+		date: {
 			type: "DATETIME",
 			isNotNull: true,
 		},

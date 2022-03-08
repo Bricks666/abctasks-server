@@ -48,10 +48,8 @@ export class TasksController {
 				status,
 				groupId
 			);
-			ActivitiesServices.newActivity(user.userId, "Creating");
-			if (newTask) {
-				ProgressServices.changeProgress(user.userId, newTask.groupId);
-			}
+			ActivitiesServices.newActivity(user.userId, "Task", "Created");
+			ProgressServices.changeProgress(user.userId, newTask!.groupId);
 
 			res.json({ task: newTask });
 		} catch (e) {
@@ -70,10 +68,8 @@ export class TasksController {
 			const deletedTask = await TasksService.getTask(user.userId, +id);
 			await TasksService.deleteTask(+id);
 
-			ActivitiesServices.newActivity(user.userId, "Deleting");
-			if (deletedTask) {
-				ProgressServices.changeProgress(user.userId, deletedTask.groupId);
-			}
+			ActivitiesServices.newActivity(user.userId, "Task", "Deleted");
+			ProgressServices.changeProgress(user.userId, deletedTask!.groupId);
 			res.json({ taskId: +id });
 		} catch (e) {
 			next(e);
@@ -101,20 +97,18 @@ export class TasksController {
 				status,
 			});
 
-			ActivitiesServices.newActivity(user.userId, "Editing");
-			if (task && oldTaskState) {
-				if (task?.groupId !== oldTaskState.groupId) {
-					ProgressServices.changeProgress(
-						user.userId,
-						task.groupId,
-						oldTaskState.groupId
-					);
-				} else if (
-					[task.status, oldTaskState.status].includes(TaskStatus.DONE) &&
-					task.status !== oldTaskState.status
-				) {
-					ProgressServices.changeProgress(user.userId, task.groupId);
-				}
+			ActivitiesServices.newActivity(user.userId, "Task", "Edited");
+			if (task?.groupId !== oldTaskState!.groupId) {
+				ProgressServices.changeProgress(
+					user.userId,
+					task!.groupId,
+					oldTaskState!.groupId
+				);
+			} else if (
+				[task.status, oldTaskState!.status].includes(TaskStatus.DONE) &&
+				task.status !== oldTaskState!.status
+			) {
+				ProgressServices.changeProgress(user.userId, task.groupId);
 			}
 
 			res.json({ task });
