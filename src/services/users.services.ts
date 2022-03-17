@@ -77,4 +77,21 @@ export class UserService {
 		}
 		return user;
 	};
+	public static updateUser = async (
+		userId: number,
+		user: Omit<UserModel, "userId">
+	) => {
+		await UsersTable.update<Partial<UserModel>>(user, {
+			userId: {
+				operator: "=",
+				value: userId,
+			},
+		});
+		return (
+			await UsersTable.select<SecureUserModel>({
+				filters: { userId: { operator: "=", value: userId } },
+				excludes: ["password"],
+			})
+		)[0];
+	};
 }

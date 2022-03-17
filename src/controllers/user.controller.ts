@@ -132,4 +132,12 @@ export class UsersController {
 			next(e);
 		}
 	};
+
+	public static updateUser: RequestHandler = (req, _, next) => {
+		try {
+			console.log(req.body);
+		} catch (e) {
+			next(e);
+		}
+	};
 }
