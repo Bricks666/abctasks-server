@@ -1,9 +1,9 @@
-import { ApiError, TokensService } from ".";
+import { ApiError } from ".";
 import { hash, verify } from "argon2";
 import { SecureUserModel, UserModel } from "../models";
 import { UsersTable } from "../database";
 
-export class UserService {
+export class AuthServices {
 	public static registrationUser = async (
 		login: string,
 		password: string,
@@ -56,42 +56,7 @@ export class UserService {
 			userId: user.userId,
 			photo: user.photo,
 		};
-		const tokens = TokensService.createTokens({ userId: user.userId });
 
-		return {
-			user: secureUser,
-			...tokens,
-		};
-	};
-
-	public static getUser = async (userId: number) => {
-		const user = (
-			await UsersTable.select<SecureUserModel>({
-				filters: { userId: { operator: "=", value: userId } },
-				excludes: ["password"],
-			})
-		)[0];
-
-		if (!user) {
-			throw ApiError.BadRequest("User not found");
-		}
-		return user;
-	};
-	public static updateUser = async (
-		userId: number,
-		user: Omit<UserModel, "userId">
-	) => {
-		await UsersTable.update<Partial<UserModel>>(user, {
-			userId: {
-				operator: "=",
-				value: userId,
-			},
-		});
-		return (
-			await UsersTable.select<SecureUserModel>({
-				filters: { userId: { operator: "=", value: userId } },
-				excludes: ["password"],
-			})
-		)[0];
+		return secureUser;
 	};
 }

@@ -14,7 +14,6 @@ export const accessVerify: RequestHandler = (req, _, next) => {
 		if (!user) {
 			throw ApiError.NoAccess();
 		}
-
 		req.body.user = user;
 
 		next();

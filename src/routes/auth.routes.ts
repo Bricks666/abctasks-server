@@ -1,14 +1,12 @@
 import { Router } from "express";
-import { UsersController } from "../controllers";
-import { accessVerify } from "../middlewares";
+import { AuthController } from "../controllers";
 
 const authRoutes = Router();
 
-authRoutes.get("/", UsersController.authentication);
-authRoutes.put("/registration", UsersController.registration);
-authRoutes.post("/login", UsersController.login);
-authRoutes.delete("/logout", UsersController.logout);
-authRoutes.get("/refresh", UsersController.refresh);
-authRoutes.post("/update", accessVerify, UsersController.updateUser);
+authRoutes.get("/", AuthController.authentication);
+authRoutes.put("/registration", AuthController.registration);
+authRoutes.post("/login", AuthController.login);
+authRoutes.delete("/logout", AuthController.logout);
+authRoutes.get("/refresh", AuthController.refresh);
 
 export { authRoutes };

@@ -1,12 +1,18 @@
 import express, { json } from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
-import { PORT } from "./config";
+import { PATHS, PORT } from "./config";
 import { appRoutes } from "./routes";
 import { errorHandler } from "./middlewares";
 import { createConnection } from "mariadb-table-wrapper";
-import { TaskGroupsTable, TasksTable, UsersTable } from "./database";
-import { ActivitiesTable } from "./database/Activities";
+import {
+	TaskGroupsTable,
+	TasksTable,
+	UsersTable,
+	RoomsTable,
+	ActivitiesTable,
+} from "./database";
+import { join } from "path";
 
 const app = express();
 
@@ -14,6 +20,8 @@ app.use(cors({ origin: "http://localhost:3000", credentials: true }));
 app.use(cookieParser());
 app.use(json());
 app.use("/", appRoutes);
+app.use("/static", express.static(join(__dirname, PATHS.AVATARS)));
+console.log(join(__dirname, PATHS.AVATARS));
 app.use(errorHandler);
 
 app.listen(PORT, async () => {
@@ -29,6 +37,7 @@ app.listen(PORT, async () => {
 		TaskGroupsTable.init(connection),
 		TasksTable.init(connection),
 		ActivitiesTable.init(connection),
+		RoomsTable.init(connection),
 	];
 
 	await Promise.all(tables);
