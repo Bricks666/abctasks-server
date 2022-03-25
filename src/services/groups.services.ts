@@ -3,14 +3,14 @@ import { HEX } from "../interfaces/common";
 import { TaskGroupModel } from "../models";
 
 export class GroupsServices {
-	public static getTaskGroups = async (userId: number) => {
+	public static getTaskGroups = async (roomId: number) => {
 		return await TaskGroupsTable.select({
-			filters: { ownerId: { operator: "=", value: userId } },
-			excludes: ["ownerId"],
+			filters: { roomId: { operator: "=", value: roomId } },
+			excludes: ["roomId"],
 		});
 	};
 	public static addTaskGroup = async (
-		userId: number,
+		roomId: number,
 		name: string,
 		mainColor: HEX,
 		secondColor: HEX
@@ -19,7 +19,7 @@ export class GroupsServices {
 			groupMainColor: mainColor,
 			groupName: name,
 			groupSecondColor: secondColor,
-			ownerId: userId,
+			roomId: roomId,
 		});
 		return await TaskGroupsTable.selectOne({
 			filters: {
@@ -35,9 +35,9 @@ export class GroupsServices {
 					operator: "=",
 					value: name,
 				},
-				ownerId: {
+				roomId: {
 					operator: "=",
-					value: userId,
+					value: roomId,
 				},
 			},
 			orderBy: {
@@ -45,11 +45,11 @@ export class GroupsServices {
 			},
 		});
 	};
-	public static deleteGroup = async (userId: number, groupId: number) => {
+	public static deleteGroup = async (roomId: number, groupId: number) => {
 		await TaskGroupsTable.delete({
-			ownerId: {
+			roomId: {
 				operator: "=",
-				value: userId,
+				value: roomId,
 			},
 			groupId: {
 				operator: "=",
@@ -58,7 +58,7 @@ export class GroupsServices {
 		});
 	};
 	public static editGroup = async (
-		userId: number,
+		roomId: number,
 		groupId: number,
 		mainColor: HEX,
 		secondColor: HEX,
@@ -75,9 +75,9 @@ export class GroupsServices {
 					operator: "=",
 					value: groupId,
 				},
-				ownerId: {
+				roomId: {
 					operator: "=",
-					value: userId,
+					value: roomId,
 				},
 			}
 		);
@@ -87,9 +87,9 @@ export class GroupsServices {
 					operator: "=",
 					value: groupId,
 				},
-				ownerId: {
+				roomId: {
 					operator: "=",
-					value: userId,
+					value: roomId,
 				},
 			},
 		});

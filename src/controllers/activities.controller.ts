@@ -1,4 +1,3 @@
-import { VerifyUserModel } from "../models";
 import { RequestHandler } from "express";
 import { ActivitiesServices } from "../services";
 import { createEventResponse } from "../utils";
@@ -6,8 +5,8 @@ import { createEventResponse } from "../utils";
 export class ActivitiesController {
 	public static getActivities: RequestHandler = async (req, res, next) => {
 		try {
-			const user: VerifyUserModel = req.body.user;
-			const activities = await ActivitiesServices.getActivities(user.userId);
+			const { roomId } = req.params;
+			const activities = await ActivitiesServices.getActivities(+roomId);
 			res.json({ activities });
 		} catch (e) {
 			next(e);
@@ -21,9 +20,9 @@ export class ActivitiesController {
 				"Content-Type": "text/event-stream",
 				"Cache-Control": "no-cache",
 			});
-			const user: VerifyUserModel = req.body.user;
+			const { roomId } = req.params;
 			const unsubscribe = ActivitiesServices.watchNewActivities(
-				user.userId,
+				+roomId,
 				(activity) => res.write(createEventResponse(activity))
 			);
 

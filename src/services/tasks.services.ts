@@ -4,12 +4,17 @@ import { TaskCreateModel, TaskModelShort, TaskStatus } from "../models";
 
 export class TasksService {
 	public static getTasks = async (
+		roomId: number,
 		userId: number,
 		page = 1,
 		countOnPage = 100
 	) => {
 		return await TasksTable.select({
 			filters: {
+				roomId: {
+					operator: "=",
+					value: roomId,
+				},
 				authorId: {
 					operator: "=",
 					value: userId,
@@ -29,12 +34,12 @@ export class TasksService {
 			},
 		});
 	};
-	public static getTask = async (userId: number, taskId: number) => {
+	public static getTask = async (roomId: number, taskId: number) => {
 		return await TasksTable.selectOne<TaskModelShort>({
 			filters: {
-				authorId: {
+				roomId: {
 					operator: "=",
-					value: userId,
+					value: roomId,
 				},
 				todoId: {
 					operator: "=",
@@ -53,6 +58,7 @@ export class TasksService {
 	};
 
 	public static createTask = async (
+		roomId: number,
 		userId: number,
 		content: string,
 		status: TaskStatus,
@@ -63,6 +69,7 @@ export class TasksService {
 		const newTask: TaskCreateModel = {
 			date: addedDate,
 			authorId: userId,
+			roomId,
 			content,
 			groupId,
 			status,
@@ -71,6 +78,10 @@ export class TasksService {
 		await TasksTable.insert(newTask);
 		return await TasksTable.selectOne<TaskModelShort>({
 			filters: {
+				roomId: {
+					operator: "=",
+					value: roomId,
+				},
 				date: {
 					operator: "=",
 					value: addedDate,
@@ -83,12 +94,17 @@ export class TasksService {
 			},
 		});
 	};
-	public static deleteTask = async (taskId: number) => {
+	public static deleteTask = async (roomId: number, taskId: number) => {
 		await TasksTable.delete({
 			todoId: { operator: "=", value: taskId },
+			roomId: {
+				operator: "=",
+				value: roomId,
+			},
 		});
 	};
 	public static editTask = async (
+		roomId: number,
 		taskId: number,
 		newValues: Partial<TaskCreateModel>
 	) => {
@@ -96,7 +112,13 @@ export class TasksService {
 			todoId: { operator: "=", value: taskId },
 		});
 		return await TasksTable.selectOne<TaskModelShort>({
-			filters: { todoId: { operator: "=", value: taskId } },
+			filters: {
+				roomId: {
+					operator: "=",
+					value: roomId,
+				},
+				todoId: { operator: "=", value: taskId },
+			},
 			joinedTable: {
 				enable: true,
 				joinTable: ["users"],

@@ -13,10 +13,10 @@ interface ChangeProgress {
 }
 
 export class ProgressServices {
-	public static getTasksProgress = async (userId: number) => {
+	public static getTasksProgress = async (roomId: number) => {
 		const tasksGroup = await TasksTable.select<GroupTotalTask>({
 			filters: {
-				authorId: { operator: "=", value: userId },
+				roomId: { operator: "=", value: roomId },
 			},
 			includes: ["groupId"],
 			count: [["*", "totalCount"]],
@@ -24,9 +24,9 @@ export class ProgressServices {
 		});
 		const doneTasks = await TasksTable.select<GroupDoneTask>({
 			filters: {
-				authorId: {
+				roomId: {
 					operator: "=",
-					value: userId,
+					value: roomId,
 				},
 				status: { operator: "=", value: TaskStatus.DONE },
 			},
@@ -50,15 +50,14 @@ export class ProgressServices {
 		return taskProgress;
 	};
 
-	/* Не используются, потому что нужно придумать, как говорить, что данный прогресс больше не отображается */
 	public static subscribeChangeProgress(
-		userId: number,
+		roomId: number,
 		listener: (progress: ChangeProgress[]) => unknown
 	) {
-		return changeProgress.subscribe(async (user, groupIds) => {
-			if (userId === user) {
+		return changeProgress.subscribe(async (room, groupIds) => {
+			if (roomId === room) {
 				const progresses: ChangeProgress[] = [];
-				const userProgresses = await this.getTasksProgress(userId);
+				const userProgresses = await this.getTasksProgress(roomId);
 				(groupIds as number[]).forEach((groupId) => {
 					progresses.push({
 						groupId,
@@ -75,7 +74,7 @@ export class ProgressServices {
 		});
 	}
 
-	public static changeProgress(userId: number, ...groupIds: number[]) {
-		changeProgress.broadcast(userId, groupIds);
+	public static changeProgress(roomId: number, ...groupIds: number[]) {
+		changeProgress.broadcast(roomId, groupIds);
 	}
 }

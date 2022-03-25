@@ -4,9 +4,13 @@ import { ActivitiesController } from "../controllers";
 
 const activityRoutes = Router();
 
-activityRoutes.get("/", accessVerify, ActivitiesController.getActivities);
 activityRoutes.get(
-	"/subscribe",
+	"/:roomId",
+	accessVerify,
+	ActivitiesController.getActivities
+);
+activityRoutes.get(
+	"/:roomId/subscribe",
 	accessVerify,
 	ActivitiesController.subscribeNewActivities
 );

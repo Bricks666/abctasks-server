@@ -4,9 +4,13 @@ import { accessVerify } from "../middlewares";
 
 const progressRoutes = Router();
 
-progressRoutes.get("/", accessVerify, ProgressControllers.getTasksProgress);
 progressRoutes.get(
-	"/subscribe",
+	"/:roomId",
+	accessVerify,
+	ProgressControllers.getTasksProgress
+);
+progressRoutes.get(
+	"/:roomId/subscribe",
 	accessVerify,
 	ProgressControllers.subscribeChangeProgress
 );

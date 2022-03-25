@@ -1,13 +1,11 @@
 import { RequestHandler } from "express";
-import { VerifyUserModel } from "../models";
 import { ActivitiesServices, GroupsServices } from "../services";
 
 export class GroupsControllers {
 	public static getTaskGroups: RequestHandler = async (req, res, next) => {
 		try {
-			const user: VerifyUserModel = req.body.user;
-
-			const groups = await GroupsServices.getTaskGroups(user.userId);
+			const { roomId } = req.params;
+			const groups = await GroupsServices.getTaskGroups(+roomId);
 
 			res.json({ groups });
 		} catch (e) {
@@ -16,16 +14,16 @@ export class GroupsControllers {
 	};
 	public static createTaskGroup: RequestHandler = async (req, res, next) => {
 		try {
-			const user: VerifyUserModel = req.body.user;
-			const { name, mainColor, secondColor } = req.body;
+			const { name, mainColor, secondColor, user } = req.body;
+			const { roomId } = req.params;
 			const group = await GroupsServices.addTaskGroup(
-				user.userId,
+				+roomId,
 				name,
 				mainColor,
 				secondColor
 			);
 
-			ActivitiesServices.newActivity(user.userId, "Group", "Created");
+			ActivitiesServices.newActivity(+roomId, user.userId, "Group", "Created");
 
 			return res.json({ group });
 		} catch (e) {
@@ -35,10 +33,10 @@ export class GroupsControllers {
 
 	public static deleteGroup: RequestHandler = async (req, res, next) => {
 		try {
-			const user: VerifyUserModel = req.body.user;
-			const { id } = req.params;
-			await GroupsServices.deleteGroup(user.userId, +id);
-			ActivitiesServices.newActivity(user.userId, "Group", "Deleted");
+			const { user } = req.body;
+			const { id, roomId } = req.params;
+			await GroupsServices.deleteGroup(+roomId, +id);
+			ActivitiesServices.newActivity(+roomId, user.userId, "Group", "Deleted");
 			res.json({ groupId: +id });
 		} catch (e) {
 			next(e);
@@ -46,17 +44,16 @@ export class GroupsControllers {
 	};
 	public static editGroup: RequestHandler = async (req, res, next) => {
 		try {
-			const user: VerifyUserModel = req.body.user;
-			const { id } = req.params;
-			const { mainColor, secondColor, name } = req.body;
+			const { id, roomId } = req.params;
+			const { mainColor, secondColor, name, user } = req.body;
 			const group = await GroupsServices.editGroup(
-				user.userId,
+				+roomId,
 				+id,
 				mainColor,
 				secondColor,
 				name
 			);
-			ActivitiesServices.newActivity(user.userId, "Group", "Edited");
+			ActivitiesServices.newActivity(+roomId, user.userId, "Group", "Edited");
 			res.json({ group });
 		} catch (e) {
 			next(e);

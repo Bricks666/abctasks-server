@@ -1,5 +1,5 @@
 import { RequestHandler } from "express";
-import { TaskStatus, VerifyUserModel } from "../models";
+import { TaskStatus } from "../models";
 import {
 	ActivitiesServices,
 	ApiError,
@@ -10,9 +10,10 @@ import {
 export class TasksController {
 	public static getTasks: RequestHandler = async (req, res, next) => {
 		try {
-			const user: VerifyUserModel = req.body.user;
+			const { user } = req.body;
+			const { roomId } = req.params;
 
-			const tasks = await TasksService.getTasks(user.userId);
+			const tasks = await TasksService.getTasks(+roomId, user.userId);
 
 			res.json({ tasks });
 		} catch (e) {
@@ -22,13 +23,8 @@ export class TasksController {
 
 	public static createTask: RequestHandler = async (req, res, next) => {
 		try {
-			const user: VerifyUserModel = req.body.user;
-
-			if (!user) {
-				throw ApiError.BadRequest("User must be provided");
-			}
-
-			const { content, status, groupId } = req.body;
+			const { content, status, groupId, user } = req.body;
+			const { roomId } = req.params;
 
 			if (!content || !status || !groupId) {
 				throw ApiError.BadRequest(
@@ -43,13 +39,14 @@ export class TasksController {
 			}
 
 			const newTask = await TasksService.createTask(
+				+roomId,
 				user.userId,
 				content,
 				status,
 				groupId
 			);
-			ActivitiesServices.newActivity(user.userId, "Task", "Created");
-			ProgressServices.changeProgress(user.userId, newTask!.groupId);
+			ActivitiesServices.newActivity(+roomId, user.userId, "Task", "Created");
+			ProgressServices.changeProgress(+roomId, newTask!.groupId);
 
 			res.json({ task: newTask });
 		} catch (e) {
@@ -60,17 +57,14 @@ export class TasksController {
 	public static deleteTask: RequestHandler = async (req, res, next) => {
 		try {
 			const user = req.body.user;
-			const { id } = req.params;
+			const { id, roomId } = req.params;
 
-			if (!id) {
-				throw ApiError.BadRequest("id must be provided");
-			}
-			const deletedTask = await TasksService.getTask(user.userId, +id);
-			await TasksService.deleteTask(+id);
+			const deletedTask = await TasksService.getTask(+roomId, +id);
+			await TasksService.deleteTask(+roomId, +id);
 
-			ActivitiesServices.newActivity(user.userId, "Task", "Deleted");
-			ProgressServices.changeProgress(user.userId, deletedTask!.groupId);
-			res.json({ taskId: +id });
+			ActivitiesServices.newActivity(+roomId, user.userId, "Task", "Deleted");
+			ProgressServices.changeProgress(+roomId, deletedTask!.groupId);
+			res.json({ taskId: +id, roomId: +roomId });
 		} catch (e) {
 			next(e);
 		}
@@ -79,25 +73,21 @@ export class TasksController {
 	public static editTask: RequestHandler = async (req, res, next) => {
 		try {
 			const { content, groupId, status, user } = req.body;
-			const { id } = req.params;
-
-			if (!id) {
-				throw ApiError.BadRequest("Id must be provided");
-			}
+			const { id, roomId } = req.params;
 
 			if (!["Done", "In Progress", "Ready", "Review"].includes(status)) {
 				throw ApiError.BadRequest(
 					"Status may be only Done, In Progress, Ready or Review"
 				);
 			}
-			const oldTaskState = await TasksService.getTask(user.userId, +id);
-			const task = await TasksService.editTask(+id, {
+			const oldTaskState = await TasksService.getTask(+roomId, +id);
+			const task = await TasksService.editTask(+roomId, +id, {
 				content,
 				groupId,
 				status,
 			});
 
-			ActivitiesServices.newActivity(user.userId, "Task", "Edited");
+			ActivitiesServices.newActivity(+roomId, user.userId, "Task", "Edited");
 			if (task?.groupId !== oldTaskState!.groupId) {
 				ProgressServices.changeProgress(
 					user.userId,
@@ -108,7 +98,7 @@ export class TasksController {
 				[task.status, oldTaskState!.status].includes(TaskStatus.DONE) &&
 				task.status !== oldTaskState!.status
 			) {
-				ProgressServices.changeProgress(user.userId, task.groupId);
+				ProgressServices.changeProgress(+roomId, task.groupId);
 			}
 
 			res.json({ task });

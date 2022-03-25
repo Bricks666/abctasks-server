@@ -4,10 +4,13 @@ import { accessVerify } from "../middlewares";
 
 const taskRoutes = Router();
 
-taskRoutes.get("/", accessVerify, TasksController.getTasks);
-taskRoutes.put("/new", accessVerify, TasksController.createTask);
-taskRoutes.delete("/:id/delete", accessVerify, TasksController.deleteTask);
-taskRoutes.delete("/delete", accessVerify);
-taskRoutes.post("/:id/edit", accessVerify, TasksController.editTask);
+taskRoutes.get("/:roomId", accessVerify, TasksController.getTasks);
+taskRoutes.put("/:roomId/new", accessVerify, TasksController.createTask);
+taskRoutes.delete(
+	"/:roomId/:id/delete",
+	accessVerify,
+	TasksController.deleteTask
+);
+taskRoutes.post("/:roomId/:id/edit", accessVerify, TasksController.editTask);
 
 export { taskRoutes };

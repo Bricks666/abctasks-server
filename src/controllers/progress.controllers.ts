@@ -1,16 +1,13 @@
 import { RequestHandler } from "express";
-import { VerifyUserModel } from "../models";
 import { createEventResponse } from "../utils";
 import { ProgressServices } from "./../services/progress.services";
 
 export class ProgressControllers {
 	public static getTasksProgress: RequestHandler = async (req, res, next) => {
 		try {
-			const user: VerifyUserModel = req.body.user;
+			const { roomId } = req.params;
 
-			const tasksProgress = await ProgressServices.getTasksProgress(
-				user.userId
-			);
+			const tasksProgress = await ProgressServices.getTasksProgress(+roomId);
 
 			res.json({ tasksProgress });
 		} catch (e) {
@@ -28,9 +25,9 @@ export class ProgressControllers {
 				"Content-Type": "text/event-stream",
 				"Change-Control": "no-cache",
 			});
-			const user: VerifyUserModel = req.body.user;
+			const { roomId } = req.params;
 			const unsubscribe = ProgressServices.subscribeChangeProgress(
-				user.userId,
+				+roomId,
 				(progress) => res.write(createEventResponse(progress))
 			);
 			res.once("close", unsubscribe);

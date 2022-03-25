@@ -1,9 +1,8 @@
 import { CookieOptions, RequestHandler } from "express";
 import { COOKIE_NAME, COOKIE_TIME } from "../config";
-import { ResponseWithTokens } from "../interfaces/responses";
 import { ApiError, TokensService, AuthServices } from "../services";
 
-interface RegistrationRequest {
+/* interface RegistrationRequest {
 	readonly password: string;
 	readonly login: string;
 	readonly photo?: string;
@@ -12,14 +11,10 @@ interface LoginRequestBody {
 	readonly login: string;
 	readonly password: string;
 	readonly remember: boolean;
-}
+} */
 
 export class AuthController {
-	public static registration: RequestHandler<
-		undefined,
-		unknown,
-		RegistrationRequest
-	> = async (req, res, next) => {
+	public static registration: RequestHandler = async (req, res, next) => {
 		try {
 			const { login, password, photo } = req.body;
 			if (!login || !password) {
@@ -34,40 +29,35 @@ export class AuthController {
 		}
 	};
 
-	public static authentication: RequestHandler<undefined, ResponseWithTokens> =
-		async (req, res, next) => {
-			try {
-				const refreshToken = req.cookies[COOKIE_NAME];
+	public static authentication: RequestHandler = async (req, res, next) => {
+		try {
+			const refreshToken = req.cookies[COOKIE_NAME];
 
-				if (!refreshToken) {
-					throw ApiError.UnAuthorization();
-				}
-
-				const user = TokensService.checkToken(refreshToken);
-
-				if (!user) {
-					throw ApiError.BadRequest("Токен обновления не действительный");
-				}
-
-				const tokens = TokensService.createTokens({ userId: user.userId });
-
-				res.cookie(COOKIE_NAME, tokens.refreshToken, {
-					httpOnly: true,
-					sameSite: "none",
-					secure: true,
-					maxAge: COOKIE_TIME,
-				});
-
-				res.json(tokens);
-			} catch (e) {
-				next(e);
+			if (!refreshToken) {
+				throw ApiError.UnAuthorization();
 			}
-		};
-	public static login: RequestHandler<
-		undefined,
-		ResponseWithTokens,
-		LoginRequestBody
-	> = async (req, res, next) => {
+
+			const user = TokensService.checkToken(refreshToken);
+
+			if (!user) {
+				throw ApiError.BadRequest("Токен обновления не действительный");
+			}
+
+			const tokens = TokensService.createTokens({ userId: user.userId });
+
+			res.cookie(COOKIE_NAME, tokens.refreshToken, {
+				httpOnly: true,
+				sameSite: "none",
+				secure: true,
+				maxAge: COOKIE_TIME,
+			});
+
+			res.json(tokens);
+		} catch (e) {
+			next(e);
+		}
+	};
+	public static login: RequestHandler = async (req, res, next) => {
 		try {
 			const { login, password, remember } = req.body;
 

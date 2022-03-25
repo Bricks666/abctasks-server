@@ -4,10 +4,10 @@ import { newActivity } from "../packages/eventBus";
 import { getSQLDatetime } from "../utils";
 
 export class ActivitiesServices {
-	public static async getActivities(userId: number) {
+	public static async getActivities(roomId: number) {
 		return await ActivitiesTable.select({
 			filters: {
-				activistId: { operator: "=", value: userId },
+				roomId: { operator: "=", value: roomId },
 			},
 			joinedTable: {
 				enable: true,
@@ -24,6 +24,7 @@ export class ActivitiesServices {
 	}
 
 	public static async newActivity(
+		roomId: number,
 		userId: number,
 		sphere: ActivitySphere,
 		type: ActivityType
@@ -31,6 +32,7 @@ export class ActivitiesServices {
 		const date = getSQLDatetime();
 		await ActivitiesTable.insert({
 			activistId: userId,
+			roomId: roomId,
 			activitySphere: sphere,
 			activityType: type,
 			date,
@@ -38,6 +40,7 @@ export class ActivitiesServices {
 		const newActivities = await ActivitiesTable.selectOne<ActivityModel>({
 			filters: {
 				activistId: { operator: "=", value: userId },
+				roomId: { operator: "=", value: roomId },
 				activityType: { operator: "=", value: type },
 				activitySphere: { operator: "=", value: sphere },
 			},
@@ -53,15 +56,16 @@ export class ActivitiesServices {
 				activityId: "DESC",
 			},
 		});
-		newActivity.broadcast(userId, newActivities!);
+		newActivity.broadcast(roomId, newActivities!);
 	}
 
 	public static watchNewActivities(
-		userId: number,
+		roomId: number,
+
 		listener: (activity: ActivityModel) => unknown
 	) {
-		return newActivity.subscribe((user, activity) => {
-			if (user === userId) {
+		return newActivity.subscribe((room, activity) => {
+			if (room === roomId) {
 				listener(activity as ActivityModel);
 			}
 		});
