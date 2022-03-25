@@ -1,5 +1,6 @@
 import { TableConfig } from "mariadb-table-wrapper";
 import { TaskModelShort, TaskStatus } from "../../models";
+import { ROOMS_TABLE } from "../Rooms";
 import { TASK_GROUPS_TABLE } from "../TaskGroups";
 import { USERS_TABLE } from "../Users";
 
@@ -25,6 +26,11 @@ export const tasksConfig: TableConfig<TaskModelShort> = {
 				TaskStatus.READY,
 				TaskStatus.REVIEW,
 			],
+		},
+		roomId: {
+			type: "SMALLINT",
+			isNotNull: true,
+			isUnique: true,
 		},
 		groupId: {
 			type: "SMALLINT",
@@ -55,6 +61,10 @@ export const tasksConfig: TableConfig<TaskModelShort> = {
 		authorId: {
 			tableName: USERS_TABLE,
 			field: "userId",
+		},
+		roomId: {
+			tableName: ROOMS_TABLE,
+			field: "roomId",
 		},
 	},
 };

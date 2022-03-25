@@ -1,5 +1,6 @@
 import { TableConfig } from "mariadb-table-wrapper";
 import { TaskGroupModel } from "../../models";
+import { ROOMS_TABLE } from "../Rooms";
 
 export const TASK_GROUPS_TABLE = "todoGroups";
 
@@ -11,6 +12,11 @@ export const taskGroupsConfig: TableConfig<TaskGroupModel> = {
 			isAutoIncrement: true,
 			isNotNull: true,
 			isPrimaryKey: true,
+			isUnsigned: true,
+		},
+		roomId: {
+			type: "SMALLINT",
+			isNotNull: true,
 			isUnsigned: true,
 		},
 		groupName: {
@@ -28,17 +34,12 @@ export const taskGroupsConfig: TableConfig<TaskGroupModel> = {
 			isNotNull: true,
 			stringLen: 9,
 		},
-		ownerId: {
-			type: "SMALLINT",
-			isNotNull: true,
-			isUnsigned: true,
-		},
 	},
 	safeCreating: true,
 	foreignKeys: {
-		ownerId: {
-			field: "userId",
-			tableName: "users",
+		roomId: {
+			tableName: ROOMS_TABLE,
+			field: "roomId",
 		},
 	},
 };

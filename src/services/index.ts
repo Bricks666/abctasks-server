@@ -6,3 +6,4 @@ export { ActivitiesServices } from "./activities.services";
 export { ProgressServices } from "./progress.services";
 export { GroupsServices } from "./groups.services";
 export { ProfileServices } from "./profile.services";
+export { RoomsServices } from "./rooms.services";

@@ -9,6 +9,7 @@ export enum TaskStatus {
 
 export interface TaskModelShort {
 	readonly todoId: number;
+	readonly roomId: number;
 	readonly status: TaskStatus;
 	readonly groupId: number;
 	readonly authorId: number;

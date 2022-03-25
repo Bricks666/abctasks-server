@@ -6,6 +6,7 @@ import { activityRoutes } from "./activity.routes";
 import { groupsRouter } from "./groups.routes";
 import { progressRoutes } from "./progress.routes";
 import { profileRoutes } from "./profile.routes";
+import { roomsRoutes } from "./rooms.routes";
 
 const appRoutes = Router();
 
@@ -15,5 +16,6 @@ appRoutes.use("/activities", activityRoutes);
 appRoutes.use("/groups", groupsRouter);
 appRoutes.use("/progress", progressRoutes);
 appRoutes.use("/profile", profileRoutes);
+appRoutes.use("/rooms", roomsRoutes);
 
 export { appRoutes };

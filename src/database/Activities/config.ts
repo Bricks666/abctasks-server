@@ -1,5 +1,7 @@
 import { TableConfig } from "mariadb-table-wrapper";
 import { ActivityModel } from "../../models";
+import { ROOMS_TABLE } from "../Rooms";
+import { USERS_TABLE } from "../Users";
 
 export const ACTIVITIES_TABLE = "activities";
 
@@ -11,6 +13,11 @@ export const config: TableConfig<ActivityModel> = {
 			isAutoIncrement: true,
 			isNotNull: true,
 			isPrimaryKey: true,
+			isUnsigned: true,
+		},
+		roomId: {
+			type: "SMALLINT",
+			isNotNull: true,
 			isUnsigned: true,
 		},
 		activitySphere: {
@@ -35,8 +42,12 @@ export const config: TableConfig<ActivityModel> = {
 	},
 	foreignKeys: {
 		activistId: {
-			tableName: "users",
+			tableName: USERS_TABLE,
 			field: "userId",
+		},
+		roomId: {
+			field: "roomId",
+			tableName: ROOMS_TABLE,
 		},
 	},
 	safeCreating: true,
