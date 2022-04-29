@@ -1,12 +1,12 @@
 import { Router } from "express";
 
-import { taskRoutes } from "./task.routes";
-import { authRoutes } from "./auth.routes";
-import { activityRoutes } from "./activity.routes";
-import { groupsRouter } from "./groups.routes";
-import { progressRoutes } from "./progress.routes";
-import { profileRoutes } from "./profile.routes";
-import { roomsRoutes } from "./rooms.routes";
+import { taskRoutes } from "./task";
+import { authRoutes } from "./auth";
+import { activityRoutes } from "./activity";
+import { groupsRouter } from "./groups";
+import { progressRoutes } from "./progress";
+import { profileRoutes } from "./profile";
+import { roomsRoutes } from "./rooms";
 
 const appRoutes = Router();
 

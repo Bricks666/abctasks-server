@@ -1,6 +1,6 @@
 import { RequestHandler } from "express";
-import { createEventResponse } from "../utils";
-import { ProgressServices } from "./../services/progress.services";
+import { createEventResponse } from "@/utils";
+import { ProgressServices } from "@/services/";
 
 export class ProgressControllers {
 	public static getTasksProgress: RequestHandler = async (req, res, next) => {

@@ -21,7 +21,6 @@ app.use(cookieParser());
 app.use(json());
 app.use("/", appRoutes);
 app.use("/static", express.static(join(__dirname, PATHS.AVATARS)));
-console.log(join(__dirname, PATHS.AVATARS));
 app.use(errorHandler);
 
 app.listen(PORT, async () => {
@@ -34,6 +33,7 @@ app.listen(PORT, async () => {
 
 	const tables = [
 		UsersTable.init(connection),
+		RoomsTable.init(connection),
 		TaskGroupsTable.init(connection),
 		TasksTable.init(connection),
 		ActivitiesTable.init(connection),

@@ -1,12 +1,10 @@
-import { TaskGroupsTable } from "../database";
-import { HEX } from "../interfaces/common";
-import { TaskGroupModel } from "../models";
+import { TaskGroupsTable } from "@/database";
+import { HEX } from "@/interfaces/common";
 
 export class GroupsServices {
 	public static getTaskGroups = async (roomId: number) => {
 		return await TaskGroupsTable.select({
 			filters: { roomId: { operator: "=", value: roomId } },
-			excludes: ["roomId"],
 		});
 	};
 	public static addTaskGroup = async (
@@ -64,7 +62,7 @@ export class GroupsServices {
 		secondColor: HEX,
 		name: string
 	) => {
-		await TaskGroupsTable.update<Partial<TaskGroupModel>>(
+		await TaskGroupsTable.update(
 			{
 				groupMainColor: mainColor,
 				groupSecondColor: secondColor,

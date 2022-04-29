@@ -1,8 +1,8 @@
 import { RequestHandler } from "express";
 import { UploadedFile } from "express-fileupload";
 import { join, resolve } from "path";
-import { getStaticRoute, PATHS } from "../config";
-import { ProfileServices } from "../services";
+import { getStaticRoute, PATHS } from "@/config";
+import { ProfileServices } from "@/services";
 
 export class ProfileControllers {
 	static getProfile: RequestHandler = async (req, res, next) => {

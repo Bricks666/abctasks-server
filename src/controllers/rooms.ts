@@ -1,5 +1,5 @@
 import { RequestHandler } from "express";
-import { RoomsServices } from "../services";
+import { RoomsServices } from "@/services";
 
 export class RoomsController {
 	public static getRooms: RequestHandler = async (req, res, next) => {
@@ -23,12 +23,12 @@ export class RoomsController {
 			next(e);
 		}
 	};
-	public static updateRoom: RequestHandler = async (req, res, next) => {
+	public static editRoom: RequestHandler = async (req, res, next) => {
 		try {
 			const { roomName } = req.body;
 			const { id } = req.params;
 
-			const room = await RoomsServices.updateRoom(+id, roomName);
+			const room = await RoomsServices.editRoom(+id, roomName);
 
 			return res.json({ room });
 		} catch (e) {

@@ -1,5 +1,12 @@
-export type ActivityType = "Edited" | "Created" | "Deleted";
-export type ActivitySphere = "Task" | "Group";
+export enum ActivityType {
+	EDIT,
+	CREATE,
+	DELETE,
+}
+export enum ActivitySphere {
+	TASK,
+	GROUP,
+}
 
 export interface ActivityModel {
 	readonly activityId: number;

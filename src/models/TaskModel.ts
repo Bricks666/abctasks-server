@@ -1,10 +1,10 @@
-import { HEX } from "../interfaces/common";
+import { HEX } from "@/interfaces/common";
 
 export enum TaskStatus {
-	DONE = "Done",
-	IN_PROGRESS = "In Progress",
-	REVIEW = "Review",
-	READY = "Ready",
+	DONE,
+	IN_PROGRESS,
+	REVIEW,
+	READY,
 }
 
 export interface TaskModelShort {

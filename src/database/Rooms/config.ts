@@ -1,4 +1,4 @@
-import { RoomModel } from "@/src/models";
+import { RoomModel } from "@/models";
 import { TableConfig } from "mariadb-table-wrapper";
 import { USERS_TABLE } from "../Users";
 
@@ -17,6 +17,12 @@ export const config: TableConfig<RoomModel> = {
 			type: "VARCHAR",
 			isNotNull: true,
 			default: "Room",
+			stringLen: 32,
+		},
+		roomDescription: {
+			type: "VARCHAR",
+			isNotNull: true,
+			default: "",
 			stringLen: 32,
 		},
 		ownerId: {

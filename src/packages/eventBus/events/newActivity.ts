@@ -1,4 +1,4 @@
-import { ActivityModel } from "@/src/models";
+import { ActivityModel } from "@/models";
 import * as eventBus from "../base";
 
 export const NEW_ACTIVITIES_EVENT = "NEW ACTIVITIES";

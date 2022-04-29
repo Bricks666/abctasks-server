@@ -1,6 +1,24 @@
-import { RoomsTable } from "../database";
+import {
+	ACTIVITIES_TABLE,
+	RoomsTable,
+	ROOMS_TABLE,
+	TASKS_TABLE,
+	USERS_TABLE,
+} from "../database";
 
 export class RoomsServices {
+	/*
+  {
+    roomId: number;
+    roomName: string;
+    roomDescription: string;
+    ownerId: number;
+    taskCount: number;
+    doneTaskCount: number
+    activitiesCount: number;
+    usersCount: number
+  }
+  */
 	public static getRooms = async (userId: number) => {
 		return await RoomsTable.select({
 			filters: {
@@ -9,6 +27,14 @@ export class RoomsServices {
 					value: userId,
 				},
 			},
+			joinedTable: {
+				enable: true,
+				joinTable: [TASKS_TABLE, USERS_TABLE, ACTIVITIES_TABLE],
+			},
+			includes: {
+				[ROOMS_TABLE]: ["*"],
+			},
+			count: []
 		});
 	};
 
@@ -34,7 +60,7 @@ export class RoomsServices {
 			},
 		});
 	};
-	public static updateRoom = async (roomId: number, roomName: string) => {
+	public static editRoom = async (roomId: number, roomName: string) => {
 		await RoomsTable.update(
 			{ roomName },
 			{

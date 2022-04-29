@@ -1,7 +1,7 @@
-import { ActivityModel, ActivitySphere, ActivityType } from "../models";
-import { ActivitiesTable } from "../database/Activities";
-import { newActivity } from "../packages/eventBus";
-import { getSQLDatetime } from "../utils";
+import { ActivityModel, ActivitySphere, ActivityType } from "@/models";
+import { ActivitiesTable, USERS_TABLE } from "@/database";
+import { newActivity } from "@/packages/eventBus";
+import { getSQLDatetime } from "@/utils";
 
 export class ActivitiesServices {
 	public static async getActivities(roomId: number) {
@@ -11,7 +11,7 @@ export class ActivitiesServices {
 			},
 			joinedTable: {
 				enable: true,
-				joinTable: ["users"],
+				joinTable: [USERS_TABLE],
 			},
 			includes: {
 				users: ["login"],
@@ -46,7 +46,7 @@ export class ActivitiesServices {
 			},
 			joinedTable: {
 				enable: true,
-				joinTable: ["users"],
+				joinTable: [USERS_TABLE],
 			},
 			includes: {
 				users: ["login"],

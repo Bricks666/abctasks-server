@@ -30,7 +30,7 @@ export const tasksConfig: TableConfig<TaskModelShort> = {
 		roomId: {
 			type: "SMALLINT",
 			isNotNull: true,
-			isUnique: true,
+			isUnsigned: true,
 		},
 		groupId: {
 			type: "SMALLINT",

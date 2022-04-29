@@ -1,6 +1,6 @@
-import { UsersTable } from "../database";
-import { SecureUserModel } from "../models";
-import { ApiError } from "./error.services";
+import { UsersTable } from "@/database";
+import { SecureUserModel } from "@/models";
+import { ApiError } from "./error";
 
 export class ProfileServices {
 	public static getUser = async (userId: number) => {

@@ -1,5 +1,5 @@
 import { TableConfig } from "mariadb-table-wrapper";
-import { ActivityModel } from "../../models";
+import { ActivityModel, ActivitySphere, ActivityType } from "@/models";
 import { ROOMS_TABLE } from "../Rooms";
 import { USERS_TABLE } from "../Users";
 
@@ -23,12 +23,16 @@ export const config: TableConfig<ActivityModel> = {
 		activitySphere: {
 			type: "ENUM",
 			isNotNull: true,
-			enumSetValues: ["Group", "Task"],
+			enumSetValues: [ActivitySphere.GROUP, ActivitySphere.TASK],
 		},
 		activityType: {
 			type: "ENUM",
 			isNotNull: true,
-			enumSetValues: ["Edited", "Created", "Deleted"],
+			enumSetValues: [
+				ActivityType.CREATE,
+				ActivityType.DELETE,
+				ActivityType.EDIT,
+			],
 		},
 		activistId: {
 			type: "SMALLINT",
