@@ -1,11 +1,10 @@
-import { getSQLDatetime } from "../utils";
-import { TasksTable } from "../database";
-import { TaskCreateModel, TaskModelShort, TaskStatus } from "../models";
+import { getSQLDatetime } from "@/utils";
+import { TasksTable } from "@/database";
+import { TaskCreateModel, TaskModel, TaskStatus } from "@/models";
 
 export class TasksService {
 	public static getTasks = async (
 		roomId: number,
-		userId: number,
 		page = 1,
 		countOnPage = 100
 	) => {
@@ -14,10 +13,6 @@ export class TasksService {
 				roomId: {
 					operator: "=",
 					value: roomId,
-				},
-				authorId: {
-					operator: "=",
-					value: userId,
 				},
 			},
 			joinedTable: {
@@ -35,7 +30,7 @@ export class TasksService {
 		});
 	};
 	public static getTask = async (roomId: number, taskId: number) => {
-		return await TasksTable.selectOne<TaskModelShort>({
+		return await TasksTable.selectOne<TaskModel>({
 			filters: {
 				roomId: {
 					operator: "=",
@@ -76,7 +71,7 @@ export class TasksService {
 		};
 
 		await TasksTable.insert(newTask);
-		return await TasksTable.selectOne<TaskModelShort>({
+		return await TasksTable.selectOne<TaskModel>({
 			filters: {
 				roomId: {
 					operator: "=",
@@ -92,14 +87,20 @@ export class TasksService {
 				enable: true,
 				joinTable: ["users"],
 			},
+			excludes: {
+				users: ["password"],
+				todos: ["isDone", "authorId"],
+			},
 		});
 	};
 	public static deleteTask = async (roomId: number, taskId: number) => {
 		await TasksTable.delete({
-			todoId: { operator: "=", value: taskId },
-			roomId: {
-				operator: "=",
-				value: roomId,
+			filters: {
+				todoId: { operator: "=", value: taskId },
+				roomId: {
+					operator: "=",
+					value: roomId,
+				},
 			},
 		});
 	};
@@ -109,20 +110,10 @@ export class TasksService {
 		newValues: Partial<TaskCreateModel>
 	) => {
 		await TasksTable.update(newValues, {
-			todoId: { operator: "=", value: taskId },
-		});
-		return await TasksTable.selectOne<TaskModelShort>({
 			filters: {
-				roomId: {
-					operator: "=",
-					value: roomId,
-				},
 				todoId: { operator: "=", value: taskId },
 			},
-			joinedTable: {
-				enable: true,
-				joinTable: ["users"],
-			},
 		});
+		return await this.getTask(roomId, taskId);
 	};
 }

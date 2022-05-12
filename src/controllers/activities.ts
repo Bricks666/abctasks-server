@@ -1,13 +1,12 @@
 import { RequestHandler } from "express";
 import { ActivitiesServices } from "@/services";
 import { createEventResponse } from "@/utils";
-import { ActivitiesParams, ActivitiesResponse } from "./activities.types";
+import { ActivitiesResponse } from "./activities.types";
+import { RoomIdParam } from "@/interfaces/param";
 
 export class ActivitiesController {
-	public static getActivities: RequestHandler<
-		ActivitiesParams,
-		ActivitiesResponse
-	> = async (req, res, next) => {
+	public static getActivities: RequestHandler<RoomIdParam, ActivitiesResponse> =
+		async (req, res, next) => {
 			try {
 				const { roomId } = req.params;
 				const activities = await ActivitiesServices.getActivities(+roomId);
@@ -17,7 +16,7 @@ export class ActivitiesController {
 			}
 		};
 
-	static subscribeNewActivities: RequestHandler<ActivitiesParams> = async (
+	static subscribeNewActivities: RequestHandler<RoomIdParam> = async (
 		req,
 		res,
 		next

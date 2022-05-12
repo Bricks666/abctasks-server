@@ -1,90 +1,154 @@
 import {
 	ACTIVITIES_TABLE,
 	RoomsTable,
+	roomsToUsersTable,
 	ROOMS_TABLE,
+	ROOMS_TO_USERS_TABLE,
 	TASKS_TABLE,
-	USERS_TABLE,
-} from "../database";
+} from "@/database";
+import { RoomModel, TaskStatus } from "@/models";
+import { SelectQuery } from "mariadb-table-wrapper";
+import { GetRoomResponse } from "./rooms.types";
+
+const roomQuery: SelectQuery<RoomModel> = {
+	joinedTable: {
+		enable: true,
+		joinTable: [
+			{ table: TASKS_TABLE, invert: true, type: "LEFT" },
+			{ table: ACTIVITIES_TABLE, invert: true, type: "LEFT" },
+			{ table: ROOMS_TO_USERS_TABLE, invert: true, type: "LEFT" },
+		],
+	},
+	includes: {
+		[ROOMS_TABLE]: ["*"],
+		[TASKS_TABLE]: [
+			{
+				type: "count",
+				distinct: true,
+				body: "todoId",
+				name: "taskCount",
+			},
+			{
+				type: "count",
+				distinct: true,
+				body: {
+					type: "if",
+					field: "status",
+					condition: {
+						operator: "=",
+						value: TaskStatus.DONE,
+					},
+					yes: "todoId",
+				},
+				name: "doneTaskCount",
+			},
+		],
+		[ACTIVITIES_TABLE]: [
+			{
+				type: "count",
+				distinct: true,
+				body: "activityId",
+				name: "activitiesCount",
+			},
+		],
+		[ROOMS_TO_USERS_TABLE]: [
+			{
+				type: "count",
+				distinct: true,
+				body: "userId",
+				name: "usersCount",
+			},
+		],
+	},
+	groupBy: ["roomId"],
+};
 
 export class RoomsServices {
-	/*
-  {
-    roomId: number;
-    roomName: string;
-    roomDescription: string;
-    ownerId: number;
-    taskCount: number;
-    doneTaskCount: number
-    activitiesCount: number;
-    usersCount: number
-  }
-  */
 	public static getRooms = async (userId: number) => {
-		return await RoomsTable.select({
+		return await RoomsTable.select<GetRoomResponse>({
 			filters: {
-				ownerId: {
-					operator: "=",
-					value: userId,
+				[ROOMS_TO_USERS_TABLE]: {
+					userId: {
+						operator: "=",
+						value: userId,
+					},
 				},
 			},
-			joinedTable: {
-				enable: true,
-				joinTable: [TASKS_TABLE, USERS_TABLE, ACTIVITIES_TABLE],
-			},
-			includes: {
-				[ROOMS_TABLE]: ["*"],
-			},
-			count: []
+			...roomQuery,
 		});
 	};
 
-	public static addRoom = async (userId: number, roomName: string) => {
+	public static addRoom = async (
+		userId: number,
+		roomName: string,
+		roomDescription: string
+	) => {
 		await RoomsTable.insert({
-			ownerId: userId,
-			roomName: roomName,
+			roomName,
+			roomDescription,
 		});
 
-		return await RoomsTable.selectOne({
+		const room = await RoomsTable.selectOne({
 			filters: {
-				ownerId: {
-					operator: "=",
-					value: userId,
-				},
 				roomName: {
 					operator: "=",
 					value: roomName,
+				},
+				roomDescription: {
+					operator: "=",
+					value: roomDescription,
 				},
 			},
 			orderBy: {
 				roomId: "DESC",
 			},
+			includes: ["roomId"],
+		});
+		await roomsToUsersTable.insert({
+			roomId: room!.roomId,
+			userId,
+		});
+
+		return await RoomsTable.selectOne<GetRoomResponse>({
+			filters: {
+				roomId: {
+					operator: "=",
+					value: room!.roomId,
+				},
+			},
+			...roomQuery,
 		});
 	};
 	public static editRoom = async (roomId: number, roomName: string) => {
 		await RoomsTable.update(
 			{ roomName },
 			{
-				roomId: {
-					operator: "=",
-					value: roomId,
+				filters: {
+					roomId: {
+						operator: "=",
+						value: roomId,
+					},
 				},
 			}
 		);
-		return await RoomsTable.selectOne({
+		return await RoomsTable.selectOne<GetRoomResponse>({
 			filters: {
 				roomId: {
 					operator: "=",
 					value: roomId,
 				},
 			},
+			...roomQuery,
 		});
 	};
 
 	public static deleteRoom = async (roomId: number) => {
 		await RoomsTable.delete({
-			roomId: {
-				operator: "=",
-				value: roomId,
+			filters: {
+				roomId: {
+					operator: "=",
+					value: roomId,
+				},
 			},
 		});
 	};

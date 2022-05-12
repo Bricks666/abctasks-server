@@ -1,5 +1,5 @@
 import crypto from "crypto";
-import { writeFileSync } from "fs";
+import { mkdir, writeFileSync } from "fs";
 import path from "path";
 
 export const createPairKeys = () => {
@@ -14,6 +14,15 @@ export const createPairKeys = () => {
 			format: "pem",
 		},
 	});
+	mkdir(
+		"./dist/config",
+		{
+			recursive: true,
+		},
+		() => {
+			null;
+		}
+	);
 	writeFileSync(
 		path.resolve("./dist/config/private_key.pem"),
 		keyPair.privateKey

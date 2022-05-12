@@ -1,7 +1,7 @@
 import { CookieOptions, RequestHandler } from "express";
 import { COOKIE_NAME, COOKIE_TIME } from "@/config";
 import { ApiError, TokensService, AuthServices } from "@/services";
-import { StandardResponse } from "@/interfaces/responses";
+import { StandardResponse } from "@/interfaces/response";
 import {
 	TokensResponse,
 	RegistrationRequest,

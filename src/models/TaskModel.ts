@@ -1,5 +1,3 @@
-import { HEX } from "@/interfaces/common";
-
 export enum TaskStatus {
 	DONE,
 	IN_PROGRESS,
@@ -7,7 +5,7 @@ export enum TaskStatus {
 	READY,
 }
 
-export interface TaskModelShort {
+export interface TaskModel {
 	readonly todoId: number;
 	readonly roomId: number;
 	readonly status: TaskStatus;
@@ -17,13 +15,4 @@ export interface TaskModelShort {
 	readonly date: string;
 }
 
-export interface TaskModelFull
-	extends Omit<TaskModelShort, "authorId" | "groupId"> {
-	readonly authorName: string;
-	readonly authorPhoto?: string | undefined;
-	readonly groupName: string;
-	readonly mainColor: HEX;
-	readonly secondColor: HEX;
-}
-
-export type TaskCreateModel = Omit<TaskModelShort, "todoId">;
+export type TaskCreateModel = Omit<TaskModel, "todoId">;

@@ -1,11 +1,7 @@
-import { TasksTable } from "../database";
-import {
-	TaskStatus,
-	GroupTotalTask,
-	GroupDoneTask,
-	TaskProgress,
-} from "../models";
-import { changeProgress } from "../packages/eventBus";
+import { TasksTable } from "@/database";
+import { TaskStatus, TaskProgress } from "@/models";
+import { changeProgress } from "@/packages/eventBus";
+import { toJSON } from "mariadb-table-wrapper";
 
 interface ChangeProgress {
 	readonly groupId: number;
@@ -14,40 +10,34 @@ interface ChangeProgress {
 
 export class ProgressServices {
 	public static getTasksProgress = async (roomId: number) => {
-		const tasksGroup = await TasksTable.select<GroupTotalTask>({
+
+		return await TasksTable.select<TaskProgress>({
 			filters: {
 				roomId: { operator: "=", value: roomId },
 			},
-			includes: ["groupId"],
-			count: [["*", "totalCount"]],
-			groupBy: ["groupId"],
-		});
-		const doneTasks = await TasksTable.select<GroupDoneTask>({
-			filters: {
-				roomId: {
-					operator: "=",
-					value: roomId,
+			includes: [
+				"groupId",
+				{
+					type: "count",
+					body: "todoId",
+					name: "totalCount",
 				},
-				status: { operator: "=", value: TaskStatus.DONE },
-			},
-			includes: ["groupId"],
-			count: [["*", "doneCount"]],
+				{
+					type: "count",
+					body: {
+						type: "if",
+						field: "status",
+						condition: {
+							operator: "=",
+							value: toJSON(TaskStatus.DONE),
+						},
+						yes: "todoId",
+					},
+					name: "doneCount",
+				},
+			],
 			groupBy: ["groupId"],
 		});
-
-		const taskProgress: TaskProgress[] = tasksGroup.map<TaskProgress>(
-			(total) => {
-				const doneGroup = doneTasks.find(
-					(group) => group.groupId === total.groupId
-				);
-				return {
-					...total,
-					doneCount: doneGroup?.doneCount || 0,
-				};
-			}
-		);
-
-		return taskProgress;
 	};
 
 	public static subscribeChangeProgress(

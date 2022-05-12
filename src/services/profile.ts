@@ -21,9 +21,11 @@ export class ProfileServices {
 		user: Omit<SecureUserModel, "userId">
 	) => {
 		await UsersTable.update<Partial<SecureUserModel>>(user, {
-			userId: {
-				operator: "=",
-				value: userId,
+			filters: {
+				userId: {
+					operator: "=",
+					value: userId,
+				},
 			},
 		});
 		return await UsersTable.selectOne<SecureUserModel>({

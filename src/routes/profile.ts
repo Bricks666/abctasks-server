@@ -1,21 +1,20 @@
-import { COOKIE_NAME } from "@/config";
-import { cookie } from "express-validator";
 import { Router } from "express";
 import { ProfileControllers } from "@/controllers";
 import { accessVerify, fileUpload, validationCheck } from "@/middlewares";
+import { header } from "express-validator";
 
 const profileRoutes = Router();
 
 profileRoutes.get(
 	"/",
-	cookie(COOKIE_NAME).isString(),
+	header("authorization").isString(),
 	accessVerify(),
 	validationCheck(),
 	ProfileControllers.getProfile
 );
 profileRoutes.post(
 	"/update",
-	cookie(COOKIE_NAME).isString(),
+	header("authorization").isString(),
 	accessVerify(),
 	validationCheck(),
 	fileUpload(),

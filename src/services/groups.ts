@@ -45,13 +45,15 @@ export class GroupsServices {
 	};
 	public static deleteGroup = async (roomId: number, groupId: number) => {
 		await TaskGroupsTable.delete({
-			roomId: {
-				operator: "=",
-				value: roomId,
-			},
-			groupId: {
-				operator: "=",
-				value: groupId,
+			filters: {
+				roomId: {
+					operator: "=",
+					value: roomId,
+				},
+				groupId: {
+					operator: "=",
+					value: groupId,
+				},
 			},
 		});
 	};
@@ -69,13 +71,15 @@ export class GroupsServices {
 				groupName: name,
 			},
 			{
-				groupId: {
-					operator: "=",
-					value: groupId,
-				},
-				roomId: {
-					operator: "=",
-					value: roomId,
+				filters: {
+					groupId: {
+						operator: "=",
+						value: groupId,
+					},
+					roomId: {
+						operator: "=",
+						value: roomId,
+					},
 				},
 			}
 		);

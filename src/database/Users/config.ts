@@ -1,5 +1,5 @@
 import { TableConfig } from "mariadb-table-wrapper";
-import { UserModel } from "../../models";
+import { UserModel } from "@/models";
 
 export const USERS_TABLE = "users";
 

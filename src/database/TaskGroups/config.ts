@@ -1,5 +1,5 @@
 import { TableConfig } from "mariadb-table-wrapper";
-import { TaskGroupModel } from "../../models";
+import { TaskGroupModel } from "@/models";
 import { ROOMS_TABLE } from "../Rooms";
 
 export const TASK_GROUPS_TABLE = "todoGroups";

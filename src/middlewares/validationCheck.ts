@@ -9,7 +9,7 @@ export const validationCheck = <
 	return (req, _, next) => {
 		try {
 			if (!validationResult(req).isEmpty()) {
-				validationResult(req).isEmpty();
+				validationResult(req).throw();
 			}
 			next();
 		} catch (e) {

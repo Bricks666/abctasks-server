@@ -2,6 +2,7 @@ import { ActivityModel, ActivitySphere, ActivityType } from "@/models";
 import { ActivitiesTable, USERS_TABLE } from "@/database";
 import { newActivity } from "@/packages/eventBus";
 import { getSQLDatetime } from "@/utils";
+import { toJSON } from "mariadb-table-wrapper";
 
 export class ActivitiesServices {
 	public static async getActivities(roomId: number) {
@@ -33,16 +34,16 @@ export class ActivitiesServices {
 		await ActivitiesTable.insert({
 			activistId: userId,
 			roomId: roomId,
-			activitySphere: sphere,
-			activityType: type,
+			activitySphere: toJSON(sphere),
+			activityType: toJSON(type),
 			date,
-		});
+		} as unknown as Partial<ActivityModel>);
 		const newActivities = await ActivitiesTable.selectOne<ActivityModel>({
 			filters: {
 				activistId: { operator: "=", value: userId },
 				roomId: { operator: "=", value: roomId },
-				activityType: { operator: "=", value: type },
-				activitySphere: { operator: "=", value: sphere },
+				activityType: { operator: "=", value: toJSON(type) },
+				activitySphere: { operator: "=", value: toJSON(sphere) },
 			},
 			joinedTable: {
 				enable: true,

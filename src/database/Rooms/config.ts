@@ -1,6 +1,5 @@
 import { RoomModel } from "@/models";
 import { TableConfig } from "mariadb-table-wrapper";
-import { USERS_TABLE } from "../Users";
 
 export const ROOMS_TABLE = "rooms";
 
@@ -16,7 +15,6 @@ export const config: TableConfig<RoomModel> = {
 		roomName: {
 			type: "VARCHAR",
 			isNotNull: true,
-			default: "Room",
 			stringLen: 32,
 		},
 		roomDescription: {
@@ -24,17 +22,6 @@ export const config: TableConfig<RoomModel> = {
 			isNotNull: true,
 			default: "",
 			stringLen: 32,
-		},
-		ownerId: {
-			type: "SMALLINT",
-			isUnsigned: true,
-			isNotNull: true,
-		},
-	},
-	foreignKeys: {
-		ownerId: {
-			field: "userId",
-			tableName: USERS_TABLE,
 		},
 	},
 	safeCreating: true,

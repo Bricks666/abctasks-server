@@ -1,5 +1,4 @@
-import { COOKIE_NAME } from "@/config";
-import { cookie, param } from "express-validator";
+import { header, param } from "express-validator";
 import { Router } from "express";
 import { ProgressControllers } from "@/controllers";
 import { accessVerify, validationCheck } from "@/middlewares";
@@ -8,7 +7,7 @@ const progressRoutes = Router();
 
 progressRoutes.get(
 	"/:roomId",
-	cookie(COOKIE_NAME).isString(),
+	header("authorization").isString(),
 	accessVerify(),
 	param("roomId").isInt({
 		min: 0,
@@ -18,7 +17,7 @@ progressRoutes.get(
 );
 progressRoutes.get(
 	"/:roomId/subscribe",
-	cookie(COOKIE_NAME).isString(),
+	header("authorization").isString(),
 	accessVerify(),
 	param("roomId").isInt({
 		min: 0,

@@ -1,14 +1,13 @@
 import { Router } from "express";
-import { cookie, param } from "express-validator";
+import { header, param } from "express-validator";
 import { accessVerify, validationCheck } from "@/middlewares";
 import { ActivitiesController } from "@/controllers";
-import { COOKIE_NAME } from "@/config";
 
 const activityRoutes = Router();
 
 activityRoutes.get(
 	"/:roomId",
-	cookie(COOKIE_NAME, "You are not authorization").isString(),
+	header("authorization").isString(),
 	accessVerify(),
 	param("roomId", "Room id must be provided").isInt({
 		min: 0,
@@ -18,7 +17,7 @@ activityRoutes.get(
 );
 activityRoutes.get(
 	"/:roomId/subscribe",
-	cookie(COOKIE_NAME, "You are not authorization").isString(),
+	header("authorization").isString(),
 	accessVerify(),
 	param("roomId", "Room id must be provided")
 		.isInt({

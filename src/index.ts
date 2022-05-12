@@ -11,6 +11,7 @@ import {
 	UsersTable,
 	RoomsTable,
 	ActivitiesTable,
+	roomsToUsersTable,
 } from "./database";
 import { join } from "path";
 
@@ -38,6 +39,7 @@ app.listen(PORT, async () => {
 		TasksTable.init(connection),
 		ActivitiesTable.init(connection),
 		RoomsTable.init(connection),
+		roomsToUsersTable.init(connection),
 	];
 
 	await Promise.all(tables);

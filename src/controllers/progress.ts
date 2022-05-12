@@ -1,20 +1,25 @@
 import { RequestHandler } from "express";
 import { createEventResponse } from "@/utils";
 import { ProgressServices } from "@/services/";
+import { RoomIdParam } from "@/interfaces/param";
+import { ProgressResponse } from "./progress.types";
 
 export class ProgressControllers {
-	public static getTasksProgress: RequestHandler = async (req, res, next) => {
-		try {
-			const { roomId } = req.params;
+	public static getTasksProgress: RequestHandler<
+		RoomIdParam,
+		ProgressResponse
+	> = async (req, res, next) => {
+			try {
+				const { roomId } = req.params;
 
-			const tasksProgress = await ProgressServices.getTasksProgress(+roomId);
+				const tasksProgress = await ProgressServices.getTasksProgress(+roomId);
 
-			res.json({ tasksProgress });
-		} catch (e) {
-			next(e);
-		}
-	};
-	public static subscribeChangeProgress: RequestHandler = async (
+				res.json({ tasksProgress });
+			} catch (e) {
+				next(e);
+			}
+		};
+	public static subscribeChangeProgress: RequestHandler<RoomIdParam> = async (
 		req,
 		res,
 		next

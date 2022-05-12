@@ -1,5 +1,4 @@
-import { COOKIE_NAME } from "@/config";
-import { cookie, param, body } from "express-validator";
+import { param, body, header } from "express-validator";
 import { validationCheck, accessVerify } from "@/middlewares";
 import { Router } from "express";
 import { TasksController } from "@/controllers";
@@ -12,7 +11,7 @@ taskRoutes.get(
 	param("roomId").isInt({
 		min: 0,
 	}),
-	cookie(COOKIE_NAME).isString(),
+	header("authorization").isString(),
 	accessVerify(),
 	validationCheck(),
 	TasksController.getTasks
@@ -22,7 +21,7 @@ taskRoutes.put(
 	param("roomId").isInt({
 		min: 0,
 	}),
-	cookie(COOKIE_NAME).isString(),
+	header("authorization").isString(),
 	accessVerify(),
 	body("content").notEmpty().isString(),
 	body("status").isIn(Object.values(TaskStatus)),
@@ -40,7 +39,7 @@ taskRoutes.delete(
 	param("id").isInt({
 		min: 0,
 	}),
-	cookie(COOKIE_NAME).isString(),
+	header("authorization").isString(),
 	accessVerify(),
 	validationCheck(),
 	TasksController.deleteTask
@@ -53,7 +52,7 @@ taskRoutes.post(
 	param("id").isInt({
 		min: 0,
 	}),
-	cookie(COOKIE_NAME).isString(),
+	header("authorization").isString(),
 	accessVerify(),
 	body("content").notEmpty().isString(),
 	body("status").isIn(Object.values(TaskStatus)),

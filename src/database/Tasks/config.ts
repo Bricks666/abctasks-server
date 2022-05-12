@@ -1,12 +1,12 @@
 import { TableConfig } from "mariadb-table-wrapper";
-import { TaskModelShort, TaskStatus } from "../../models";
+import { TaskModel, TaskStatus } from "@/models";
 import { ROOMS_TABLE } from "../Rooms";
 import { TASK_GROUPS_TABLE } from "../TaskGroups";
 import { USERS_TABLE } from "../Users";
 
 export const TASKS_TABLE = "todos";
 
-export const tasksConfig: TableConfig<TaskModelShort> = {
+export const tasksConfig: TableConfig<TaskModel> = {
 	table: TASKS_TABLE,
 	fields: {
 		todoId: {

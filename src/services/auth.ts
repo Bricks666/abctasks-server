@@ -1,7 +1,7 @@
-import { ApiError } from ".";
+import { ApiError } from "./error";
 import { hash, verify } from "argon2";
-import { SecureUserModel, UserModel } from "../models";
-import { UsersTable } from "../database";
+import { SecureUserModel, UserModel } from "@/models";
+import { UsersTable } from "@/database";
 
 export class AuthServices {
 	public static registrationUser = async (

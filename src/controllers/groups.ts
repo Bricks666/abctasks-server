@@ -4,15 +4,15 @@ import { ActivitySphere, ActivityType } from "@/models";
 import {
 	ChangeGroupParams,
 	GroupIdResponse,
-	GroupParams,
 	GroupResponse,
 	GroupsRequest,
 	GroupsResponse,
 } from "./groups.types";
 import { RequestWithUser } from "@/interfaces/request";
+import { RoomIdParam } from "@/interfaces/param";
 
 export class GroupsControllers {
-	public static getTaskGroups: RequestHandler<GroupParams, GroupsResponse> =
+	public static getTaskGroups: RequestHandler<RoomIdParam, GroupsResponse> =
 		async (req, res, next) => {
 			try {
 				const { roomId } = req.params;
@@ -24,7 +24,7 @@ export class GroupsControllers {
 			}
 		};
 	public static createTaskGroup: RequestHandler<
-		GroupParams,
+		RoomIdParam,
 		GroupResponse,
 		GroupsRequest
 	> = async (req, res, next) => {
