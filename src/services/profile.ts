@@ -16,10 +16,8 @@ export class ProfileServices {
 		}
 		return user;
 	};
-	public static updateUser = async (
-		userId: number,
-		user: Omit<SecureUserModel, 'userId'>
-	) => {
+
+	public static updateUser = async (userId: number, user: Omit<SecureUserModel, 'userId'>) => {
 		await UsersTable.update<Partial<SecureUserModel>>(user, {
 			filters: {
 				userId: {
@@ -28,7 +26,7 @@ export class ProfileServices {
 				},
 			},
 		});
-		return await UsersTable.selectOne<SecureUserModel>({
+		return UsersTable.selectOne<SecureUserModel>({
 			filters: { userId: { operator: '=', value: userId } },
 			excludes: ['password'],
 		});

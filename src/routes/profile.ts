@@ -1,7 +1,7 @@
 import { Router } from 'express';
+import { header } from 'express-validator';
 import { ProfileControllers } from '@/controllers';
 import { accessVerify, fileUpload, validationCheck } from '@/middlewares';
-import { header } from 'express-validator';
 
 const profileRoutes = Router();
 

@@ -5,22 +5,21 @@ import { ActivitiesResponse } from './activities.types';
 import { RoomIdParam } from '@/interfaces/param';
 
 export class ActivitiesController {
-	public static getActivities: RequestHandler<RoomIdParam, ActivitiesResponse> =
-		async (req, res, next) => {
-			try {
-				const { roomId } = req.params;
-				const activities = await ActivitiesServices.getActivities(+roomId);
-				res.json({ activities });
-			} catch (e) {
-				next(e);
-			}
-		};
-
-	static subscribeNewActivities: RequestHandler<RoomIdParam> = async (
+	public static getActivities: RequestHandler<RoomIdParam, ActivitiesResponse> = async (
 		req,
 		res,
 		next
 	) => {
+		try {
+			const { roomId } = req.params;
+			const activities = await ActivitiesServices.getActivities(+roomId);
+			res.json({ activities });
+		} catch (e) {
+			next(e);
+		}
+	};
+
+	static subscribeNewActivities: RequestHandler<RoomIdParam> = async (req, res, next) => {
 		try {
 			res.writeHead(200, {
 				Connection: 'keep-alive',
@@ -28,9 +27,8 @@ export class ActivitiesController {
 				'Cache-Control': 'no-cache',
 			});
 			const { roomId } = req.params;
-			const unsubscribe = ActivitiesServices.watchNewActivities(
-				+roomId,
-				(activity) => res.write(createEventResponse(activity))
+			const unsubscribe = ActivitiesServices.watchNewActivities(+roomId, (activity) =>
+				res.write(createEventResponse(activity))
 			);
 			res.on('close', unsubscribe);
 			res.on('error', unsubscribe);

@@ -9,7 +9,7 @@ export interface RoomResponse {
 }
 export interface RoomRequest extends RequestWithUser {
 	readonly roomName: string;
-  readonly roomDescription: string
+	readonly roomDescription: string;
 }
 export interface RoomIdResponse {
 	readonly roomId: string | number;

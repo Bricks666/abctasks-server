@@ -9,7 +9,7 @@ export interface LoginRequest {
 	readonly remember: boolean;
 }
 
-export interface TokensResponse  {
-  readonly accessToken: string;
-  readonly refreshToken: string
+export interface TokensResponse {
+	readonly accessToken: string;
+	readonly refreshToken: string;
 }

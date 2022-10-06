@@ -2,8 +2,10 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { AuthModule } from './auth/auth.module';
-import { User } from './users/user.model';
+import { User } from './users/models';
 import { UsersModule } from './users/users.module';
+import { RoomsModule } from './rooms/rooms.module';
+import { Room, RoomUser } from './rooms/models';
 
 @Module({
 	imports: [
@@ -18,10 +20,11 @@ import { UsersModule } from './users/users.module';
 			host: process.env.DB_HOST,
 			port: Number(process.env.DB_PORT),
 			autoLoadModels: true,
-			models: [User],
+			models: [User, Room, RoomUser],
 		}),
 		AuthModule,
 		UsersModule,
+		RoomsModule,
 	],
 })
 export class AppModule {}

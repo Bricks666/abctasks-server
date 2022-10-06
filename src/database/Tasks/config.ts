@@ -20,12 +20,7 @@ export const tasksConfig: TableConfig<TaskModel> = {
 			type: 'ENUM',
 			isUnsigned: true,
 			isNotNull: true,
-			enumSetValues: [
-				TaskStatus.DONE,
-				TaskStatus.IN_PROGRESS,
-				TaskStatus.READY,
-				TaskStatus.REVIEW,
-			],
+			enumSetValues: [TaskStatus.DONE, TaskStatus.IN_PROGRESS, TaskStatus.READY, TaskStatus.REVIEW],
 		},
 		roomId: {
 			type: 'SMALLINT',

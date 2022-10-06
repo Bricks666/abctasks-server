@@ -1,17 +1,15 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { CreateUserDto } from './dto/create-user.dto';
 import { GetUserByLoginDto } from './dto/get-user-by-login.dto';
 import { GetUserDto } from './dto/get-user.dto';
 import { SecurityUserDto } from './dto/security-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { User } from './user.model';
+import { User } from './models';
 
 @Injectable()
 export class UsersService {
-	constructor(
-		@InjectModel(User) private readonly usersRepository: typeof User
-	) {}
+	constructor(@InjectModel(User) private readonly usersRepository: typeof User) {}
 
 	async createUser(dto: CreateUserDto): Promise<SecurityUserDto> {
 		const user = await this.usersRepository.create(dto);
@@ -31,8 +29,8 @@ export class UsersService {
 		});
 	}
 
-	async getUser(dto: GetUserDto): Promise<SecurityUserDto | null> {
-		return this.usersRepository.findOne({
+	async getUser(dto: GetUserDto): Promise<SecurityUserDto> {
+		const user = await this.usersRepository.findOne({
 			attributes: {
 				exclude: ['password'],
 			},
@@ -40,12 +38,16 @@ export class UsersService {
 				userId: dto.userId,
 			},
 		});
+
+		if (!user) {
+			throw new NotFoundException();
+		}
+
+		return user;
 	}
 
-	async getUserByLogin(
-		dto: GetUserByLoginDto
-	): Promise<SecurityUserDto | null> {
-		return this.usersRepository.findOne({
+	async getUserByLogin(dto: GetUserByLoginDto): Promise<SecurityUserDto> {
+		const user = await this.usersRepository.findOne({
 			attributes: {
 				exclude: ['password'],
 			},
@@ -53,18 +55,27 @@ export class UsersService {
 				login: dto.login,
 			},
 		});
+
+		if (!user) {
+			throw new NotFoundException();
+		}
+
+		return user;
 	}
 
-	async getInsecureUser(dto: Partial<User>): Promise<User | null> {
-		return this.usersRepository.findOne({
+	async getInsecureUser(dto: Partial<User>): Promise<User> {
+		const user = await this.usersRepository.findOne({
 			where: dto,
 		});
+
+		if (!user) {
+			throw new NotFoundException();
+		}
+
+		return user;
 	}
 
-	async updateUser(
-		userId: number,
-		dto: UpdateUserDto
-	): Promise<SecurityUserDto> {
+	async updateUser(userId: number, dto: UpdateUserDto): Promise<SecurityUserDto> {
 		await this.usersRepository.update(
 			{
 				password: dto.password,
@@ -72,7 +83,7 @@ export class UsersService {
 			},
 			{
 				where: {
-					userId: userId,
+					userId,
 				},
 			}
 		);

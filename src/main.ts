@@ -1,6 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import cookieParser from 'cookie-parser';
+// import cookieParser from 'cookie-parser';
+// import cors from 'cors';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
@@ -8,7 +9,7 @@ async function bootstrap() {
 	const HOST = process.env.HOST || 'localhost';
 	const app = await NestFactory.create(AppModule);
 
-	app.use(cookieParser());
+	// app.use(cookieParser(), cors());
 
 	const config = new DocumentBuilder()
 		.setTitle('Документация по API сервера "Todo"')

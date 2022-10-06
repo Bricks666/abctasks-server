@@ -3,12 +3,8 @@ import { TasksTable } from '@/database';
 import { TaskCreateModel, TaskModel, TaskStatus } from '@/models';
 
 export class TasksService {
-	public static getTasks = async (
-		roomId: number,
-		page = 1,
-		countOnPage = 100
-	) => {
-		return await TasksTable.select({
+	public static getTasks = async (roomId: number, page = 1, countOnPage = 100) => {
+		return TasksTable.select({
 			filters: {
 				roomId: {
 					operator: '=',
@@ -29,8 +25,9 @@ export class TasksService {
 			},
 		});
 	};
+
 	public static getTask = async (roomId: number, taskId: number) => {
-		return await TasksTable.selectOne<TaskModel>({
+		return TasksTable.selectOne<TaskModel>({
 			filters: {
 				roomId: {
 					operator: '=',
@@ -71,7 +68,7 @@ export class TasksService {
 		};
 
 		await TasksTable.insert(newTask);
-		return await TasksTable.selectOne<TaskModel>({
+		return TasksTable.selectOne<TaskModel>({
 			filters: {
 				roomId: {
 					operator: '=',
@@ -93,6 +90,7 @@ export class TasksService {
 			},
 		});
 	};
+
 	public static deleteTask = async (roomId: number, taskId: number) => {
 		await TasksTable.delete({
 			filters: {
@@ -104,6 +102,7 @@ export class TasksService {
 			},
 		});
 	};
+
 	public static editTask = async (
 		roomId: number,
 		taskId: number,
@@ -114,6 +113,6 @@ export class TasksService {
 				todoId: { operator: '=', value: taskId },
 			},
 		});
-		return await this.getTask(roomId, taskId);
+		return this.getTask(roomId, taskId);
 	};
 }

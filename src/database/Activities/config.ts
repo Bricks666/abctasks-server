@@ -28,11 +28,7 @@ export const config: TableConfig<ActivityModel> = {
 		activityType: {
 			type: 'ENUM',
 			isNotNull: true,
-			enumSetValues: [
-				ActivityType.CREATE,
-				ActivityType.DELETE,
-				ActivityType.EDIT,
-			],
+			enumSetValues: [ActivityType.CREATE, ActivityType.DELETE, ActivityType.EDIT],
 		},
 		activistId: {
 			type: 'SMALLINT',

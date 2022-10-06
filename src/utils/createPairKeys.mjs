@@ -1,21 +1,21 @@
-import crypto from "crypto";
-import { mkdir, writeFileSync } from "fs";
-import path from "path";
+import crypto from 'crypto';
+import { mkdir, writeFileSync } from 'fs';
+import path from 'path';
 
 export const createPairKeys = () => {
-	const keyPair = crypto.generateKeyPairSync("rsa", {
+	const keyPair = crypto.generateKeyPairSync('rsa', {
 		modulusLength: 4096,
 		publicKeyEncoding: {
-			type: "pkcs1",
-			format: "pem",
+			type: 'pkcs1',
+			format: 'pem',
 		},
 		privateKeyEncoding: {
-			type: "pkcs1",
-			format: "pem",
+			type: 'pkcs1',
+			format: 'pem',
 		},
 	});
 	mkdir(
-		"./dist/config",
+		'./dist/config',
 		{
 			recursive: true,
 		},
@@ -23,11 +23,8 @@ export const createPairKeys = () => {
 			null;
 		}
 	);
-	writeFileSync(
-		path.resolve("./dist/config/private_key.pem"),
-		keyPair.privateKey
-	);
-	writeFileSync("./dist/config/public_key.pem", keyPair.publicKey);
+	writeFileSync(path.resolve('./dist/config/private_key.pem'), keyPair.privateKey);
+	writeFileSync('./dist/config/public_key.pem', keyPair.publicKey);
 };
 
 createPairKeys();

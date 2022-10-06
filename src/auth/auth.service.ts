@@ -3,8 +3,7 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { compare } from 'bcrypt';
 import { UsersService } from '@/users/users.service';
 import { CreateUserDto, SecurityUserDto } from '@/users/dto';
-import { AuthenticationResult, Tokens } from './types';
-import { LoginDto } from './dto';
+import { AuthenticationResultDto, LoginDto, TokensDto } from './dto';
 
 @Injectable()
 export class AuthService {
@@ -13,10 +12,8 @@ export class AuthService {
 		private readonly jwtService: JwtService
 	) {}
 
-	async authentication(token: string): Promise<AuthenticationResult> {
-		const authUser = await this.jwtService.verifyAsync<SecurityUserDto>(token, {
-			secret: process.env.SECRET,
-		});
+	async authentication(token: string): Promise<AuthenticationResultDto> {
+		const authUser = await this.verifyUser(token);
 
 		const user = await this.usersService.getUser({ userId: authUser.userId });
 
@@ -34,7 +31,8 @@ export class AuthService {
 	async registration(dto: CreateUserDto): Promise<SecurityUserDto> {
 		return this.usersService.createUser(dto);
 	}
-	async login(dto: LoginDto): Promise<AuthenticationResult> {
+
+	async login(dto: LoginDto): Promise<AuthenticationResultDto> {
 		const user = await this.usersService.getInsecureUser(dto);
 		if (!user) {
 			throw new BadRequestException();
@@ -57,11 +55,8 @@ export class AuthService {
 		return { user: secureUser, tokens };
 	}
 
-	async refresh(refreshToken: string): Promise<Tokens> {
-		const authUser = await this.jwtService.verifyAsync<SecurityUserDto>(
-			refreshToken,
-			{ secret: process.env.SECRET }
-		);
+	async refresh(refreshToken: string): Promise<TokensDto> {
+		const authUser = await this.verifyUser(refreshToken);
 		return this.generateToken({
 			login: authUser.login,
 			photo: authUser.photo,
@@ -69,7 +64,7 @@ export class AuthService {
 		});
 	}
 
-	private async generateToken(user: SecurityUserDto): Promise<Tokens> {
+	private async generateToken(user: SecurityUserDto): Promise<TokensDto> {
 		const accessToken = this.jwtService.signAsync(user, {
 			secret: process.env.SECRET,
 			expiresIn: '15m',
@@ -83,5 +78,11 @@ export class AuthService {
 			refreshToken: tokens[0],
 			accessToken: tokens[1],
 		};
+	}
+
+	async verifyUser(token: string): Promise<SecurityUserDto> {
+		return this.jwtService.verifyAsync<SecurityUserDto>(token, {
+			secret: process.env.SECRET,
+		});
 	}
 }

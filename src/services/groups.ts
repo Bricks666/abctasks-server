@@ -3,10 +3,11 @@ import { HEX } from '@/interfaces/common';
 
 export class GroupsServices {
 	public static getTaskGroups = async (roomId: number) => {
-		return await TaskGroupsTable.select({
+		return TaskGroupsTable.select({
 			filters: { roomId: { operator: '=', value: roomId } },
 		});
 	};
+
 	public static addTaskGroup = async (
 		roomId: number,
 		name: string,
@@ -17,9 +18,9 @@ export class GroupsServices {
 			groupMainColor: mainColor,
 			groupName: name,
 			groupSecondColor: secondColor,
-			roomId: roomId,
+			roomId,
 		});
-		return await TaskGroupsTable.selectOne({
+		return TaskGroupsTable.selectOne({
 			filters: {
 				groupMainColor: {
 					operator: '=',
@@ -43,6 +44,7 @@ export class GroupsServices {
 			},
 		});
 	};
+
 	public static deleteGroup = async (roomId: number, groupId: number) => {
 		await TaskGroupsTable.delete({
 			filters: {
@@ -57,6 +59,7 @@ export class GroupsServices {
 			},
 		});
 	};
+
 	public static editGroup = async (
 		roomId: number,
 		groupId: number,
@@ -83,7 +86,7 @@ export class GroupsServices {
 				},
 			}
 		);
-		return await TaskGroupsTable.selectOne({
+		return TaskGroupsTable.selectOne({
 			filters: {
 				groupId: {
 					operator: '=',

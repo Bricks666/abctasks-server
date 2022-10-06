@@ -1,35 +1,71 @@
 {
-	"root": true,
 	"env": {
-		"browser": true
+		"browser": true,
+		"es2021": true
 	},
 	"extends": [
 		"eslint:recommended",
 		"plugin:@typescript-eslint/recommended",
-		"plugin:sonarjs/recommended"
+		"plugin:import/recommended",
+		"plugin:import/warnings",
+		"plugin:import/typescript",
+		"airbnb-base",
+		"prettier"
 	],
 	"parser": "@typescript-eslint/parser",
 	"parserOptions": {
-		"project": "tsconfig.json",
-		"ecmaVersion": "latest"
+		"ecmaFeatures": {
+			"jsx": true
+		},
+		"ecmaVersion": "latest",
+		"sourceType": "module"
 	},
-	"plugins": ["@typescript-eslint", "sonarjs"],
+	"plugins": ["@typescript-eslint"],
 	"rules": {
 		/* STANDARD */
-		"indent": ["warn", "tab", { "SwitchCase": 1 }],
-		"no-mixed-spaces-and-tabs": "warn",
-		"quotes": ["error", "single"],
-		"semi": ["warn", "always"],
-		"no-alert": "error",
-		"no-debugger": "warn",
-		"no-constructor-return": "error",
-		"no-duplicate-imports": "warn",
-		"no-promise-executor-return": "error",
-		"no-self-compare": "error",
-		"no-console": "warn",
+		"no-use-before-define": "off",
+		"no-tabs": "off",
+		"indent": [
+			"error",
+			"tab",
+			{
+				"SwitchCase": 1
+			}
+		],
+		"jsx-quotes": ["error", "prefer-single"],
+		"linebreak-style": "off",
+		"no-param-reassign": "off",
+		"implicit-arrow-linebreak": "off",
+		"consistent-return": "off",
+		"no-unused-vars": "off",
+		"arrow-body-style": "off",
+		"object-curly-newline": "off",
+		"comma-dangle": [
+			"warn",
+			{
+				"arrays": "never",
+				"objects": "always",
+				"imports": "never",
+				"exports": "never",
+				"functions": "never"
+			}
+		],
+		"no-restricted-exports": "off",
+		"prefer-arrow-callback": "off",
+		"no-shadow": "warn",
+		"default-param-last": "warn",
+		"no-useless-constructor": "off",
+		"no-empty-function": "warn",
+		"class-methods-use-this": "off",
 
-		/* TYPESCRIPT */
-		"@typescript-eslint/no-explicit-any": "error"
+		/* IMPORT */
+		"import/extensions": "off",
+		"import/no-unresolved": 0,
+		"import/prefer-default-export": "off",
+
+		/* TS */
+		"@typescript-eslint/no-unused-vars": ["error"],
+		"@typescript-eslint/no-empty-interface": ["off"]
 	},
-	"ignorePatterns": ["*.js", "configs/**/*"]
+	"ignorePatterns": ["templates/**/*", "*.css.d.ts", "config-overrides.js"]
 }

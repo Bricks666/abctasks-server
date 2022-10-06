@@ -1,10 +1,11 @@
 import express, { json } from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
+import { createConnection } from 'mariadb-table-wrapper';
+import { join } from 'path';
 import { DOMAIN, PATHS, PORT } from './config';
 import { appRoutes } from './routes';
 import { errorHandler } from './middlewares';
-import { createConnection } from 'mariadb-table-wrapper';
 import {
 	TaskGroupsTable,
 	TasksTable,
@@ -13,7 +14,6 @@ import {
 	ActivitiesTable,
 	roomsToUsersTable,
 } from './database';
-import { join } from 'path';
 
 const app = express();
 

@@ -1,6 +1,8 @@
 export class ApiError extends Error {
 	public readonly name = 'API ERROR';
+
 	public readonly status: number;
+
 	public readonly message: string;
 
 	public constructor(status: number, message: string) {

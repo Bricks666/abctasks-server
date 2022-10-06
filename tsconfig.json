@@ -1,34 +1,25 @@
 {
-	"compilerOptions": {
-		"outDir": "./dist",
-		"rootDir": "./src",
-		"baseUrl": "src",
-		"paths": {
-			"@/*": ["*"]
-		},
-		/* Language and Environment */
-		"target": "ESNext" /* Set the JavaScript language version for emitted JavaScript and include compatible library declarations. */,
-		"allowJs": true, //Компилировать ли файлы с JS тоже
-		"checkJs": true, //Сообщать об ошибках в JS файлах
-		"alwaysStrict": true, //Компилировать ли с использование strict mode
-		"downlevelIteration": true, //Обеспечение полно поддержки интераторов и операторов ...
-		"noEmitOnError": true, //Не создаст файл, при ошибки компиляции
-		"noUnusedLocals": true, //Показывать ошибку, если есть неиспользуемые локальные переменные
-		"noUnusedParameters": true, //Показывать ошибку, если есть неиспользуемые параметры
-		"noEmit": false,
-
-		"module": "ESNext",
-		/* Interop Constraints */
-		"esModuleInterop": true /* Emit additional JavaScript to ease support for importing CommonJS modules. This enables `allowSyntheticDefaultImports` for type compatibility. */,
-		"moduleResolution": "node",
-		"forceConsistentCasingInFileNames": true /* Ensure that casing is correct in imports. */,
-		/* Type Checking */
-		"strict": true /* Enable all strict type-checking options. */,
-		/* Completeness */
-		"skipLibCheck": false /* Skip type checking all .d.ts files. */,
-		"experimentalDecorators": true,
-		"emitDecoratorMetadata": true
-	},
-	"include": ["src/**/*"],
-	"exclude": ["node_modules", "middlewares"]
+  "compilerOptions": {
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "declaration": true,
+    "removeComments": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "allowSyntheticDefaultImports": true,
+    "target": "es2017",
+    "sourceMap": true,
+    "outDir": "./dist",
+    "baseUrl": "./src/",
+    "paths": {
+      "@/*": ["*"]
+    },
+    "incremental": true,
+    "skipLibCheck": true,
+    "strictNullChecks": false,
+    "noImplicitAny": false,
+    "strictBindCallApply": false,
+    "forceConsistentCasingInFileNames": false,
+    "noFallthroughCasesInSwitch": false
+  }
 }

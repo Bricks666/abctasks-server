@@ -1,7 +1,7 @@
+import { toJSON } from 'mariadb-table-wrapper';
 import { TasksTable } from '@/database';
 import { TaskStatus, TaskProgress } from '@/models';
 import { changeProgress } from '@/packages/eventBus';
-import { toJSON } from 'mariadb-table-wrapper';
 
 interface ChangeProgress {
 	readonly groupId: number;
@@ -10,8 +10,7 @@ interface ChangeProgress {
 
 export class ProgressServices {
 	public static getTasksProgress = async (roomId: number) => {
-
-		return await TasksTable.select<TaskProgress>({
+		return TasksTable.select<TaskProgress>({
 			filters: {
 				roomId: { operator: '=', value: roomId },
 			},
@@ -51,9 +50,7 @@ export class ProgressServices {
 				(groupIds as number[]).forEach((groupId) => {
 					progresses.push({
 						groupId,
-						progress: userProgresses.find(
-							(progress) => progress.groupId === groupId
-						),
+						progress: userProgresses.find((progress) => progress.groupId === groupId),
 					});
 				});
 

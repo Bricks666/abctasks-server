@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { ErrorRequestHandler } from 'express';
 import { ApiError } from '../services';
 
@@ -7,5 +8,4 @@ export const errorHandler: ErrorRequestHandler = (err, _, res, _next) => {
 	}
 
 	return res.status(500).json({ message: err.message });
-	_next();
 };

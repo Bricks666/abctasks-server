@@ -1,12 +1,12 @@
+import { toJSON } from 'mariadb-table-wrapper';
 import { ActivityModel, ActivitySphere, ActivityType } from '@/models';
 import { ActivitiesTable, USERS_TABLE } from '@/database';
 import { newActivity } from '@/packages/eventBus';
 import { getSQLDatetime } from '@/utils';
-import { toJSON } from 'mariadb-table-wrapper';
 
 export class ActivitiesServices {
 	public static async getActivities(roomId: number) {
-		return await ActivitiesTable.select({
+		return ActivitiesTable.select({
 			filters: {
 				roomId: { operator: '=', value: roomId },
 			},
@@ -33,7 +33,7 @@ export class ActivitiesServices {
 		const date = getSQLDatetime();
 		await ActivitiesTable.insert({
 			activistId: userId,
-			roomId: roomId,
+			roomId,
 			activitySphere: toJSON(sphere),
 			activityType: toJSON(type),
 			date,

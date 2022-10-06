@@ -8,10 +8,6 @@ export const signToken = <T extends object | string>(
 	return sign(token, secret, options);
 };
 
-export const verifyToken = <T>(
-	token: string,
-	secret: Secret,
-	options?: VerifyOptions
-): T => {
+export const verifyToken = <T>(token: string, secret: Secret, options?: VerifyOptions): T => {
 	return verify(token, secret, options) as T;
 };

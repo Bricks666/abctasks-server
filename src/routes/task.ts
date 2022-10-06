@@ -1,6 +1,6 @@
 import { param, body, header } from 'express-validator';
-import { validationCheck, accessVerify } from '@/middlewares';
 import { Router } from 'express';
+import { validationCheck, accessVerify } from '@/middlewares';
 import { TasksController } from '@/controllers';
 import { TaskStatus } from '@/models';
 

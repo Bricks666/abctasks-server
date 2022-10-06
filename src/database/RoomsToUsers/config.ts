@@ -1,5 +1,5 @@
-import { RoomToUsersModel } from '@/models';
 import { TableConfig } from 'mariadb-table-wrapper';
+import { RoomToUsersModel } from '@/models';
 import { ROOMS_TABLE } from '../Rooms';
 import { USERS_TABLE } from '../Users';
 
@@ -29,5 +29,5 @@ export const config: TableConfig<RoomToUsersModel> = {
 			tableName: ROOMS_TABLE,
 		},
 	},
-	safeCreating: true
+	safeCreating: true,
 };

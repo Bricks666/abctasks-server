@@ -1,3 +1,4 @@
+import { SelectQuery } from 'mariadb-table-wrapper';
 import {
 	ACTIVITIES_TABLE,
 	RoomsTable,
@@ -7,7 +8,6 @@ import {
 	TASKS_TABLE,
 } from '@/database';
 import { RoomModel, TaskStatus } from '@/models';
-import { SelectQuery } from 'mariadb-table-wrapper';
 import { GetRoomResponse } from './rooms.types';
 
 const roomQuery: SelectQuery<RoomModel> = {
@@ -65,7 +65,7 @@ const roomQuery: SelectQuery<RoomModel> = {
 
 export class RoomsServices {
 	public static getRooms = async (userId: number) => {
-		return await RoomsTable.select<GetRoomResponse>({
+		return RoomsTable.select<GetRoomResponse>({
 			filters: {
 				[ROOMS_TO_USERS_TABLE]: {
 					userId: {
@@ -78,11 +78,7 @@ export class RoomsServices {
 		});
 	};
 
-	public static addRoom = async (
-		userId: number,
-		roomName: string,
-		roomDescription: string
-	) => {
+	public static addRoom = async (userId: number, roomName: string, roomDescription: string) => {
 		await RoomsTable.insert({
 			roomName,
 			roomDescription,
@@ -109,7 +105,7 @@ export class RoomsServices {
 			userId,
 		});
 
-		return await RoomsTable.selectOne<GetRoomResponse>({
+		return RoomsTable.selectOne<GetRoomResponse>({
 			filters: {
 				roomId: {
 					operator: '=',
@@ -119,6 +115,7 @@ export class RoomsServices {
 			...roomQuery,
 		});
 	};
+
 	public static editRoom = async (roomId: number, roomName: string) => {
 		await RoomsTable.update(
 			{ roomName },
@@ -131,7 +128,7 @@ export class RoomsServices {
 				},
 			}
 		);
-		return await RoomsTable.selectOne<GetRoomResponse>({
+		return RoomsTable.selectOne<GetRoomResponse>({
 			filters: {
 				roomId: {
 					operator: '=',

@@ -1,5 +1,5 @@
-import { RoomModel } from '@/models';
 import { TableConfig } from 'mariadb-table-wrapper';
+import { RoomModel } from '@/models';
 
 export const ROOMS_TABLE = 'rooms';
 
