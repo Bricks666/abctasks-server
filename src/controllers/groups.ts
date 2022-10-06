@@ -1,15 +1,15 @@
-import { RequestHandler } from "express";
-import { ActivitiesServices, GroupsServices } from "@/services";
-import { ActivitySphere, ActivityType } from "@/models";
+import { RequestHandler } from 'express';
+import { ActivitiesServices, GroupsServices } from '@/services';
+import { ActivitySphere, ActivityType } from '@/models';
 import {
 	ChangeGroupParams,
 	GroupIdResponse,
 	GroupResponse,
 	GroupsRequest,
 	GroupsResponse,
-} from "./groups.types";
-import { RequestWithUser } from "@/interfaces/request";
-import { RoomIdParam } from "@/interfaces/param";
+} from './groups.types';
+import { RequestWithUser } from '@/interfaces/request';
+import { RoomIdParam } from '@/interfaces/param';
 
 export class GroupsControllers {
 	public static getTaskGroups: RequestHandler<RoomIdParam, GroupsResponse> =

@@ -1,4 +1,4 @@
-import { RoomModel } from "@/models";
+import { RoomModel } from '@/models';
 
 export interface GetRoomResponse extends RoomModel {
 	readonly taskCount: number;

@@ -5,5 +5,5 @@ export interface UserModel {
 	readonly photo?: string | undefined;
 }
 
-export type SecureUserModel = Omit<UserModel, "password">;
-export type VerifyUserModel = Pick<UserModel, "userId">;
+export type SecureUserModel = Omit<UserModel, 'password'>;
+export type VerifyUserModel = Pick<UserModel, 'userId'>;

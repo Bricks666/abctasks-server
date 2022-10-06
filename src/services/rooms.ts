@@ -5,62 +5,62 @@ import {
 	ROOMS_TABLE,
 	ROOMS_TO_USERS_TABLE,
 	TASKS_TABLE,
-} from "@/database";
-import { RoomModel, TaskStatus } from "@/models";
-import { SelectQuery } from "mariadb-table-wrapper";
-import { GetRoomResponse } from "./rooms.types";
+} from '@/database';
+import { RoomModel, TaskStatus } from '@/models';
+import { SelectQuery } from 'mariadb-table-wrapper';
+import { GetRoomResponse } from './rooms.types';
 
 const roomQuery: SelectQuery<RoomModel> = {
 	joinedTable: {
 		enable: true,
 		joinTable: [
-			{ table: TASKS_TABLE, invert: true, type: "LEFT" },
-			{ table: ACTIVITIES_TABLE, invert: true, type: "LEFT" },
-			{ table: ROOMS_TO_USERS_TABLE, invert: true, type: "LEFT" },
+			{ table: TASKS_TABLE, invert: true, type: 'LEFT' },
+			{ table: ACTIVITIES_TABLE, invert: true, type: 'LEFT' },
+			{ table: ROOMS_TO_USERS_TABLE, invert: true, type: 'LEFT' },
 		],
 	},
 	includes: {
-		[ROOMS_TABLE]: ["*"],
+		[ROOMS_TABLE]: ['*'],
 		[TASKS_TABLE]: [
 			{
-				type: "count",
+				type: 'count',
 				distinct: true,
-				body: "todoId",
-				name: "taskCount",
+				body: 'todoId',
+				name: 'taskCount',
 			},
 			{
-				type: "count",
+				type: 'count',
 				distinct: true,
 				body: {
-					type: "if",
-					field: "status",
+					type: 'if',
+					field: 'status',
 					condition: {
-						operator: "=",
+						operator: '=',
 						value: TaskStatus.DONE,
 					},
-					yes: "todoId",
+					yes: 'todoId',
 				},
-				name: "doneTaskCount",
+				name: 'doneTaskCount',
 			},
 		],
 		[ACTIVITIES_TABLE]: [
 			{
-				type: "count",
+				type: 'count',
 				distinct: true,
-				body: "activityId",
-				name: "activitiesCount",
+				body: 'activityId',
+				name: 'activitiesCount',
 			},
 		],
 		[ROOMS_TO_USERS_TABLE]: [
 			{
-				type: "count",
+				type: 'count',
 				distinct: true,
-				body: "userId",
-				name: "usersCount",
+				body: 'userId',
+				name: 'usersCount',
 			},
 		],
 	},
-	groupBy: ["roomId"],
+	groupBy: ['roomId'],
 };
 
 export class RoomsServices {
@@ -69,7 +69,7 @@ export class RoomsServices {
 			filters: {
 				[ROOMS_TO_USERS_TABLE]: {
 					userId: {
-						operator: "=",
+						operator: '=',
 						value: userId,
 					},
 				},
@@ -91,18 +91,18 @@ export class RoomsServices {
 		const room = await RoomsTable.selectOne({
 			filters: {
 				roomName: {
-					operator: "=",
+					operator: '=',
 					value: roomName,
 				},
 				roomDescription: {
-					operator: "=",
+					operator: '=',
 					value: roomDescription,
 				},
 			},
 			orderBy: {
-				roomId: "DESC",
+				roomId: 'DESC',
 			},
-			includes: ["roomId"],
+			includes: ['roomId'],
 		});
 		await roomsToUsersTable.insert({
 			roomId: room!.roomId,
@@ -112,7 +112,7 @@ export class RoomsServices {
 		return await RoomsTable.selectOne<GetRoomResponse>({
 			filters: {
 				roomId: {
-					operator: "=",
+					operator: '=',
 					value: room!.roomId,
 				},
 			},
@@ -125,7 +125,7 @@ export class RoomsServices {
 			{
 				filters: {
 					roomId: {
-						operator: "=",
+						operator: '=',
 						value: roomId,
 					},
 				},
@@ -134,7 +134,7 @@ export class RoomsServices {
 		return await RoomsTable.selectOne<GetRoomResponse>({
 			filters: {
 				roomId: {
-					operator: "=",
+					operator: '=',
 					value: roomId,
 				},
 			},
@@ -146,7 +146,7 @@ export class RoomsServices {
 		await RoomsTable.delete({
 			filters: {
 				roomId: {
-					operator: "=",
+					operator: '=',
 					value: roomId,
 				},
 			},

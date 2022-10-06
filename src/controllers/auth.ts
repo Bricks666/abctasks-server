@@ -1,12 +1,12 @@
-import { CookieOptions, RequestHandler } from "express";
-import { COOKIE_NAME, COOKIE_TIME } from "@/config";
-import { ApiError, TokensService, AuthServices } from "@/services";
-import { StandardResponse } from "@/interfaces/response";
+import { CookieOptions, RequestHandler } from 'express';
+import { COOKIE_NAME, COOKIE_TIME } from '@/config';
+import { ApiError, TokensService, AuthServices } from '@/services';
+import { StandardResponse } from '@/interfaces/response';
 import {
 	TokensResponse,
 	RegistrationRequest,
 	LoginRequest,
-} from "./auth.types";
+} from './auth.types';
 
 export class AuthController {
 	public static registration: RequestHandler<
@@ -30,14 +30,14 @@ export class AuthController {
 				const user = TokensService.checkToken(refreshToken);
 
 				if (!user) {
-					throw ApiError.BadRequest("Токен обновления не действительный");
+					throw ApiError.BadRequest('Токен обновления не действительный');
 				}
 
 				const tokens = TokensService.createTokens({ userId: user.userId });
 
 				res.cookie(COOKIE_NAME, tokens.refreshToken, {
 					httpOnly: true,
-					sameSite: "none",
+					sameSite: 'none',
 					secure: true,
 					maxAge: COOKIE_TIME,
 				});
@@ -55,7 +55,7 @@ export class AuthController {
 
 				const cookieOptions: CookieOptions = {
 					httpOnly: true,
-					sameSite: "none",
+					sameSite: 'none',
 					secure: true,
 				};
 
@@ -93,7 +93,7 @@ export class AuthController {
 			}
 			res.cookie(COOKIE_NAME, tokens.refreshToken, {
 				httpOnly: true,
-				sameSite: "none",
+				sameSite: 'none',
 				secure: true,
 				maxAge: COOKIE_TIME,
 			});

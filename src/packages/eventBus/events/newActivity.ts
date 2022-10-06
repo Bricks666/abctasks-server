@@ -1,7 +1,7 @@
-import { ActivityModel } from "@/models";
-import * as eventBus from "../base";
+import { ActivityModel } from '@/models';
+import * as eventBus from '../base';
 
-export const NEW_ACTIVITIES_EVENT = "NEW ACTIVITIES";
+export const NEW_ACTIVITIES_EVENT = 'NEW ACTIVITIES';
 
 export const subscribe = (listener: eventBus.Listener) => {
 	return eventBus.subscribe(NEW_ACTIVITIES_EVENT, listener);

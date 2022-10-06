@@ -1,6 +1,6 @@
-import { RequestHandler } from "express";
-import { ApiError, TokensService } from "@/services";
-import { RequestAfterAccess } from "./accessVerify.types";
+import { RequestHandler } from 'express';
+import { ApiError, TokensService } from '@/services';
+import { RequestAfterAccess } from './accessVerify.types';
 
 export const accessVerify = <
 	Params = undefined,
@@ -9,10 +9,10 @@ export const accessVerify = <
 >(): RequestHandler<Params, Response, Request & RequestAfterAccess> => {
 	return (req, _, next) => {
 		try {
-			const accessToken = req.headers.authorization?.split(" ")[1];
+			const accessToken = req.headers.authorization?.split(' ')[1];
 
 			if (!accessToken) {
-				throw ApiError.BadRequest("Not Access Token");
+				throw ApiError.BadRequest('Not Access Token');
 			}
 
 			const user = TokensService.checkToken(accessToken);

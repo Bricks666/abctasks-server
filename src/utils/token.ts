@@ -1,4 +1,4 @@
-import { sign, Secret, SignOptions, verify, VerifyOptions } from "jsonwebtoken";
+import { sign, Secret, SignOptions, verify, VerifyOptions } from 'jsonwebtoken';
 
 export const signToken = <T extends object | string>(
 	token: T,

@@ -15,4 +15,4 @@ export interface TaskModel {
 	readonly date: string;
 }
 
-export type TaskCreateModel = Omit<TaskModel, "todoId">;
+export type TaskCreateModel = Omit<TaskModel, 'todoId'>;

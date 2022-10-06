@@ -1,5 +1,5 @@
-import { validationResult } from "express-validator";
-import { RequestHandler } from "express";
+import { validationResult } from 'express-validator';
+import { RequestHandler } from 'express';
 
 export const validationCheck = <
 	Params = undefined,

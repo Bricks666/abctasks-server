@@ -1,23 +1,23 @@
-import { TableConfig } from "mariadb-table-wrapper";
-import { TaskModel, TaskStatus } from "@/models";
-import { ROOMS_TABLE } from "../Rooms";
-import { TASK_GROUPS_TABLE } from "../TaskGroups";
-import { USERS_TABLE } from "../Users";
+import { TableConfig } from 'mariadb-table-wrapper';
+import { TaskModel, TaskStatus } from '@/models';
+import { ROOMS_TABLE } from '../Rooms';
+import { TASK_GROUPS_TABLE } from '../TaskGroups';
+import { USERS_TABLE } from '../Users';
 
-export const TASKS_TABLE = "todos";
+export const TASKS_TABLE = 'todos';
 
 export const tasksConfig: TableConfig<TaskModel> = {
 	table: TASKS_TABLE,
 	fields: {
 		todoId: {
-			type: "SMALLINT",
+			type: 'SMALLINT',
 			isPrimaryKey: true,
 			isAutoIncrement: true,
 			isNotNull: true,
 			isUnsigned: true,
 		},
 		status: {
-			type: "ENUM",
+			type: 'ENUM',
 			isUnsigned: true,
 			isNotNull: true,
 			enumSetValues: [
@@ -28,27 +28,27 @@ export const tasksConfig: TableConfig<TaskModel> = {
 			],
 		},
 		roomId: {
-			type: "SMALLINT",
+			type: 'SMALLINT',
 			isNotNull: true,
 			isUnsigned: true,
 		},
 		groupId: {
-			type: "SMALLINT",
+			type: 'SMALLINT',
 			isUnsigned: true,
 			isNotNull: true,
 		},
 		authorId: {
-			type: "SMALLINT",
+			type: 'SMALLINT',
 			isNotNull: true,
 			isUnsigned: true,
 		},
 		content: {
-			type: "VARCHAR",
+			type: 'VARCHAR',
 			stringLen: 128,
 			isNotNull: true,
 		},
 		date: {
-			type: "DATETIME",
+			type: 'DATETIME',
 			isNotNull: true,
 		},
 	},
@@ -56,15 +56,15 @@ export const tasksConfig: TableConfig<TaskModel> = {
 	foreignKeys: {
 		groupId: {
 			tableName: TASK_GROUPS_TABLE,
-			field: "groupId",
+			field: 'groupId',
 		},
 		authorId: {
 			tableName: USERS_TABLE,
-			field: "userId",
+			field: 'userId',
 		},
 		roomId: {
 			tableName: ROOMS_TABLE,
-			field: "roomId",
+			field: 'roomId',
 		},
 	},
 };

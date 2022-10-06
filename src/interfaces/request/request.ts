@@ -1,4 +1,4 @@
-import { VerifyUserModel } from "@/models";
+import { VerifyUserModel } from '@/models';
 
 export interface RequestWithUser {
 	readonly user: VerifyUserModel;

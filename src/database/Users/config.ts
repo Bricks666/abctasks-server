@@ -1,13 +1,13 @@
-import { TableConfig } from "mariadb-table-wrapper";
-import { UserModel } from "@/models";
+import { TableConfig } from 'mariadb-table-wrapper';
+import { UserModel } from '@/models';
 
-export const USERS_TABLE = "users";
+export const USERS_TABLE = 'users';
 
 export const usersConfig: TableConfig<UserModel> = {
 	table: USERS_TABLE,
 	fields: {
 		userId: {
-			type: "SMALLINT",
+			type: 'SMALLINT',
 			isAutoIncrement: true,
 			isNotNull: true,
 			isPrimaryKey: true,
@@ -15,18 +15,18 @@ export const usersConfig: TableConfig<UserModel> = {
 		},
 
 		login: {
-			type: "VARCHAR",
+			type: 'VARCHAR',
 			isUnique: true,
 			isNotNull: true,
 			stringLen: 32,
 		},
 		password: {
-			type: "VARCHAR",
+			type: 'VARCHAR',
 			stringLen: 128,
 			isNotNull: true,
 		},
 		photo: {
-			type: "VARCHAR",
+			type: 'VARCHAR',
 			stringLen: 128,
 		},
 	},

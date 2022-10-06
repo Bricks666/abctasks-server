@@ -1,4 +1,4 @@
-import { ActivityModel } from "@/models";
+import { ActivityModel } from '@/models';
 
 
 export interface ActivitiesResponse {

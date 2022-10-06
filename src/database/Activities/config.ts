@@ -1,32 +1,32 @@
-import { TableConfig } from "mariadb-table-wrapper";
-import { ActivityModel, ActivitySphere, ActivityType } from "@/models";
-import { ROOMS_TABLE } from "../Rooms";
-import { USERS_TABLE } from "../Users";
+import { TableConfig } from 'mariadb-table-wrapper';
+import { ActivityModel, ActivitySphere, ActivityType } from '@/models';
+import { ROOMS_TABLE } from '../Rooms';
+import { USERS_TABLE } from '../Users';
 
-export const ACTIVITIES_TABLE = "activities";
+export const ACTIVITIES_TABLE = 'activities';
 
 export const config: TableConfig<ActivityModel> = {
 	table: ACTIVITIES_TABLE,
 	fields: {
 		activityId: {
-			type: "SMALLINT",
+			type: 'SMALLINT',
 			isAutoIncrement: true,
 			isNotNull: true,
 			isPrimaryKey: true,
 			isUnsigned: true,
 		},
 		roomId: {
-			type: "SMALLINT",
+			type: 'SMALLINT',
 			isNotNull: true,
 			isUnsigned: true,
 		},
 		activitySphere: {
-			type: "ENUM",
+			type: 'ENUM',
 			isNotNull: true,
 			enumSetValues: [ActivitySphere.GROUP, ActivitySphere.TASK],
 		},
 		activityType: {
-			type: "ENUM",
+			type: 'ENUM',
 			isNotNull: true,
 			enumSetValues: [
 				ActivityType.CREATE,
@@ -35,22 +35,22 @@ export const config: TableConfig<ActivityModel> = {
 			],
 		},
 		activistId: {
-			type: "SMALLINT",
+			type: 'SMALLINT',
 			isNotNull: true,
 			isUnsigned: true,
 		},
 		date: {
-			type: "DATETIME",
+			type: 'DATETIME',
 			isNotNull: true,
 		},
 	},
 	foreignKeys: {
 		activistId: {
 			tableName: USERS_TABLE,
-			field: "userId",
+			field: 'userId',
 		},
 		roomId: {
-			field: "roomId",
+			field: 'roomId',
 			tableName: ROOMS_TABLE,
 		},
 	},

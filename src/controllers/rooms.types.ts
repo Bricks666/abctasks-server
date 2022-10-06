@@ -1,5 +1,5 @@
-import { RequestWithUser } from "@/interfaces/request";
-import { RoomModel } from "@/models";
+import { RequestWithUser } from '@/interfaces/request';
+import { RoomModel } from '@/models';
 
 export interface RoomsResponse {
 	readonly rooms: RoomModel[];

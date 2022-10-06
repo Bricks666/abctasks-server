@@ -1,15 +1,15 @@
-import { RequestHandler } from "express";
-import { ActivitySphere, ActivityType, TaskStatus } from "@/models";
-import { ActivitiesServices, ProgressServices, TasksService } from "@/services";
-import { RoomIdParam } from "@/interfaces/param";
+import { RequestHandler } from 'express';
+import { ActivitySphere, ActivityType, TaskStatus } from '@/models';
+import { ActivitiesServices, ProgressServices, TasksService } from '@/services';
+import { RoomIdParam } from '@/interfaces/param';
 import {
 	DeleteTaskResponse,
 	TaskParams,
 	TaskRequest,
 	TaskResponse,
 	TasksResponse,
-} from "./tasks.types";
-import { RequestWithUser } from "@/interfaces/request";
+} from './tasks.types';
+import { RequestWithUser } from '@/interfaces/request';
 
 export class TasksController {
 	public static getTasks: RequestHandler<

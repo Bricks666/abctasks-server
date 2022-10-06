@@ -1,6 +1,6 @@
-import { RoomIdParam } from "@/interfaces/param";
-import { RequestWithUser } from "@/interfaces/request";
-import { TaskCreateModel, TaskModel } from "@/models";
+import { RoomIdParam } from '@/interfaces/param';
+import { RequestWithUser } from '@/interfaces/request';
+import { TaskCreateModel, TaskModel } from '@/models';
 
 export interface TasksResponse {
 	readonly tasks: TaskModel[];
@@ -17,7 +17,7 @@ export interface DeleteTaskResponse {
 
 export interface TaskRequest
 	extends RequestWithUser,
-		Omit<TaskCreateModel, "date" | "roomId" | "authorId"> {}
+		Omit<TaskCreateModel, 'date' | 'roomId' | 'authorId'> {}
 
 export interface TaskParams extends RoomIdParam {
 	readonly id: string;

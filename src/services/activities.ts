@@ -1,25 +1,25 @@
-import { ActivityModel, ActivitySphere, ActivityType } from "@/models";
-import { ActivitiesTable, USERS_TABLE } from "@/database";
-import { newActivity } from "@/packages/eventBus";
-import { getSQLDatetime } from "@/utils";
-import { toJSON } from "mariadb-table-wrapper";
+import { ActivityModel, ActivitySphere, ActivityType } from '@/models';
+import { ActivitiesTable, USERS_TABLE } from '@/database';
+import { newActivity } from '@/packages/eventBus';
+import { getSQLDatetime } from '@/utils';
+import { toJSON } from 'mariadb-table-wrapper';
 
 export class ActivitiesServices {
 	public static async getActivities(roomId: number) {
 		return await ActivitiesTable.select({
 			filters: {
-				roomId: { operator: "=", value: roomId },
+				roomId: { operator: '=', value: roomId },
 			},
 			joinedTable: {
 				enable: true,
 				joinTable: [USERS_TABLE],
 			},
 			includes: {
-				users: ["login"],
-				activities: ["*"],
+				users: ['login'],
+				activities: ['*'],
 			},
 			orderBy: {
-				activityId: "DESC",
+				activityId: 'DESC',
 			},
 		});
 	}
@@ -40,21 +40,21 @@ export class ActivitiesServices {
 		} as unknown as Partial<ActivityModel>);
 		const newActivities = await ActivitiesTable.selectOne<ActivityModel>({
 			filters: {
-				activistId: { operator: "=", value: userId },
-				roomId: { operator: "=", value: roomId },
-				activityType: { operator: "=", value: toJSON(type) },
-				activitySphere: { operator: "=", value: toJSON(sphere) },
+				activistId: { operator: '=', value: userId },
+				roomId: { operator: '=', value: roomId },
+				activityType: { operator: '=', value: toJSON(type) },
+				activitySphere: { operator: '=', value: toJSON(sphere) },
 			},
 			joinedTable: {
 				enable: true,
 				joinTable: [USERS_TABLE],
 			},
 			includes: {
-				users: ["login"],
-				activities: ["*"],
+				users: ['login'],
+				activities: ['*'],
 			},
 			orderBy: {
-				activityId: "DESC",
+				activityId: 'DESC',
 			},
 		});
 		newActivity.broadcast(roomId, newActivities!);

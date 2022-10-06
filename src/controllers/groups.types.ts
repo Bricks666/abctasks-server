@@ -1,7 +1,7 @@
-import { HEX } from "@/interfaces/common";
-import { RequestWithUser } from "@/interfaces/request";
-import { RoomIdParam } from "@/interfaces/param";
-import { TaskGroupModel } from "@/models";
+import { HEX } from '@/interfaces/common';
+import { RequestWithUser } from '@/interfaces/request';
+import { RoomIdParam } from '@/interfaces/param';
+import { TaskGroupModel } from '@/models';
 
 export interface ChangeGroupParams extends RoomIdParam {
 	readonly id: string;

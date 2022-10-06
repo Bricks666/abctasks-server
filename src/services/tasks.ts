@@ -1,6 +1,6 @@
-import { getSQLDatetime } from "@/utils";
-import { TasksTable } from "@/database";
-import { TaskCreateModel, TaskModel, TaskStatus } from "@/models";
+import { getSQLDatetime } from '@/utils';
+import { TasksTable } from '@/database';
+import { TaskCreateModel, TaskModel, TaskStatus } from '@/models';
 
 export class TasksService {
 	public static getTasks = async (
@@ -11,21 +11,21 @@ export class TasksService {
 		return await TasksTable.select({
 			filters: {
 				roomId: {
-					operator: "=",
+					operator: '=',
 					value: roomId,
 				},
 			},
 			joinedTable: {
 				enable: true,
-				joinTable: ["users"],
+				joinTable: ['users'],
 			},
 			limit: {
 				page,
 				countOnPage,
 			},
 			excludes: {
-				users: ["password"],
-				todos: ["isDone", "authorId"],
+				users: ['password'],
+				todos: ['isDone', 'authorId'],
 			},
 		});
 	};
@@ -33,21 +33,21 @@ export class TasksService {
 		return await TasksTable.selectOne<TaskModel>({
 			filters: {
 				roomId: {
-					operator: "=",
+					operator: '=',
 					value: roomId,
 				},
 				todoId: {
-					operator: "=",
+					operator: '=',
 					value: taskId,
 				},
 			},
 			joinedTable: {
 				enable: true,
-				joinTable: ["users"],
+				joinTable: ['users'],
 			},
 			excludes: {
-				users: ["password"],
-				todos: ["isDone", "authorId"],
+				users: ['password'],
+				todos: ['isDone', 'authorId'],
 			},
 		});
 	};
@@ -74,31 +74,31 @@ export class TasksService {
 		return await TasksTable.selectOne<TaskModel>({
 			filters: {
 				roomId: {
-					operator: "=",
+					operator: '=',
 					value: roomId,
 				},
 				date: {
-					operator: "=",
+					operator: '=',
 					value: addedDate,
 				},
-				authorId: { operator: "=", value: userId },
+				authorId: { operator: '=', value: userId },
 			},
 			joinedTable: {
 				enable: true,
-				joinTable: ["users"],
+				joinTable: ['users'],
 			},
 			excludes: {
-				users: ["password"],
-				todos: ["isDone", "authorId"],
+				users: ['password'],
+				todos: ['isDone', 'authorId'],
 			},
 		});
 	};
 	public static deleteTask = async (roomId: number, taskId: number) => {
 		await TasksTable.delete({
 			filters: {
-				todoId: { operator: "=", value: taskId },
+				todoId: { operator: '=', value: taskId },
 				roomId: {
-					operator: "=",
+					operator: '=',
 					value: roomId,
 				},
 			},
@@ -111,7 +111,7 @@ export class TasksService {
 	) => {
 		await TasksTable.update(newValues, {
 			filters: {
-				todoId: { operator: "=", value: taskId },
+				todoId: { operator: '=', value: taskId },
 			},
 		});
 		return await this.getTask(roomId, taskId);

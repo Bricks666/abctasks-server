@@ -1,36 +1,36 @@
-import { TableConfig } from "mariadb-table-wrapper";
-import { TaskGroupModel } from "@/models";
-import { ROOMS_TABLE } from "../Rooms";
+import { TableConfig } from 'mariadb-table-wrapper';
+import { TaskGroupModel } from '@/models';
+import { ROOMS_TABLE } from '../Rooms';
 
-export const TASK_GROUPS_TABLE = "todoGroups";
+export const TASK_GROUPS_TABLE = 'todoGroups';
 
 export const taskGroupsConfig: TableConfig<TaskGroupModel> = {
 	table: TASK_GROUPS_TABLE,
 	fields: {
 		groupId: {
-			type: "SMALLINT",
+			type: 'SMALLINT',
 			isAutoIncrement: true,
 			isNotNull: true,
 			isPrimaryKey: true,
 			isUnsigned: true,
 		},
 		roomId: {
-			type: "SMALLINT",
+			type: 'SMALLINT',
 			isNotNull: true,
 			isUnsigned: true,
 		},
 		groupName: {
-			type: "VARCHAR",
+			type: 'VARCHAR',
 			isNotNull: true,
 			stringLen: 32,
 		},
 		groupMainColor: {
-			type: "VARCHAR",
+			type: 'VARCHAR',
 			isNotNull: true,
 			stringLen: 9,
 		},
 		groupSecondColor: {
-			type: "VARCHAR",
+			type: 'VARCHAR',
 			isNotNull: true,
 			stringLen: 9,
 		},
@@ -39,7 +39,7 @@ export const taskGroupsConfig: TableConfig<TaskGroupModel> = {
 	foreignKeys: {
 		roomId: {
 			tableName: ROOMS_TABLE,
-			field: "roomId",
+			field: 'roomId',
 		},
 	},
 };

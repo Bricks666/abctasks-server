@@ -1,10 +1,10 @@
-import { TaskGroupsTable } from "@/database";
-import { HEX } from "@/interfaces/common";
+import { TaskGroupsTable } from '@/database';
+import { HEX } from '@/interfaces/common';
 
 export class GroupsServices {
 	public static getTaskGroups = async (roomId: number) => {
 		return await TaskGroupsTable.select({
-			filters: { roomId: { operator: "=", value: roomId } },
+			filters: { roomId: { operator: '=', value: roomId } },
 		});
 	};
 	public static addTaskGroup = async (
@@ -22,24 +22,24 @@ export class GroupsServices {
 		return await TaskGroupsTable.selectOne({
 			filters: {
 				groupMainColor: {
-					operator: "=",
+					operator: '=',
 					value: mainColor,
 				},
 				groupSecondColor: {
-					operator: "=",
+					operator: '=',
 					value: secondColor,
 				},
 				groupName: {
-					operator: "=",
+					operator: '=',
 					value: name,
 				},
 				roomId: {
-					operator: "=",
+					operator: '=',
 					value: roomId,
 				},
 			},
 			orderBy: {
-				groupId: "DESC",
+				groupId: 'DESC',
 			},
 		});
 	};
@@ -47,11 +47,11 @@ export class GroupsServices {
 		await TaskGroupsTable.delete({
 			filters: {
 				roomId: {
-					operator: "=",
+					operator: '=',
 					value: roomId,
 				},
 				groupId: {
-					operator: "=",
+					operator: '=',
 					value: groupId,
 				},
 			},
@@ -73,11 +73,11 @@ export class GroupsServices {
 			{
 				filters: {
 					groupId: {
-						operator: "=",
+						operator: '=',
 						value: groupId,
 					},
 					roomId: {
-						operator: "=",
+						operator: '=',
 						value: roomId,
 					},
 				},
@@ -86,11 +86,11 @@ export class GroupsServices {
 		return await TaskGroupsTable.selectOne({
 			filters: {
 				groupId: {
-					operator: "=",
+					operator: '=',
 					value: groupId,
 				},
 				roomId: {
-					operator: "=",
+					operator: '=',
 					value: roomId,
 				},
 			},

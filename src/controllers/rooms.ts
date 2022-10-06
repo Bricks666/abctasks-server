@@ -1,13 +1,13 @@
-import { RequestHandler } from "express";
-import { RoomsServices } from "@/services";
+import { RequestHandler } from 'express';
+import { RoomsServices } from '@/services';
 import {
 	RoomIdResponse,
 	RoomRequest,
 	RoomResponse,
 	RoomsResponse,
-} from "./rooms.types";
-import { RequestWithUser } from "@/interfaces/request";
-import { RoomIdParam } from "@/interfaces/param";
+} from './rooms.types';
+import { RequestWithUser } from '@/interfaces/request';
+import { RoomIdParam } from '@/interfaces/param';
 
 export class RoomsController {
 	public static getRooms: RequestHandler<
@@ -15,15 +15,15 @@ export class RoomsController {
 		RoomsResponse,
 		RequestWithUser
 	> = async (req, res, next) => {
-		try {
-			const { user } = req.body;
-			const rooms = await RoomsServices.getRooms(user.userId);
+			try {
+				const { user } = req.body;
+				const rooms = await RoomsServices.getRooms(user.userId);
 
-			return res.json({ rooms });
-		} catch (e) {
-			next(e);
-		}
-	};
+				return res.json({ rooms });
+			} catch (e) {
+				next(e);
+			}
+		};
 	public static addRoom: RequestHandler<undefined, RoomResponse, RoomRequest> =
 		async (req, res, next) => {
 			try {
@@ -45,17 +45,17 @@ export class RoomsController {
 		RoomResponse,
 		RoomRequest
 	> = async (req, res, next) => {
-		try {
-			const { roomName } = req.body;
-			const { roomId } = req.params;
+			try {
+				const { roomName } = req.body;
+				const { roomId } = req.params;
 
-			const room = await RoomsServices.editRoom(+roomId, roomName);
+				const room = await RoomsServices.editRoom(+roomId, roomName);
 
-			return res.json({ room: room! });
-		} catch (e) {
-			next(e);
-		}
-	};
+				return res.json({ room: room! });
+			} catch (e) {
+				next(e);
+			}
+		};
 
 	public static deleteRoom: RequestHandler<RoomIdParam, RoomIdResponse> =
 		async (req, res, next) => {

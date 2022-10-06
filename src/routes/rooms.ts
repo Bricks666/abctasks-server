@@ -1,41 +1,41 @@
-import { param, body, header } from "express-validator";
-import { Router } from "express";
-import { RoomsController } from "@/controllers";
-import { accessVerify, validationCheck } from "@/middlewares";
+import { param, body, header } from 'express-validator';
+import { Router } from 'express';
+import { RoomsController } from '@/controllers';
+import { accessVerify, validationCheck } from '@/middlewares';
 
 const roomsRoutes = Router();
 
 roomsRoutes.get(
-	"/",
-	header("authorization").isString(),
+	'/',
+	header('authorization').isString(),
 	accessVerify(),
 	validationCheck(),
 	RoomsController.getRooms
 );
 roomsRoutes.put(
-	"/new",
-	header("authorization").isString(),
+	'/new',
+	header('authorization').isString(),
 	accessVerify(),
-	body("roomName").isString().notEmpty(),
+	body('roomName').isString().notEmpty(),
 	validationCheck(),
 	RoomsController.addRoom
 );
 roomsRoutes.post(
-	"/:roomId/edit",
-	header("authorization").isString(),
+	'/:roomId/edit',
+	header('authorization').isString(),
 	accessVerify(),
-	body("roomName").isString().notEmpty(),
-	param("roomId").isInt({
+	body('roomName').isString().notEmpty(),
+	param('roomId').isInt({
 		min: 0,
 	}),
 	validationCheck(),
 	RoomsController.editRoom
 );
 roomsRoutes.delete(
-	"/:roomId/delete",
-	header("authorization").isString(),
+	'/:roomId/delete',
+	header('authorization').isString(),
 	accessVerify(),
-	param("roomId").isInt({
+	param('roomId').isInt({
 		min: 0,
 	}),
 	validationCheck(),

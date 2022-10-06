@@ -1,7 +1,7 @@
-import { ApiError } from "./error";
-import { hash, verify } from "argon2";
-import { SecureUserModel, UserModel } from "@/models";
-import { UsersTable } from "@/database";
+import { ApiError } from './error';
+import { hash, verify } from 'argon2';
+import { SecureUserModel, UserModel } from '@/models';
+import { UsersTable } from '@/database';
 
 export class AuthServices {
 	public static registrationUser = async (
@@ -12,13 +12,13 @@ export class AuthServices {
 		const user = await UsersTable.select({
 			filters: {
 				login: {
-					operator: "=",
+					operator: '=',
 					value: login,
 				},
 			},
 		});
 		if (user[0]) {
-			throw ApiError.BadRequest("User already exists");
+			throw ApiError.BadRequest('User already exists');
 		}
 
 		const hashedPassword = await hash(password);
@@ -35,7 +35,7 @@ export class AuthServices {
 			await UsersTable.select({
 				filters: {
 					login: {
-						operator: "=",
+						operator: '=',
 						value: login,
 					},
 				},
@@ -43,13 +43,13 @@ export class AuthServices {
 		)[0];
 
 		if (!user) {
-			throw ApiError.BadRequest("User not found");
+			throw ApiError.BadRequest('User not found');
 		}
 
 		const isCorrectPassword = await verify(user.password, password);
 
 		if (!isCorrectPassword) {
-			throw ApiError.BadRequest("Password is incorrect");
+			throw ApiError.BadRequest('Password is incorrect');
 		}
 		const secureUser: SecureUserModel = {
 			login: user.login,

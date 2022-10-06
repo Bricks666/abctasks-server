@@ -1,10 +1,10 @@
-import { RequestHandler } from "express";
-import { UploadedFile } from "express-fileupload";
-import { join, resolve } from "path";
-import { getStaticRoute, PATHS } from "@/config";
-import { ProfileServices } from "@/services";
-import { ProfileResponse, UpdateProfileRequest } from "./profile.types";
-import { RequestWithUser } from "@/interfaces/request";
+import { RequestHandler } from 'express';
+import { UploadedFile } from 'express-fileupload';
+import { join, resolve } from 'path';
+import { getStaticRoute, PATHS } from '@/config';
+import { ProfileServices } from '@/services';
+import { ProfileResponse, UpdateProfileRequest } from './profile.types';
+import { RequestWithUser } from '@/interfaces/request';
 
 export class ProfileControllers {
 	static getProfile: RequestHandler<
@@ -32,7 +32,7 @@ export class ProfileControllers {
 				const { user, ...newValues } = req.body;
 				const photo = req.files?.photo as UploadedFile | undefined;
 				if (photo) {
-					const extension = photo.mimetype.match(/[\w]+$/) || "jpg";
+					const extension = photo.mimetype.match(/[\w]+$/) || 'jpg';
 					const photoName = `avatar_${user.userId}_${Date.now()}.${extension}`;
 
 					const innerPath = join(user.userId.toString(), photoName);

@@ -1,7 +1,7 @@
-import { TasksTable } from "@/database";
-import { TaskStatus, TaskProgress } from "@/models";
-import { changeProgress } from "@/packages/eventBus";
-import { toJSON } from "mariadb-table-wrapper";
+import { TasksTable } from '@/database';
+import { TaskStatus, TaskProgress } from '@/models';
+import { changeProgress } from '@/packages/eventBus';
+import { toJSON } from 'mariadb-table-wrapper';
 
 interface ChangeProgress {
 	readonly groupId: number;
@@ -13,30 +13,30 @@ export class ProgressServices {
 
 		return await TasksTable.select<TaskProgress>({
 			filters: {
-				roomId: { operator: "=", value: roomId },
+				roomId: { operator: '=', value: roomId },
 			},
 			includes: [
-				"groupId",
+				'groupId',
 				{
-					type: "count",
-					body: "todoId",
-					name: "totalCount",
+					type: 'count',
+					body: 'todoId',
+					name: 'totalCount',
 				},
 				{
-					type: "count",
+					type: 'count',
 					body: {
-						type: "if",
-						field: "status",
+						type: 'if',
+						field: 'status',
 						condition: {
-							operator: "=",
+							operator: '=',
 							value: toJSON(TaskStatus.DONE),
 						},
-						yes: "todoId",
+						yes: 'todoId',
 					},
-					name: "doneCount",
+					name: 'doneCount',
 				},
 			],
-			groupBy: ["groupId"],
+			groupBy: ['groupId'],
 		});
 	};
 

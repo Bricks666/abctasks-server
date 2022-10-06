@@ -1,4 +1,4 @@
-import { HEX } from "../interfaces/common";
+import { HEX } from '../interfaces/common';
 
 export interface TaskGroupModel {
 	readonly groupId: number;
