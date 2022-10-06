@@ -2,7 +2,6 @@ import {
 	Controller,
 	Get,
 	Param,
-	Req,
 	UseGuards,
 	ParseIntPipe,
 	Post,
@@ -13,7 +12,6 @@ import {
 	NotFoundException,
 	UnauthorizedException,
 } from '@nestjs/common';
-import { Request } from 'express';
 import {
 	ApiBearerAuth,
 	ApiBody,
@@ -26,8 +24,8 @@ import { AuthGuard } from '@/auth/auth.guard';
 import { Room } from './models';
 import { RoomsService } from './rooms.service';
 import { AuthService } from '@/auth/auth.service';
-import { extractAccessToken } from '@/utils';
 import { CreateRoomDto, UpdateRoomDto } from './dto';
+import { AuthToken } from '@/decorators/auth-token.decorator';
 
 @ApiTags('Комнаты')
 @Controller('rooms')
@@ -52,8 +50,7 @@ export class RoomsController {
 	})
 	@UseGuards(AuthGuard)
 	@Get('/')
-	async getRooms(@Req() req: Request): Promise<Room[]> {
-		const [, token] = extractAccessToken(req)!;
+	async getRooms(@AuthToken() token: string): Promise<Room[]> {
 		const { userId } = await this.authService.verifyUser(token);
 		return this.roomsService.getRooms(userId);
 	}
@@ -100,8 +97,7 @@ export class RoomsController {
 	@ApiBearerAuth()
 	@UseGuards(AuthGuard)
 	@Post('/create')
-	async createRoom(@Req() req: Request, @Body() dto: CreateRoomDto): Promise<Room> {
-		const [, token] = extractAccessToken(req)!;
+	async createRoom(@AuthToken() token: string, @Body() dto: CreateRoomDto): Promise<Room> {
 		const { userId } = await this.authService.verifyUser(token);
 		return this.roomsService.createRoom(userId, dto);
 	}

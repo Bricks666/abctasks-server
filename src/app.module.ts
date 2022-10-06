@@ -6,6 +6,8 @@ import { User } from './users/models';
 import { UsersModule } from './users/users.module';
 import { RoomsModule } from './rooms/rooms.module';
 import { Room, RoomUser } from './rooms/models';
+import { TasksModule } from './tasks/tasks.module';
+import { Task } from './tasks/models';
 
 @Module({
 	imports: [
@@ -20,11 +22,12 @@ import { Room, RoomUser } from './rooms/models';
 			host: process.env.DB_HOST,
 			port: Number(process.env.DB_PORT),
 			autoLoadModels: true,
-			models: [User, Room, RoomUser],
+			models: [User, Room, RoomUser, Task],
 		}),
 		AuthModule,
 		UsersModule,
 		RoomsModule,
+		TasksModule,
 	],
 })
 export class AppModule {}

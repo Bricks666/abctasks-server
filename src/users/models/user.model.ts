@@ -1,4 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiHideProperty, ApiProperty } from '@nestjs/swagger';
 import { Column, DataType, Model, Table } from 'sequelize-typescript';
 import { IsNumber, IsString } from 'class-validator';
 
@@ -44,6 +44,7 @@ export class User extends Model<User, CreateUser> {
 		description: 'Пароль пользователя',
 		example: 'Password',
 	})
+	@ApiHideProperty()
 	@IsString()
 	@Column({
 		type: DataType.STRING,
