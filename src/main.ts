@@ -1,17 +1,26 @@
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-// import cookieParser from 'cookie-parser';
-// import cors from 'cors';
+import * as cookieParser from 'cookie-parser';
+import * as cors from 'cors';
+import { ValidationPipe } from './pipes/validation.pipe';
 import { AppModule } from './app.module';
-import { appRoutes } from './routes';
+import { StandardResponseInterceptor } from './interceptors/standard-response.interceptor';
 
 async function bootstrap() {
 	const PORT = process.env.PORT || 3000;
 	const HOST = process.env.HOST || 'localhost';
 	const app = await NestFactory.create(AppModule);
 
-	// app.use(cookieParser(), cors());
-	app.use('/', appRoutes);
+	app.use(
+		cors({
+			credentials: true,
+			origin: /localhost/,
+		}),
+		cookieParser()
+	);
+	app.useGlobalPipes(new ValidationPipe());
+	app.useGlobalInterceptors(new StandardResponseInterceptor());
+	app.setGlobalPrefix('api');
 
 	const config = new DocumentBuilder()
 		.setTitle('Документация по API сервера "Todo"')

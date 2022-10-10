@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
+import { hash } from 'bcrypt';
 import { CreateUserDto } from './dto/create-user.dto';
 import { GetUserByLoginDto } from './dto/get-user-by-login.dto';
 import { GetUserDto } from './dto/get-user.dto';
@@ -14,7 +15,10 @@ export class UsersService {
 	) {}
 
 	async createUser(dto: CreateUserDto): Promise<SecurityUserDto> {
-		const user = await this.usersRepository.create(dto);
+		const user = await this.usersRepository.create({
+			...dto,
+			password: await hash(dto.password, Number(process.env.ROUND_COUNT)),
+		});
 
 		return {
 			userId: user.userId,
@@ -65,9 +69,11 @@ export class UsersService {
 		return user;
 	}
 
-	async getInsecureUser(dto: Partial<User>): Promise<User> {
+	async getInsecureUser(login: string): Promise<User> {
 		const user = await this.usersRepository.findOne({
-			where: dto,
+			where: {
+				login,
+			},
 		});
 
 		if (!user) {

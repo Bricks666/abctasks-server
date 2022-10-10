@@ -9,3 +9,5 @@ export interface FailResponse {
 	readonly errorMessage: string;
 	readonly statusCode: number;
 }
+
+export type StandardResponse<T> = SuccessResponse<T> | FailResponse;

@@ -11,7 +11,6 @@ import {
 	Put,
 	UnauthorizedException,
 	UseGuards,
-	UseInterceptors,
 } from '@nestjs/common';
 import {
 	ApiBearerAuth,
@@ -25,8 +24,6 @@ import { AuthGuard } from '@/auth/auth.guard';
 import { CreateGroupDto, UpdateGroupDto } from './dto';
 import { GroupsService } from './groups.service';
 import { Group } from './models';
-import { StandardResponseInterceptor } from '@/intercepiors/standard-response.interceptor';
-import { ErrorHandlerInterceptor } from '@/intercepiors/error-handler.interceptor';
 
 @ApiTags('Группы')
 @Controller('groups')
@@ -46,7 +43,6 @@ export class GroupsController {
 		type: Group,
 		isArray: true,
 	})
-	@UseInterceptors(StandardResponseInterceptor)
 	@Get('/:roomId')
 	async getGroups(
 		@Param('roomId', ParseIntPipe) roomId: number
@@ -75,8 +71,6 @@ export class GroupsController {
 		status: HttpStatus.NOT_FOUND,
 		type: NotFoundException,
 	})
-	@UseInterceptors(StandardResponseInterceptor)
-	@UseInterceptors(ErrorHandlerInterceptor)
 	@Get('/:roomId/:groupId')
 	async getGroup(
 		@Param('roomId', ParseIntPipe) roomId: number,
@@ -106,8 +100,6 @@ export class GroupsController {
 		status: HttpStatus.UNAUTHORIZED,
 		type: UnauthorizedException,
 	})
-	@UseInterceptors(StandardResponseInterceptor)
-	@UseInterceptors(ErrorHandlerInterceptor)
 	@UseGuards(AuthGuard)
 	@Post('/:roomId/create')
 	async createGroup(
@@ -143,8 +135,6 @@ export class GroupsController {
 		status: HttpStatus.UNAUTHORIZED,
 		type: UnauthorizedException,
 	})
-	@UseInterceptors(StandardResponseInterceptor)
-	@UseInterceptors(ErrorHandlerInterceptor)
 	@UseGuards(AuthGuard)
 	@Put('/:roomId/:groupId/update')
 	async updateGroup(
@@ -177,8 +167,6 @@ export class GroupsController {
 		status: HttpStatus.UNAUTHORIZED,
 		type: UnauthorizedException,
 	})
-	@UseInterceptors(StandardResponseInterceptor)
-	@UseInterceptors(ErrorHandlerInterceptor)
 	@UseGuards(AuthGuard)
 	@Delete('/:roomId/:groupId/delete')
 	async deleteGroup(

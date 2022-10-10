@@ -11,7 +11,6 @@ import {
 	UnauthorizedException,
 	HttpStatus,
 	NotFoundException,
-	UseInterceptors,
 } from '@nestjs/common';
 import {
 	ApiOperation,
@@ -27,8 +26,6 @@ import { Task } from './models';
 import { AuthToken } from '@/decorators/auth-token.decorator';
 import { CreateTaskDto, UpdateTaskDto } from './dto';
 import { AuthService } from '@/auth/auth.service';
-import { StandardResponseInterceptor } from '@/intercepiors/standard-response.interceptor';
-import { ErrorHandlerInterceptor } from '@/intercepiors/error-handler.interceptor';
 
 @ApiTags('Задачи')
 @Controller('tasks')
@@ -51,7 +48,6 @@ export class TasksController {
 		type: Task,
 		isArray: true,
 	})
-	@UseInterceptors(StandardResponseInterceptor)
 	@Get('/:roomId')
 	async getTasks(
 		@Param('roomId', ParseIntPipe) roomId: number
@@ -80,8 +76,6 @@ export class TasksController {
 		status: HttpStatus.NOT_FOUND,
 		type: NotFoundException,
 	})
-	@UseInterceptors(StandardResponseInterceptor)
-	@UseInterceptors(ErrorHandlerInterceptor)
 	@Get('/:roomId/:taskId')
 	async getTask(
 		@Param('roomId', ParseIntPipe) roomId: number,

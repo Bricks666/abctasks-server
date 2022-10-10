@@ -14,12 +14,8 @@ export class AuthService {
 
 	async authentication(token: string): Promise<AuthenticationResultDto> {
 		const authUser = await this.verifyUser(token);
-
 		const user = await this.usersService.getUser({ userId: authUser.userId });
 
-		if (!user) {
-			throw new BadRequestException();
-		}
 		const tokens = await this.generateToken(user);
 
 		return {
@@ -33,10 +29,7 @@ export class AuthService {
 	}
 
 	async login(dto: LoginDto): Promise<AuthenticationResultDto> {
-		const user = await this.usersService.getInsecureUser(dto);
-		if (!user) {
-			throw new BadRequestException();
-		}
+		const user = await this.usersService.getInsecureUser(dto.login);
 
 		const isValidPassword = await compare(dto.password, user.get('password'));
 
@@ -50,7 +43,7 @@ export class AuthService {
 			photo: user.get('photo'),
 		};
 
-		const tokens = await this.generateToken(user);
+		const tokens = await this.generateToken(secureUser);
 
 		return { user: secureUser, tokens };
 	}

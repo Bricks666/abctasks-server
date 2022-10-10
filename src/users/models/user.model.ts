@@ -1,6 +1,6 @@
 import { ApiHideProperty, ApiProperty } from '@nestjs/swagger';
 import { Column, DataType, Model, Table } from 'sequelize-typescript';
-import { IsNumber, IsString } from 'class-validator';
+import { IsNumber, IsOptional, IsString } from 'class-validator';
 
 interface CreateUser {
 	readonly login: string;
@@ -58,6 +58,7 @@ export class User extends Model<User, CreateUser> {
 		nullable: true,
 	})
 	@IsString()
+	@IsOptional()
 	@Column({
 		type: DataType.STRING,
 		allowNull: true,

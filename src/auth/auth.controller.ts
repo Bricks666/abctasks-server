@@ -41,13 +41,12 @@ export class AuthController {
 		type: AuthenticationResultDto,
 	})
 	@ApiCookieAuth()
-	@Get('auth')
+	@Get('/')
 	async authentication(
 		@Req() req: Request,
 		@Res({ passthrough: true }) res: Response
 	): Promise<AuthenticationResultDto> {
 		const accessToken = req.cookies[COOKIE_NAME];
-
 		if (!accessToken) {
 			throw new UnauthorizedException();
 		}
