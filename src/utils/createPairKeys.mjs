@@ -23,7 +23,10 @@ export const createPairKeys = () => {
 			null;
 		}
 	);
-	writeFileSync(path.resolve('./dist/config/private_key.pem'), keyPair.privateKey);
+	writeFileSync(
+		path.resolve('./dist/config/private_key.pem'),
+		keyPair.privateKey
+	);
 	writeFileSync('./dist/config/public_key.pem', keyPair.publicKey);
 };
 

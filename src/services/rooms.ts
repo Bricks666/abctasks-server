@@ -78,7 +78,11 @@ export class RoomsServices {
 		});
 	};
 
-	public static addRoom = async (userId: number, roomName: string, roomDescription: string) => {
+	public static addRoom = async (
+		userId: number,
+		roomName: string,
+		roomDescription: string
+	) => {
 		await RoomsTable.insert({
 			roomName,
 			roomDescription,

@@ -97,7 +97,10 @@ export class RoomsController {
 	@ApiBearerAuth()
 	@UseGuards(AuthGuard)
 	@Post('/create')
-	async createRoom(@AuthToken() token: string, @Body() dto: CreateRoomDto): Promise<Room> {
+	async createRoom(
+		@AuthToken() token: string,
+		@Body() dto: CreateRoomDto
+	): Promise<Room> {
 		const { userId } = await this.authService.verifyUser(token);
 		return this.roomsService.createRoom(userId, dto);
 	}
@@ -141,7 +144,9 @@ export class RoomsController {
 	@ApiBearerAuth()
 	@UseGuards(AuthGuard)
 	@Delete('/:roomId/delete')
-	async deleteRoom(@Param('roomId', ParseIntPipe) roomId: number): Promise<void> {
+	async deleteRoom(
+		@Param('roomId', ParseIntPipe) roomId: number
+	): Promise<void> {
 		return this.roomsService.deleteRoom(roomId);
 	}
 }

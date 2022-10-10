@@ -1,14 +1,10 @@
-import { readFileSync } from 'fs';
-import { resolve } from 'path';
 import { VerifyUserModel } from '../models';
 import { signToken, verifyToken } from '../utils';
 
-const PUBLIC_KEY = readFileSync(resolve(__dirname, './config/public_key.pem'), 'utf-8');
-const PRIVATE_KEY = readFileSync(resolve(__dirname, './config/private_key.pem'), 'utf-8');
 export class TokensService {
 	public static checkToken = (token: string) => {
 		try {
-			const user = verifyToken<VerifyUserModel>(token, PUBLIC_KEY);
+			const user = verifyToken<VerifyUserModel>(token, process.env.SECRET);
 			if (!user) {
 				return null;
 			}
@@ -20,12 +16,10 @@ export class TokensService {
 	};
 
 	public static createTokens = (user: VerifyUserModel) => {
-		const accessToken = signToken(user, PRIVATE_KEY, {
-			algorithm: 'RS256',
+		const accessToken = signToken(user, process.env.SECRET, {
 			expiresIn: '10m',
 		});
-		const refreshToken = signToken(user, PRIVATE_KEY, {
-			algorithm: 'RS256',
+		const refreshToken = signToken(user, process.env.SECRET, {
 			expiresIn: '14d',
 		});
 
@@ -37,7 +31,10 @@ export class TokensService {
 
 	public static refreshTokens = (refreshToken: string) => {
 		try {
-			const user = verifyToken<VerifyUserModel>(refreshToken, PUBLIC_KEY);
+			const user = verifyToken<VerifyUserModel>(
+				refreshToken,
+				process.env.SECRET
+			);
 
 			return TokensService.createTokens({
 				userId: user.userId,

@@ -1,5 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { BelongsToMany, Column, DataType, Model, Table } from 'sequelize-typescript';
+import {
+	BelongsToMany,
+	Column,
+	DataType,
+	Model,
+	Table,
+} from 'sequelize-typescript';
 import { IsString, IsNumber } from 'class-validator';
 import { User } from '@/users/models';
 import { RoomUser } from './room-user.model';

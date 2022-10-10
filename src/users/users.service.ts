@@ -9,7 +9,9 @@ import { User } from './models';
 
 @Injectable()
 export class UsersService {
-	constructor(@InjectModel(User) private readonly usersRepository: typeof User) {}
+	constructor(
+		@InjectModel(User) private readonly usersRepository: typeof User
+	) {}
 
 	async createUser(dto: CreateUserDto): Promise<SecurityUserDto> {
 		const user = await this.usersRepository.create(dto);
@@ -75,7 +77,10 @@ export class UsersService {
 		return user;
 	}
 
-	async updateUser(userId: number, dto: UpdateUserDto): Promise<SecurityUserDto> {
+	async updateUser(
+		userId: number,
+		dto: UpdateUserDto
+	): Promise<SecurityUserDto> {
 		await this.usersRepository.update(
 			{
 				password: dto.password,

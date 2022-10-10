@@ -8,6 +8,8 @@ import { RoomsModule } from './rooms/rooms.module';
 import { Room, RoomUser } from './rooms/models';
 import { TasksModule } from './tasks/tasks.module';
 import { Task } from './tasks/models';
+import { GroupsModule } from './groups/groups.module';
+import { Group } from './groups/models';
 
 @Module({
 	imports: [
@@ -22,12 +24,13 @@ import { Task } from './tasks/models';
 			host: process.env.DB_HOST,
 			port: Number(process.env.DB_PORT),
 			autoLoadModels: true,
-			models: [User, Room, RoomUser, Task],
+			models: [User, Room, RoomUser, Task, Group],
 		}),
 		AuthModule,
 		UsersModule,
 		RoomsModule,
 		TasksModule,
+		GroupsModule,
 	],
 })
 export class AppModule {}

@@ -6,7 +6,9 @@ import { Room } from './models';
 
 @Injectable()
 export class RoomsService {
-	constructor(@InjectModel(Room) private readonly roomsRepository: typeof Room) {}
+	constructor(
+		@InjectModel(Room) private readonly roomsRepository: typeof Room
+	) {}
 
 	async getRooms(userId: number): Promise<Room[]> {
 		return this.roomsRepository.findAll({

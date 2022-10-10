@@ -50,7 +50,9 @@ export class ProgressServices {
 				(groupIds as number[]).forEach((groupId) => {
 					progresses.push({
 						groupId,
-						progress: userProgresses.find((progress) => progress.groupId === groupId),
+						progress: userProgresses.find(
+							(progress) => progress.groupId === groupId
+						),
 					});
 				});
 

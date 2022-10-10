@@ -3,7 +3,11 @@ import { TasksTable } from '@/database';
 import { TaskCreateModel, TaskModel, TaskStatus } from '@/models';
 
 export class TasksService {
-	public static getTasks = async (roomId: number, page = 1, countOnPage = 100) => {
+	public static getTasks = async (
+		roomId: number,
+		page = 1,
+		countOnPage = 100
+	) => {
 		return TasksTable.select({
 			filters: {
 				roomId: {

@@ -5,11 +5,10 @@ import { RoomIdParam } from '@/interfaces/param';
 import { ProgressResponse } from './progress.types';
 
 export class ProgressControllers {
-	public static getTasksProgress: RequestHandler<RoomIdParam, ProgressResponse> = async (
-		req,
-		res,
-		next
-	) => {
+	public static getTasksProgress: RequestHandler<
+		RoomIdParam,
+		ProgressResponse
+	> = async (req, res, next) => {
 		try {
 			const { roomId } = req.params;
 
@@ -21,7 +20,11 @@ export class ProgressControllers {
 		}
 	};
 
-	public static subscribeChangeProgress: RequestHandler<RoomIdParam> = async (req, res, next) => {
+	public static subscribeChangeProgress: RequestHandler<RoomIdParam> = async (
+		req,
+		res,
+		next
+	) => {
 		try {
 			res.writeHead(200, {
 				Connection: 'keep-alive',
@@ -29,8 +32,9 @@ export class ProgressControllers {
 				'Change-Control': 'no-cache',
 			});
 			const { roomId } = req.params;
-			const unsubscribe = ProgressServices.subscribeChangeProgress(+roomId, (progress) =>
-				res.write(createEventResponse(progress))
+			const unsubscribe = ProgressServices.subscribeChangeProgress(
+				+roomId,
+				(progress) => res.write(createEventResponse(progress))
 			);
 			res.once('close', unsubscribe);
 			res.once('error', unsubscribe);

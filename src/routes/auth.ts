@@ -26,7 +26,17 @@ authRoutes.post(
 	validationCheck(),
 	AuthController.login
 );
-authRoutes.delete('/logout', cookie(COOKIE_NAME), validationCheck(), AuthController.logout);
-authRoutes.get('/refresh', cookie(COOKIE_NAME), validationCheck(), AuthController.refresh);
+authRoutes.delete(
+	'/logout',
+	cookie(COOKIE_NAME),
+	validationCheck(),
+	AuthController.logout
+);
+authRoutes.get(
+	'/refresh',
+	cookie(COOKIE_NAME),
+	validationCheck(),
+	AuthController.refresh
+);
 
 export { authRoutes };

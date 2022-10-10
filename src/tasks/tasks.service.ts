@@ -5,7 +5,9 @@ import { Task } from './models';
 
 @Injectable()
 export class TasksService {
-	constructor(@InjectModel(Task) private readonly tasksRepository: typeof Task) {}
+	constructor(
+		@InjectModel(Task) private readonly tasksRepository: typeof Task
+	) {}
 
 	async getTasks(roomId: number): Promise<Task[]> {
 		return this.tasksRepository.findAll({
@@ -30,11 +32,15 @@ export class TasksService {
 		return task;
 	}
 
-	async createTask(dto: CreateTaskDto): Promise<Task> {
-		return this.tasksRepository.create(dto);
+	async createTask(roomId: number, dto: CreateTaskDto): Promise<Task> {
+		return this.tasksRepository.create({ roomId, ...dto });
 	}
 
-	async updateTask(roomId: number, taskId: number, dto: UpdateTaskDto): Promise<Task> {
+	async updateTask(
+		roomId: number,
+		taskId: number,
+		dto: UpdateTaskDto
+	): Promise<Task> {
 		await this.tasksRepository.update(dto, {
 			where: {
 				roomId,

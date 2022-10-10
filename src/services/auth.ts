@@ -4,7 +4,11 @@ import { SecureUserModel, UserModel } from '@/models';
 import { UsersTable } from '@/database';
 
 export class AuthServices {
-	public static registrationUser = async (login: string, password: string, photo?: string) => {
+	public static registrationUser = async (
+		login: string,
+		password: string,
+		photo?: string
+	) => {
 		const user = await UsersTable.select({
 			filters: {
 				login: {

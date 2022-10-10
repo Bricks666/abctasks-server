@@ -17,7 +17,10 @@ export class ProfileServices {
 		return user;
 	};
 
-	public static updateUser = async (userId: number, user: Omit<SecureUserModel, 'userId'>) => {
+	public static updateUser = async (
+		userId: number,
+		user: Omit<SecureUserModel, 'userId'>
+	) => {
 		await UsersTable.update<Partial<SecureUserModel>>(user, {
 			filters: {
 				userId: {

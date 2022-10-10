@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Param, ParseIntPipe, Put, UseGuards } from '@nestjs/common';
+import {
+	Body,
+	Controller,
+	Get,
+	Param,
+	ParseIntPipe,
+	Put,
+	UseGuards,
+} from '@nestjs/common';
 import {
 	ApiTags,
 	ApiOperation,

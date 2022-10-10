@@ -11,11 +11,22 @@ import {
 	UnauthorizedException,
 } from '@nestjs/common';
 import { Request, Response } from 'express';
-import { ApiBody, ApiCookieAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+	ApiBody,
+	ApiCookieAuth,
+	ApiOperation,
+	ApiResponse,
+	ApiTags,
+} from '@nestjs/swagger';
 import { BASE_COOKIE_OPTIONS, COOKIE_NAME, COOKIE_TIME } from '@/const/cookie';
 import { CreateUserDto, SecurityUserDto } from '@/users/dto';
 import { AuthService } from './auth.service';
-import { AuthenticationResultDto, LoginDto, LoginRequestDto, TokensDto } from './dto';
+import {
+	AuthenticationResultDto,
+	LoginDto,
+	LoginRequestDto,
+	TokensDto,
+} from './dto';
 
 @ApiTags('Авторизация')
 @Controller('auth')

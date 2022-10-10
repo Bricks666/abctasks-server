@@ -1,8 +1,16 @@
 import { IsDateString, IsNumber, IsString } from 'class-validator';
-import { Column, DataType, ForeignKey, Model, Table } from 'sequelize-typescript';
+import {
+	BelongsTo,
+	Column,
+	DataType,
+	ForeignKey,
+	Model,
+	Table,
+} from 'sequelize-typescript';
 import { ApiProperty } from '@nestjs/swagger';
 import { Room } from '@/rooms/models';
 import { User } from '@/users/models';
+import { Group } from '@/groups/models';
 
 export type TaskStatus = 'done' | 'in progress' | 'review' | 'ready';
 
@@ -53,6 +61,7 @@ export class Task extends Model<Task, CreateTask> {
 	@Column({
 		type: DataType.INTEGER,
 	})
+	@ForeignKey(() => Group)
 	@IsNumber()
 	declare groupId: number;
 
@@ -98,4 +107,10 @@ export class Task extends Model<Task, CreateTask> {
 	})
 	@IsDateString()
 	declare createdAt: string;
+
+	@BelongsTo(() => User)
+	declare author: User;
+
+	@BelongsTo(() => Group)
+	declare group: Group;
 }

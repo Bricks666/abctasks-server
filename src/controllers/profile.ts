@@ -7,11 +7,11 @@ import { ProfileResponse, UpdateProfileRequest } from './profile.types';
 import { RequestWithUser } from '@/interfaces/request';
 
 export class ProfileControllers {
-	static getProfile: RequestHandler<undefined, ProfileResponse, RequestWithUser> = async (
-		req,
-		res,
-		next
-	) => {
+	static getProfile: RequestHandler<
+		undefined,
+		ProfileResponse,
+		RequestWithUser
+	> = async (req, res, next) => {
 		try {
 			const {
 				user: { userId },
@@ -24,11 +24,11 @@ export class ProfileControllers {
 		}
 	};
 
-	static updateProfile: RequestHandler<undefined, ProfileResponse, UpdateProfileRequest> = async (
-		req,
-		res,
-		next
-	) => {
+	static updateProfile: RequestHandler<
+		undefined,
+		ProfileResponse,
+		UpdateProfileRequest
+	> = async (req, res, next) => {
 		try {
 			const { user, ...newValues } = req.body;
 			const photo = req.files?.photo as UploadedFile | undefined;
