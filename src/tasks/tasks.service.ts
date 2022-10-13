@@ -21,7 +21,7 @@ export class TasksService {
 		const task = await this.tasksRepository.findOne({
 			where: {
 				roomId,
-				taskId,
+				id: taskId,
 			},
 		});
 
@@ -32,8 +32,12 @@ export class TasksService {
 		return task;
 	}
 
-	async createTask(roomId: number, dto: CreateTaskDto): Promise<Task> {
-		return this.tasksRepository.create({ roomId, ...dto });
+	async createTask(
+		roomId: number,
+		authorId: number,
+		dto: CreateTaskDto
+	): Promise<Task> {
+		return this.tasksRepository.create({ roomId, authorId, ...dto });
 	}
 
 	async updateTask(
@@ -44,19 +48,21 @@ export class TasksService {
 		await this.tasksRepository.update(dto, {
 			where: {
 				roomId,
-				taskId,
+				id: taskId,
 			},
 		});
 
 		return this.getTask(roomId, taskId);
 	}
 
-	async deleteTask(roomId: number, taskId: number): Promise<void> {
+	async deleteTask(roomId: number, taskId: number): Promise<boolean> {
 		await this.tasksRepository.destroy({
 			where: {
 				roomId,
-				taskId,
+				id: taskId,
 			},
 		});
+
+		return true;
 	}
 }

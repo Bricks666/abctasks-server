@@ -55,11 +55,13 @@ export class RoomsService {
 		return this.getRoom(roomId);
 	}
 
-	async deleteRoom(roomId: number): Promise<void> {
+	async deleteRoom(roomId: number): Promise<boolean> {
 		await this.roomsRepository.destroy({
 			where: {
 				roomId,
 			},
 		});
+
+		return true;
 	}
 }

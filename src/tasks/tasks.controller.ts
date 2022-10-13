@@ -113,10 +113,7 @@ export class TasksController {
 		@Body() dto: CreateTaskDto
 	): Promise<Task> {
 		const { userId } = await this.authService.verifyUser(token);
-		return this.tasksService.createTask(roomId, {
-			authorId: userId,
-			...dto,
-		});
+		return this.tasksService.createTask(roomId, userId, dto);
 	}
 
 	@ApiOperation({
@@ -182,7 +179,7 @@ export class TasksController {
 	async deleteTask(
 		@Param('roomId', ParseIntPipe) roomId: number,
 		@Param('taskId', ParseIntPipe) taskId: number
-	) {
-		await this.tasksService.deleteTask(roomId, taskId);
+	): Promise<boolean> {
+		return this.tasksService.deleteTask(roomId, taskId);
 	}
 }

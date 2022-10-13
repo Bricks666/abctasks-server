@@ -46,12 +46,12 @@ export class AuthController {
 		@Req() req: Request,
 		@Res({ passthrough: true }) res: Response
 	): Promise<AuthenticationResultDto> {
-		const accessToken = req.cookies[COOKIE_NAME];
-		if (!accessToken) {
+		const refreshToken = req.cookies[COOKIE_NAME];
+		if (!refreshToken) {
 			throw new UnauthorizedException();
 		}
 
-		const result = await this.authService.authentication(accessToken);
+		const result = await this.authService.authentication(refreshToken);
 
 		res.cookie(COOKIE_NAME, result.tokens.refreshToken, {
 			...BASE_COOKIE_OPTIONS,
@@ -104,12 +104,13 @@ export class AuthController {
 	@ApiOperation({ summary: 'Выход их аккаунта' })
 	@ApiResponse({
 		status: 200,
-		type: undefined,
+		type: Boolean,
 		description: 'Подтверждение успешности выхода',
 	})
 	@Delete('logout')
-	async logout(@Res() res: Response): Promise<void> {
+	async logout(@Res({ passthrough: true }) res: Response): Promise<boolean> {
 		res.clearCookie(COOKIE_NAME);
+		return true;
 	}
 
 	@ApiOperation({ summary: 'Обновление токена доступа' })

@@ -6,9 +6,9 @@ import {
 	ForeignKey,
 } from 'sequelize-typescript';
 import { ApiProperty } from '@nestjs/swagger';
-import { IsDateString, IsHexColor, IsNumber } from 'class-validator';
-import { HEX } from '@/interfaces/common';
+import { IsHexColor, IsNumber, IsString } from 'class-validator';
 import { Room } from '@/rooms/models';
+import { HEX } from '@/types/common';
 
 interface CreateGroup {
 	readonly roomId: number;
@@ -34,7 +34,7 @@ export class Group extends Model<Group, CreateGroup> {
 		primaryKey: true,
 		autoIncrement: true,
 	})
-	declare groupId: number;
+	declare id: number;
 
 	@ApiProperty({
 		description: 'Id комнаты',
@@ -53,11 +53,11 @@ export class Group extends Model<Group, CreateGroup> {
 		example: 'Name',
 		type: String,
 	})
-	@IsDateString()
+	@IsString()
 	@Column({
 		type: DataType.STRING,
 	})
-	declare groupName: string;
+	declare name: string;
 
 	@ApiProperty({
 		description: 'Основной цвет группы',
@@ -68,7 +68,7 @@ export class Group extends Model<Group, CreateGroup> {
 	@Column({
 		type: DataType.STRING,
 	})
-	declare groupMainColor: HEX;
+	declare mainColor: HEX;
 
 	@ApiProperty({
 		description: 'Вторичный цвет группы',
@@ -79,5 +79,5 @@ export class Group extends Model<Group, CreateGroup> {
 	@Column({
 		type: DataType.STRING,
 	})
-	declare groupSecondColor: HEX;
+	declare secondColor: HEX;
 }

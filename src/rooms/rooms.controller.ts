@@ -146,7 +146,7 @@ export class RoomsController {
 	@Delete('/:roomId/delete')
 	async deleteRoom(
 		@Param('roomId', ParseIntPipe) roomId: number
-	): Promise<void> {
+	): Promise<boolean> {
 		return this.roomsService.deleteRoom(roomId);
 	}
 }

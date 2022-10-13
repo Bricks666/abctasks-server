@@ -17,7 +17,7 @@ interface CreateRoom {
 
 @Table({
 	tableName: 'rooms',
-	createdAt: false,
+	updatedAt: true,
 })
 export class Room extends Model<Room, CreateRoom> {
 	@ApiProperty({

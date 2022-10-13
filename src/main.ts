@@ -10,11 +10,10 @@ async function bootstrap() {
 	const PORT = process.env.PORT || 3000;
 	const HOST = process.env.HOST || 'localhost';
 	const app = await NestFactory.create(AppModule);
-
 	app.use(
 		cors({
 			credentials: true,
-			origin: /localhost/,
+			origin: [/http:\/\/localhost/, /http:\/\/127.0.0.1/],
 		}),
 		cookieParser()
 	);

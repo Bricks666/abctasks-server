@@ -39,7 +39,7 @@ export class Task extends Model<Task, CreateTask> {
 		autoIncrement: true,
 	})
 	@IsNumber()
-	declare taskId: number;
+	declare id: number;
 
 	@ApiProperty({
 		type: Number,
@@ -111,6 +111,6 @@ export class Task extends Model<Task, CreateTask> {
 	@BelongsTo(() => User)
 	declare author: User;
 
-	@BelongsTo(() => Group)
+	@BelongsTo(() => Group, { onDelete: 'CASCADE' })
 	declare group: Group;
 }

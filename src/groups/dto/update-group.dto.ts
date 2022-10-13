@@ -1,11 +1,4 @@
-import { PartialType, PickType } from '@nestjs/swagger';
-import { Group } from '../models';
+import { PartialType } from '@nestjs/swagger';
+import { CreateGroupDto } from './create-group.dto';
 
-export class UpdateGroupDto extends PartialType(
-	PickType(Group, [
-		'groupName',
-		'groupMainColor',
-		'groupSecondColor',
-		'groupName',
-	])
-) {}
+export class UpdateGroupDto extends PartialType(CreateGroupDto) {}

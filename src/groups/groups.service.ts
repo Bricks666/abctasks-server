@@ -21,7 +21,7 @@ export class GroupsService {
 		const group = await this.groupRepository.findOne({
 			where: {
 				roomId,
-				groupId,
+				id: groupId,
 			},
 		});
 
@@ -47,7 +47,7 @@ export class GroupsService {
 		await this.groupRepository.update(dto, {
 			where: {
 				roomId,
-				groupId,
+				id: groupId,
 			},
 		});
 
@@ -58,9 +58,8 @@ export class GroupsService {
 		const a = await this.groupRepository.destroy({
 			where: {
 				roomId,
-				groupId,
+				id: groupId,
 			},
-			cascade: true,
 		});
 
 		return !!a;

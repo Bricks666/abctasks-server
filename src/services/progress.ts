@@ -1,12 +1,12 @@
 import { toJSON } from 'mariadb-table-wrapper';
 import { TasksTable } from '@/database';
-import { TaskStatus, TaskProgress } from '@/models';
-import { changeProgress } from '@/packages/eventBus';
+// import { changeProgress } from '@/packages/eventBus';
+import { TaskProgress } from '@/models';
 
-interface ChangeProgress {
+/* interface ChangeProgress {
 	readonly groupId: number;
 	readonly progress: TaskProgress | undefined;
-}
+} */
 
 export class ProgressServices {
 	public static getTasksProgress = async (roomId: number) => {
@@ -28,7 +28,7 @@ export class ProgressServices {
 						field: 'status',
 						condition: {
 							operator: '=',
-							value: toJSON(TaskStatus.DONE),
+							value: toJSON('done'),
 						},
 						yes: 'todoId',
 					},
@@ -39,7 +39,7 @@ export class ProgressServices {
 		});
 	};
 
-	public static subscribeChangeProgress(
+	/* 	public static subscribeChangeProgress(
 		roomId: number,
 		listener: (progress: ChangeProgress[]) => unknown
 	) {
@@ -65,5 +65,5 @@ export class ProgressServices {
 
 	public static changeProgress(roomId: number, ...groupIds: number[]) {
 		changeProgress.broadcast(roomId, groupIds);
-	}
+	} */
 }

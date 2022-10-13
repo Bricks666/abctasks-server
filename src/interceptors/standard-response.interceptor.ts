@@ -26,14 +26,14 @@ export class StandardResponseInterceptor<T>
 				errorMessage: null,
 				statusCode: 200,
 			})),
-			catchError(
-				(error: HttpException): Observable<FailResponse> =>
-					of({
-						data: null,
-						statusCode: error.getStatus ? error.getStatus() : 500,
-						errorMessage: error.message,
-					})
-			)
+			catchError((error: HttpException): Observable<FailResponse> => {
+				console.log(error);
+				return of({
+					data: null,
+					statusCode: error.getStatus ? error.getStatus() : 500,
+					errorMessage: error.message,
+				});
+			})
 		);
 	}
 }

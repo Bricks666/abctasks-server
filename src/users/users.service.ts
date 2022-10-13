@@ -49,7 +49,11 @@ export class UsersService {
 			throw new NotFoundException();
 		}
 
-		return user;
+		return {
+			login: user.login,
+			userId: user.userId,
+			photo: user.photo,
+		};
 	}
 
 	async getUserByLogin(dto: GetUserByLoginDto): Promise<SecurityUserDto> {
