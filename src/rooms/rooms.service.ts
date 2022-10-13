@@ -10,13 +10,13 @@ export class RoomsService {
 		@InjectModel(Room) private readonly roomsRepository: typeof Room
 	) {}
 
-	async getRooms(userId: number): Promise<Room[]> {
+	async getAll(userId: number): Promise<Room[]> {
 		return this.roomsRepository.findAll({
 			include: [
 				{
 					model: User,
 					where: {
-						userId,
+						id: userId,
 					},
 					attributes: [],
 				},
@@ -24,10 +24,10 @@ export class RoomsService {
 		});
 	}
 
-	async getRoom(roomId: number): Promise<Room> {
+	async getOne(id: number): Promise<Room> {
 		const room = await this.roomsRepository.findOne({
 			where: {
-				roomId,
+				id,
 			},
 		});
 
@@ -38,27 +38,27 @@ export class RoomsService {
 		return room;
 	}
 
-	async createRoom(userId: number, dto: CreateRoomDto): Promise<Room> {
+	async create(userId: number, dto: CreateRoomDto): Promise<Room> {
 		const room = await this.roomsRepository.create(dto);
 		room.$add('users', [userId]);
 
 		return room;
 	}
 
-	async updateRoom(roomId: number, dto: UpdateRoomDto): Promise<Room> {
+	async update(id: number, dto: UpdateRoomDto): Promise<Room> {
 		await this.roomsRepository.update(dto, {
 			where: {
-				roomId,
+				id,
 			},
 		});
 
-		return this.getRoom(roomId);
+		return this.getOne(id);
 	}
 
-	async deleteRoom(roomId: number): Promise<boolean> {
+	async remove(id: number): Promise<boolean> {
 		await this.roomsRepository.destroy({
 			where: {
-				roomId,
+				id,
 			},
 		});
 

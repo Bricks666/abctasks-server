@@ -9,7 +9,7 @@ export class TasksService {
 		@InjectModel(Task) private readonly tasksRepository: typeof Task
 	) {}
 
-	async getTasks(roomId: number): Promise<Task[]> {
+	async getAll(roomId: number): Promise<Task[]> {
 		return this.tasksRepository.findAll({
 			where: {
 				roomId,
@@ -17,11 +17,11 @@ export class TasksService {
 		});
 	}
 
-	async getTask(roomId: number, taskId: number): Promise<Task> {
+	async getOne(roomId: number, id: number): Promise<Task> {
 		const task = await this.tasksRepository.findOne({
 			where: {
 				roomId,
-				id: taskId,
+				id,
 			},
 		});
 
@@ -32,7 +32,7 @@ export class TasksService {
 		return task;
 	}
 
-	async createTask(
+	async create(
 		roomId: number,
 		authorId: number,
 		dto: CreateTaskDto
@@ -40,26 +40,22 @@ export class TasksService {
 		return this.tasksRepository.create({ roomId, authorId, ...dto });
 	}
 
-	async updateTask(
-		roomId: number,
-		taskId: number,
-		dto: UpdateTaskDto
-	): Promise<Task> {
+	async update(roomId: number, id: number, dto: UpdateTaskDto): Promise<Task> {
 		await this.tasksRepository.update(dto, {
 			where: {
 				roomId,
-				id: taskId,
+				id,
 			},
 		});
 
-		return this.getTask(roomId, taskId);
+		return this.getOne(roomId, id);
 	}
 
-	async deleteTask(roomId: number, taskId: number): Promise<boolean> {
+	async remove(roomId: number, id: number): Promise<boolean> {
 		await this.tasksRepository.destroy({
 			where: {
 				roomId,
-				id: taskId,
+				id,
 			},
 		});
 

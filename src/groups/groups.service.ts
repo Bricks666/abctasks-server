@@ -9,7 +9,7 @@ export class GroupsService {
 		@InjectModel(Group) private readonly groupRepository: typeof Group
 	) {}
 
-	async getGroups(roomId: number): Promise<Group[]> {
+	async getAll(roomId: number): Promise<Group[]> {
 		return this.groupRepository.findAll({
 			where: {
 				roomId,
@@ -17,11 +17,11 @@ export class GroupsService {
 		});
 	}
 
-	async getGroup(roomId: number, groupId: number): Promise<Group> {
+	async getOne(roomId: number, id: number): Promise<Group> {
 		const group = await this.groupRepository.findOne({
 			where: {
 				roomId,
-				id: groupId,
+				id,
 			},
 		});
 
@@ -32,33 +32,33 @@ export class GroupsService {
 		return group;
 	}
 
-	async createGroup(roomId: number, dto: CreateGroupDto): Promise<Group> {
+	async create(roomId: number, dto: CreateGroupDto): Promise<Group> {
 		return this.groupRepository.create({
 			roomId,
 			...dto,
 		});
 	}
 
-	async updateGroup(
+	async update(
 		roomId: number,
-		groupId: number,
+		id: number,
 		dto: UpdateGroupDto
 	): Promise<Group> {
 		await this.groupRepository.update(dto, {
 			where: {
 				roomId,
-				id: groupId,
+				id,
 			},
 		});
 
-		return this.getGroup(roomId, groupId);
+		return this.getOne(roomId, id);
 	}
 
-	async deleteGroup(roomId: number, groupId: number): Promise<boolean> {
+	async remove(roomId: number, id: number): Promise<boolean> {
 		const a = await this.groupRepository.destroy({
 			where: {
 				roomId,
-				id: groupId,
+				id,
 			},
 		});
 

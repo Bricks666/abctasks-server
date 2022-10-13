@@ -25,7 +25,7 @@ export class User extends Model<User, CreateUser> {
 		primaryKey: true,
 		autoIncrement: true,
 	})
-	declare userId: number;
+	declare id: number;
 
 	@ApiProperty({
 		type: String,

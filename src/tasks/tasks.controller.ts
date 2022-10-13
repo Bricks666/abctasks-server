@@ -5,34 +5,33 @@ import {
 	Param,
 	Post,
 	Put,
-	UseGuards,
 	ParseIntPipe,
 	Body,
-	UnauthorizedException,
 	HttpStatus,
 	NotFoundException,
 } from '@nestjs/common';
 import {
 	ApiOperation,
-	ApiBearerAuth,
 	ApiResponse,
 	ApiParam,
 	ApiBody,
 	ApiTags,
 } from '@nestjs/swagger';
 import { TasksService } from './tasks.service';
-import { AuthGuard } from '@/auth/auth.guard';
 import { Task } from './models';
 import { AuthToken } from '@/decorators/auth-token.decorator';
 import { CreateTaskDto, UpdateTaskDto } from './dto';
 import { AuthService } from '@/auth/auth.service';
+import { ActivitiesService } from '@/activities/activities.service';
+import { Auth } from '@/decorators/auth.decorator';
 
 @ApiTags('Задачи')
 @Controller('tasks')
 export class TasksController {
 	constructor(
 		private readonly tasksService: TasksService,
-		private readonly authService: AuthService
+		private readonly authService: AuthService,
+		private readonly activitiesService: ActivitiesService
 	) {}
 
 	@ApiOperation({
@@ -49,10 +48,8 @@ export class TasksController {
 		isArray: true,
 	})
 	@Get('/:roomId')
-	async getTasks(
-		@Param('roomId', ParseIntPipe) roomId: number
-	): Promise<Task[]> {
-		return this.tasksService.getTasks(roomId);
+	async getAll(@Param('roomId', ParseIntPipe) roomId: number): Promise<Task[]> {
+		return this.tasksService.getAll(roomId);
 	}
 
 	@ApiOperation({
@@ -64,7 +61,7 @@ export class TasksController {
 		description: 'Id комнаты',
 	})
 	@ApiParam({
-		name: 'taskId',
+		name: 'id',
 		type: Number,
 		description: 'Id задачи',
 	})
@@ -76,18 +73,17 @@ export class TasksController {
 		status: HttpStatus.NOT_FOUND,
 		type: NotFoundException,
 	})
-	@Get('/:roomId/:taskId')
-	async getTask(
+	@Get('/:roomId/:id')
+	async getOne(
 		@Param('roomId', ParseIntPipe) roomId: number,
-		@Param('taskId', ParseIntPipe) taskId: number
+		@Param('id', ParseIntPipe) id: number
 	): Promise<Task> {
-		return this.tasksService.getTask(roomId, taskId);
+		return this.tasksService.getOne(roomId, id);
 	}
 
 	@ApiOperation({
 		summary: 'Создание новой задачи',
 	})
-	@ApiBearerAuth()
 	@ApiParam({
 		name: 'roomId',
 		type: Number,
@@ -101,32 +97,33 @@ export class TasksController {
 		status: HttpStatus.OK,
 		type: Task,
 	})
-	@ApiResponse({
-		status: HttpStatus.UNAUTHORIZED,
-		type: UnauthorizedException,
-	})
-	@UseGuards(AuthGuard)
+	@Auth()
 	@Post('/:roomId/create')
-	async createTask(
+	async create(
 		@Param('roomId', ParseIntPipe) roomId: number,
 		@AuthToken() token: string,
 		@Body() dto: CreateTaskDto
 	): Promise<Task> {
-		const { userId } = await this.authService.verifyUser(token);
-		return this.tasksService.createTask(roomId, userId, dto);
+		const { id: userId } = await this.authService.verifyUser(token);
+		const task = await this.tasksService.create(roomId, userId, dto);
+		await this.activitiesService.create(roomId, {
+			activistId: userId,
+			sphere: 'task',
+			type: 'create',
+		});
+		return task;
 	}
 
 	@ApiOperation({
 		summary: 'Изменение информации о комнате',
 	})
-	@ApiBearerAuth()
 	@ApiParam({
 		name: 'roomId',
 		type: Number,
 		description: 'Id комнаты',
 	})
 	@ApiParam({
-		name: 'taskId',
+		name: 'id',
 		type: Number,
 		description: 'Id задачи',
 	})
@@ -139,34 +136,37 @@ export class TasksController {
 		type: Task,
 	})
 	@ApiResponse({
-		status: HttpStatus.UNAUTHORIZED,
-		type: UnauthorizedException,
-	})
-	@ApiResponse({
 		status: HttpStatus.NOT_FOUND,
 		type: NotFoundException,
 	})
-	@UseGuards(AuthGuard)
-	@Put('/:roomId/:taskId/update')
-	async updateTask(
+	@Auth()
+	@Put('/:roomId/:id/update')
+	async update(
 		@Param('roomId', ParseIntPipe) roomId: number,
-		@Param('taskId', ParseIntPipe) taskId: number,
-		@Body() dto: UpdateTaskDto
+		@Param('id', ParseIntPipe) id: number,
+		@Body() dto: UpdateTaskDto,
+		@AuthToken() token: string
 	): Promise<Task> {
-		return this.tasksService.updateTask(roomId, taskId, dto);
+		const { id: userId } = await this.authService.verifyUser(token);
+		const task = await this.tasksService.update(roomId, id, dto);
+		await this.activitiesService.create(roomId, {
+			activistId: userId,
+			sphere: 'task',
+			type: 'update',
+		});
+		return task;
 	}
 
 	@ApiOperation({
 		summary: 'Изменение информации о комнате',
 	})
-	@ApiBearerAuth()
 	@ApiParam({
 		name: 'roomId',
 		type: Number,
 		description: 'Id комнаты',
 	})
 	@ApiParam({
-		name: 'taskId',
+		name: 'id',
 		type: Number,
 		description: 'Id задачи',
 	})
@@ -174,12 +174,20 @@ export class TasksController {
 		status: HttpStatus.OK,
 		type: undefined,
 	})
-	@UseGuards(AuthGuard)
-	@Delete('/:roomId/:taskId/delete')
-	async deleteTask(
+	@Auth()
+	@Delete('/:roomId/:id/remove')
+	async remove(
 		@Param('roomId', ParseIntPipe) roomId: number,
-		@Param('taskId', ParseIntPipe) taskId: number
+		@Param('id', ParseIntPipe) id: number,
+		@AuthToken() token: string
 	): Promise<boolean> {
-		return this.tasksService.deleteTask(roomId, taskId);
+		const { id: userId } = await this.authService.verifyUser(token);
+		const response = await this.tasksService.remove(roomId, id);
+		await this.activitiesService.create(roomId, {
+			activistId: userId,
+			sphere: 'task',
+			type: 'remove',
+		});
+		return response;
 	}
 }

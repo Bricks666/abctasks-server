@@ -31,7 +31,7 @@ export class Room extends Model<Room, CreateRoom> {
 		primaryKey: true,
 		autoIncrement: true,
 	})
-	declare roomId: number;
+	declare id: number;
 
 	@ApiProperty({
 		example: 'Room name',
@@ -42,7 +42,7 @@ export class Room extends Model<Room, CreateRoom> {
 	@Column({
 		type: DataType.STRING,
 	})
-	declare roomName: string;
+	declare name: string;
 
 	@ApiProperty({
 		example: 'Room description',
@@ -53,7 +53,7 @@ export class Room extends Model<Room, CreateRoom> {
 	@Column({
 		type: DataType.STRING,
 	})
-	declare roomDescription: string;
+	declare description: string;
 
 	@BelongsToMany(() => User, () => RoomUser)
 	declare users: User[];

@@ -2,7 +2,6 @@ import {
 	Controller,
 	Get,
 	Param,
-	UseGuards,
 	ParseIntPipe,
 	Post,
 	Body,
@@ -10,22 +9,20 @@ import {
 	Delete,
 	HttpStatus,
 	NotFoundException,
-	UnauthorizedException,
 } from '@nestjs/common';
 import {
-	ApiBearerAuth,
 	ApiBody,
 	ApiOperation,
 	ApiParam,
 	ApiResponse,
 	ApiTags,
 } from '@nestjs/swagger';
-import { AuthGuard } from '@/auth/auth.guard';
 import { Room } from './models';
 import { RoomsService } from './rooms.service';
 import { AuthService } from '@/auth/auth.service';
 import { CreateRoomDto, UpdateRoomDto } from './dto';
 import { AuthToken } from '@/decorators/auth-token.decorator';
+import { Auth } from '@/decorators/auth.decorator';
 
 @ApiTags('Комнаты')
 @Controller('rooms')
@@ -38,28 +35,23 @@ export class RoomsController {
 	@ApiOperation({
 		summary: 'Возврат всех комнат авторизованного пользователя',
 	})
-	@ApiBearerAuth()
 	@ApiResponse({
 		status: HttpStatus.OK,
 		type: Room,
 		isArray: true,
 	})
-	@ApiResponse({
-		status: HttpStatus.UNAUTHORIZED,
-		type: UnauthorizedException,
-	})
-	@UseGuards(AuthGuard)
+	@Auth()
 	@Get('/')
-	async getRooms(@AuthToken() token: string): Promise<Room[]> {
-		const { userId } = await this.authService.verifyUser(token);
-		return this.roomsService.getRooms(userId);
+	async getAll(@AuthToken() token: string): Promise<Room[]> {
+		const { id } = await this.authService.verifyUser(token);
+		return this.roomsService.getAll(id);
 	}
 
 	@ApiOperation({
 		summary: 'Возврат комнаты',
 	})
 	@ApiParam({
-		name: 'roomId',
+		name: 'id',
 		type: Number,
 	})
 	@ApiResponse({
@@ -70,9 +62,9 @@ export class RoomsController {
 		status: HttpStatus.NOT_FOUND,
 		type: NotFoundException,
 	})
-	@Get('/:roomId')
-	async getRoom(@Param('roomId', ParseIntPipe) roomId: number): Promise<Room> {
-		return this.roomsService.getRoom(roomId);
+	@Get('/:id')
+	async getOne(@Param('id', ParseIntPipe) id: number): Promise<Room> {
+		return this.roomsService.getOne(id);
 	}
 
 	@ApiOperation({
@@ -90,19 +82,14 @@ export class RoomsController {
 		status: HttpStatus.NOT_FOUND,
 		type: NotFoundException,
 	})
-	@ApiResponse({
-		status: HttpStatus.UNAUTHORIZED,
-		type: UnauthorizedException,
-	})
-	@ApiBearerAuth()
-	@UseGuards(AuthGuard)
+	@Auth()
 	@Post('/create')
-	async createRoom(
+	async create(
 		@AuthToken() token: string,
 		@Body() dto: CreateRoomDto
 	): Promise<Room> {
-		const { userId } = await this.authService.verifyUser(token);
-		return this.roomsService.createRoom(userId, dto);
+		const { id } = await this.authService.verifyUser(token);
+		return this.roomsService.create(id, dto);
 	}
 
 	@ApiOperation({
@@ -120,18 +107,13 @@ export class RoomsController {
 		status: HttpStatus.NOT_FOUND,
 		type: NotFoundException,
 	})
-	@ApiResponse({
-		status: HttpStatus.UNAUTHORIZED,
-		type: UnauthorizedException,
-	})
-	@ApiBearerAuth()
-	@UseGuards(AuthGuard)
-	@Put('/:roomId/update')
-	async updateRoom(
-		@Param('roomId', ParseIntPipe) roomId: number,
+	@Auth()
+	@Put('/:id/update')
+	async update(
+		@Param('id', ParseIntPipe) id: number,
 		@Body() dto: UpdateRoomDto
 	): Promise<Room> {
-		return this.roomsService.updateRoom(roomId, dto);
+		return this.roomsService.update(id, dto);
 	}
 
 	@ApiOperation({
@@ -141,12 +123,9 @@ export class RoomsController {
 		status: HttpStatus.OK,
 		type: undefined,
 	})
-	@ApiBearerAuth()
-	@UseGuards(AuthGuard)
-	@Delete('/:roomId/delete')
-	async deleteRoom(
-		@Param('roomId', ParseIntPipe) roomId: number
-	): Promise<boolean> {
-		return this.roomsService.deleteRoom(roomId);
+	@Auth()
+	@Delete('/:id/remove')
+	async remove(@Param('id', ParseIntPipe) id: number): Promise<boolean> {
+		return this.roomsService.remove(id);
 	}
 }

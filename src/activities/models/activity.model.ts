@@ -12,7 +12,7 @@ import { User } from '@/users/models';
 
 export type ActivitySphere = 'group' | 'task';
 
-export type ActivityType = 'update' | 'create' | 'delete';
+export type ActivityType = 'update' | 'create' | 'remove';
 
 interface CreateActivity {
 	readonly roomId: number;
@@ -68,15 +68,15 @@ export class Activity extends Model<Activity, CreateActivity> {
 	@ApiProperty({
 		description: 'Тип активности',
 		example: 'create',
-		enum: ['create', 'delete', 'update'],
+		enum: ['create', 'remove', 'update'],
 	})
 	@IsEnum({
 		create: 'create',
 		update: 'update',
-		delete: 'delete',
+		remove: 'remove',
 	})
 	@Column({
-		type: DataType.ENUM<ActivityType>('create', 'delete', 'update'),
+		type: DataType.ENUM<ActivityType>('create', 'remove', 'update'),
 	})
 	declare type: ActivityType;
 

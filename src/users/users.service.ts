@@ -14,20 +14,7 @@ export class UsersService {
 		@InjectModel(User) private readonly usersRepository: typeof User
 	) {}
 
-	async createUser(dto: CreateUserDto): Promise<SecurityUserDto> {
-		const user = await this.usersRepository.create({
-			...dto,
-			password: await hash(dto.password, Number(process.env.ROUND_COUNT)),
-		});
-
-		return {
-			userId: user.userId,
-			login: user.login,
-			photo: user.photo,
-		};
-	}
-
-	async getUsers(): Promise<SecurityUserDto[]> {
+	async getAll(): Promise<SecurityUserDto[]> {
 		return this.usersRepository.findAll({
 			attributes: {
 				exclude: ['password'],
@@ -35,13 +22,13 @@ export class UsersService {
 		});
 	}
 
-	async getUser(dto: GetUserDto): Promise<SecurityUserDto> {
+	async getOne(dto: GetUserDto): Promise<SecurityUserDto> {
 		const user = await this.usersRepository.findOne({
 			attributes: {
 				exclude: ['password'],
 			},
 			where: {
-				userId: dto.userId,
+				id: dto.id,
 			},
 		});
 
@@ -51,12 +38,25 @@ export class UsersService {
 
 		return {
 			login: user.login,
-			userId: user.userId,
+			id: user.id,
 			photo: user.photo,
 		};
 	}
 
-	async getUserByLogin(dto: GetUserByLoginDto): Promise<SecurityUserDto> {
+	async create(dto: CreateUserDto): Promise<SecurityUserDto> {
+		const user = await this.usersRepository.create({
+			...dto,
+			password: await hash(dto.password, Number(process.env.ROUND_COUNT)),
+		});
+
+		return {
+			id: user.id,
+			login: user.login,
+			photo: user.photo,
+		};
+	}
+
+	async getOneByLogin(dto: GetUserByLoginDto): Promise<SecurityUserDto> {
 		const user = await this.usersRepository.findOne({
 			attributes: {
 				exclude: ['password'],
@@ -73,7 +73,7 @@ export class UsersService {
 		return user;
 	}
 
-	async getInsecureUser(login: string): Promise<User> {
+	async getInsecure(login: string): Promise<User> {
 		const user = await this.usersRepository.findOne({
 			where: {
 				login,
@@ -87,10 +87,7 @@ export class UsersService {
 		return user;
 	}
 
-	async updateUser(
-		userId: number,
-		dto: UpdateUserDto
-	): Promise<SecurityUserDto> {
+	async update(id: number, dto: UpdateUserDto): Promise<SecurityUserDto> {
 		await this.usersRepository.update(
 			{
 				password: dto.password,
@@ -98,11 +95,11 @@ export class UsersService {
 			},
 			{
 				where: {
-					userId,
+					id,
 				},
 			}
 		);
 
-		return this.getUser({ userId }) as Promise<SecurityUserDto>;
+		return this.getOne({ id }) as Promise<SecurityUserDto>;
 	}
 }

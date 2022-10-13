@@ -9,26 +9,30 @@ import {
 	ParseIntPipe,
 	Post,
 	Put,
-	UnauthorizedException,
-	UseGuards,
 } from '@nestjs/common';
 import {
-	ApiBearerAuth,
 	ApiBody,
 	ApiOperation,
 	ApiParam,
 	ApiResponse,
 	ApiTags,
 } from '@nestjs/swagger';
-import { AuthGuard } from '@/auth/auth.guard';
 import { CreateGroupDto, UpdateGroupDto } from './dto';
 import { GroupsService } from './groups.service';
 import { Group } from './models';
+import { ActivitiesService } from '@/activities/activities.service';
+import { Auth } from '@/decorators/auth.decorator';
+import { AuthToken } from '@/decorators/auth-token.decorator';
+import { AuthService } from '@/auth/auth.service';
 
 @ApiTags('Группы')
 @Controller('groups')
 export class GroupsController {
-	constructor(private readonly groupsService: GroupsService) {}
+	constructor(
+		private readonly groupsService: GroupsService,
+		private readonly authService: AuthService,
+		private readonly activitiesService: ActivitiesService
+	) {}
 
 	@ApiOperation({
 		summary: 'Получение всех групп в комнате',
@@ -44,10 +48,10 @@ export class GroupsController {
 		isArray: true,
 	})
 	@Get('/:roomId')
-	async getGroups(
+	async getAll(
 		@Param('roomId', ParseIntPipe) roomId: number
 	): Promise<Group[]> {
-		return this.groupsService.getGroups(roomId);
+		return this.groupsService.getAll(roomId);
 	}
 
 	@ApiOperation({
@@ -71,18 +75,17 @@ export class GroupsController {
 		status: HttpStatus.NOT_FOUND,
 		type: NotFoundException,
 	})
-	@Get('/:roomId/:groupId')
-	async getGroup(
+	@Get('/:roomId/:id')
+	async getOne(
 		@Param('roomId', ParseIntPipe) roomId: number,
-		@Param('groupId', ParseIntPipe) groupId: number
+		@Param('id', ParseIntPipe) id: number
 	): Promise<Group> {
-		return this.groupsService.getGroup(roomId, groupId);
+		return this.groupsService.getOne(roomId, id);
 	}
 
 	@ApiOperation({
 		summary: 'Создание новой группы',
 	})
-	@ApiBearerAuth()
 	@ApiParam({
 		name: 'roomId',
 		type: Number,
@@ -96,30 +99,33 @@ export class GroupsController {
 		status: HttpStatus.OK,
 		type: Group,
 	})
-	@ApiResponse({
-		status: HttpStatus.UNAUTHORIZED,
-		type: UnauthorizedException,
-	})
-	@UseGuards(AuthGuard)
+	@Auth()
 	@Post('/:roomId/create')
-	async createGroup(
+	async create(
 		@Param('roomId', ParseIntPipe) roomId: number,
-		@Body() dto: CreateGroupDto
+		@Body() dto: CreateGroupDto,
+		@AuthToken() token: string
 	): Promise<Group> {
-		return this.groupsService.createGroup(roomId, dto);
+		const { id: userId } = await this.authService.verifyUser(token);
+		const group = await this.groupsService.create(roomId, dto);
+		await this.activitiesService.create(roomId, {
+			sphere: 'group',
+			type: 'create',
+			activistId: userId,
+		});
+		return group;
 	}
 
 	@ApiOperation({
 		summary: 'Изменение группы',
 	})
-	@ApiBearerAuth()
 	@ApiParam({
 		name: 'roomId',
 		type: Number,
 		description: 'Id комнаты',
 	})
 	@ApiParam({
-		name: 'groupId',
+		name: 'id',
 		type: Number,
 		description: 'Id группы',
 	})
@@ -131,31 +137,34 @@ export class GroupsController {
 		status: HttpStatus.OK,
 		type: Group,
 	})
-	@ApiResponse({
-		status: HttpStatus.UNAUTHORIZED,
-		type: UnauthorizedException,
-	})
-	@UseGuards(AuthGuard)
-	@Put('/:roomId/:groupId/update')
-	async updateGroup(
+	@Auth()
+	@Put('/:roomId/:id/update')
+	async update(
 		@Param('roomId', ParseIntPipe) roomId: number,
-		@Param('groupId', ParseIntPipe) groupId: number,
-		@Body() dto: UpdateGroupDto
+		@Param('id', ParseIntPipe) id: number,
+		@Body() dto: UpdateGroupDto,
+		@AuthToken() token: string
 	): Promise<Group> {
-		return this.groupsService.updateGroup(roomId, groupId, dto);
+		const { id: userId } = await this.authService.verifyUser(token);
+		const group = await this.groupsService.update(roomId, id, dto);
+		await this.activitiesService.create(roomId, {
+			sphere: 'group',
+			type: 'update',
+			activistId: userId,
+		});
+		return group;
 	}
 
 	@ApiOperation({
 		summary: 'Удаление группы',
 	})
-	@ApiBearerAuth()
 	@ApiParam({
 		name: 'roomId',
 		type: Number,
 		description: 'Id комнаты',
 	})
 	@ApiParam({
-		name: 'groupId',
+		name: 'id',
 		type: Number,
 		description: 'Id группы',
 	})
@@ -163,16 +172,20 @@ export class GroupsController {
 		status: HttpStatus.OK,
 		type: Boolean,
 	})
-	@ApiResponse({
-		status: HttpStatus.UNAUTHORIZED,
-		type: UnauthorizedException,
-	})
-	@UseGuards(AuthGuard)
-	@Delete('/:roomId/:groupId/delete')
-	async deleteGroup(
+	@Auth()
+	@Delete('/:roomId/:id/remove')
+	async remove(
 		@Param('roomId', ParseIntPipe) roomId: number,
-		@Param('groupId', ParseIntPipe) groupId: number
+		@Param('id', ParseIntPipe) id: number,
+		@AuthToken() token: string
 	): Promise<boolean> {
-		return this.groupsService.deleteGroup(roomId, groupId);
+		const { id: userId } = await this.authService.verifyUser(token);
+		const response = await this.groupsService.remove(roomId, id);
+		await this.activitiesService.create(roomId, {
+			sphere: 'group',
+			type: 'remove',
+			activistId: userId,
+		});
+		return response;
 	}
 }

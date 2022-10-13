@@ -10,15 +10,16 @@ export class ActivitiesService {
 		private readonly activitiesRepository: typeof Activity
 	) {}
 
-	async getActivities(roomId: number): Promise<Activity[]> {
+	async getAll(roomId: number): Promise<Activity[]> {
 		return this.activitiesRepository.findAll({
 			where: {
 				roomId,
 			},
+			order: [['id', 'DESC']],
 		});
 	}
 
-	async getActivity(roomId: number, id: number): Promise<Activity> {
+	async getOne(roomId: number, id: number): Promise<Activity> {
 		const activity = await this.activitiesRepository.findOne({
 			where: {
 				roomId,
@@ -33,10 +34,7 @@ export class ActivitiesService {
 		return activity;
 	}
 
-	async createActivity(
-		roomId: number,
-		dto: CreateActivityDto
-	): Promise<Activity> {
+	async create(roomId: number, dto: CreateActivityDto): Promise<Activity> {
 		return this.activitiesRepository.create({
 			roomId,
 			...dto,

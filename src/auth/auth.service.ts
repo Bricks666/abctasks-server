@@ -14,7 +14,7 @@ export class AuthService {
 
 	async authentication(token: string): Promise<AuthenticationResultDto> {
 		const authUser = await this.verifyUser(token);
-		const user = await this.usersService.getUser({ userId: authUser.userId });
+		const user = await this.usersService.getOne({ id: authUser.id });
 
 		const tokens = await this.generateToken(user);
 
@@ -25,11 +25,11 @@ export class AuthService {
 	}
 
 	async registration(dto: CreateUserDto): Promise<SecurityUserDto> {
-		return this.usersService.createUser(dto);
+		return this.usersService.create(dto);
 	}
 
 	async login(dto: LoginDto): Promise<AuthenticationResultDto> {
-		const user = await this.usersService.getInsecureUser(dto.login);
+		const user = await this.usersService.getInsecure(dto.login);
 
 		const isValidPassword = await compare(dto.password, user.get('password'));
 
@@ -38,9 +38,9 @@ export class AuthService {
 		}
 
 		const secureUser: SecurityUserDto = {
-			login: user.get('login'),
-			userId: user.get('userId'),
-			photo: user.get('photo'),
+			login: user.login,
+			id: user.id,
+			photo: user.photo,
 		};
 
 		const tokens = await this.generateToken(secureUser);
@@ -53,14 +53,14 @@ export class AuthService {
 		return this.generateToken({
 			login: authUser.login,
 			photo: authUser.photo,
-			userId: authUser.userId,
+			id: authUser.id,
 		});
 	}
 
 	private async generateToken(user: SecurityUserDto): Promise<TokensDto> {
 		const accessToken = this.jwtService.signAsync(user, {
 			secret: process.env.SECRET,
-			expiresIn: '15m',
+			expiresIn: '1m',
 		});
 		const refreshToke = this.jwtService.signAsync(user, {
 			secret: process.env.SECRET,
