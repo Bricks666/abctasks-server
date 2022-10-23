@@ -60,7 +60,7 @@ export class AuthService {
 	private async generateToken(user: SecurityUserDto): Promise<TokensDto> {
 		const accessToken = this.jwtService.signAsync(user, {
 			secret: process.env.SECRET,
-			expiresIn: '1m',
+			expiresIn: '15m',
 		});
 		const refreshToke = this.jwtService.signAsync(user, {
 			secret: process.env.SECRET,

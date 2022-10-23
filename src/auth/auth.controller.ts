@@ -121,7 +121,10 @@ export class AuthController {
 	})
 	@ApiCookieAuth()
 	@Get('refresh')
-	async refresh(@Req() req: Request, @Res() res: Response): Promise<TokensDto> {
+	async refresh(
+		@Req() req: Request,
+		@Res({ passthrough: true }) res: Response
+	): Promise<TokensDto> {
 		const refreshToken = req.cookies[COOKIE_NAME];
 
 		if (!refreshToken) {

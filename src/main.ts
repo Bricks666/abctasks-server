@@ -1,7 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import * as cookieParser from 'cookie-parser';
-import * as cors from 'cors';
 import { ValidationPipe } from './pipes/validation.pipe';
 import { AppModule } from './app.module';
 import { StandardResponseInterceptor } from './interceptors/standard-response.interceptor';
@@ -10,13 +9,11 @@ async function bootstrap() {
 	const PORT = process.env.PORT || 3000;
 	const HOST = process.env.HOST || 'localhost';
 	const app = await NestFactory.create(AppModule);
-	app.use(
-		cors({
-			credentials: true,
-			origin: [/http:\/\/localhost/, /http:\/\/127.0.0.1/],
-		}),
-		cookieParser()
-	);
+	app.use(cookieParser());
+	app.enableCors({
+		credentials: true,
+		origin: [/http:\/\/localhost/, /http:\/\/127.0.0.1/],
+	});
 	app.useGlobalPipes(new ValidationPipe());
 	app.useGlobalInterceptors(new StandardResponseInterceptor());
 	app.setGlobalPrefix('api');

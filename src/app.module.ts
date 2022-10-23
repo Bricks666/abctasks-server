@@ -12,6 +12,7 @@ import { Group } from '@/groups/models';
 import { ActivitiesModule } from '@/activities/activities.module';
 import { Activity } from '@/activities/models';
 import { AuthModule } from '@/auth/auth.module';
+import { ProgressModule } from './progress/progress.module';
 
 @Module({
 	imports: [
@@ -34,6 +35,7 @@ import { AuthModule } from '@/auth/auth.module';
 		TasksModule,
 		GroupsModule,
 		ActivitiesModule,
+		ProgressModule,
 	],
 })
 export class AppModule {}
