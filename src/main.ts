@@ -4,6 +4,7 @@ import * as cookieParser from 'cookie-parser';
 import { ValidationPipe } from './pipes/validation.pipe';
 import { AppModule } from './app.module';
 import { StandardResponseInterceptor } from './interceptors/standard-response.interceptor';
+import { CORS } from './const';
 
 async function bootstrap() {
 	const PORT = process.env.PORT || 3000;
@@ -12,7 +13,7 @@ async function bootstrap() {
 	app.use(cookieParser());
 	app.enableCors({
 		credentials: true,
-		origin: [/http:\/\/localhost/, /http:\/\/127.0.0.1/],
+		origin: CORS.ORIGIN,
 	});
 	app.useGlobalPipes(new ValidationPipe());
 	app.useGlobalInterceptors(new StandardResponseInterceptor());

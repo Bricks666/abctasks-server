@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { CacheModule, Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { User } from '@/users/models';
@@ -16,6 +16,9 @@ import { ProgressModule } from './progress/progress.module';
 
 @Module({
 	imports: [
+		CacheModule.register({
+			isGlobal: true,
+		}),
 		ConfigModule.forRoot({
 			envFilePath: '.env.local',
 		}),

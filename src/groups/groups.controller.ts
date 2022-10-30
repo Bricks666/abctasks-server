@@ -1,5 +1,6 @@
 import {
 	Body,
+	CacheInterceptor,
 	Controller,
 	Delete,
 	Get,
@@ -9,6 +10,7 @@ import {
 	ParseIntPipe,
 	Post,
 	Put,
+	UseInterceptors,
 } from '@nestjs/common';
 import {
 	ApiBody,
@@ -47,6 +49,7 @@ export class GroupsController {
 		type: Group,
 		isArray: true,
 	})
+	@UseInterceptors(CacheInterceptor)
 	@Get('/:roomId')
 	async getAll(
 		@Param('roomId', ParseIntPipe) roomId: number
@@ -75,6 +78,7 @@ export class GroupsController {
 		status: HttpStatus.NOT_FOUND,
 		type: NotFoundException,
 	})
+	@UseInterceptors(CacheInterceptor)
 	@Get('/:roomId/:id')
 	async getOne(
 		@Param('roomId', ParseIntPipe) roomId: number,

@@ -1,10 +1,12 @@
 import {
 	Body,
+	CacheInterceptor,
 	Controller,
 	Get,
 	Param,
 	ParseIntPipe,
 	Put,
+	UseInterceptors,
 } from '@nestjs/common';
 import {
 	ApiTags,
@@ -31,6 +33,7 @@ export class UsersController {
 		isArray: true,
 		type: SecurityUserDto,
 	})
+	@UseInterceptors(CacheInterceptor)
 	@Get('/')
 	async getAll(): Promise<SecurityUserDto[]> {
 		return this.usersService.getAll();

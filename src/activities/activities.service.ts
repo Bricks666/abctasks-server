@@ -15,6 +15,7 @@ export class ActivitiesService {
 			where: {
 				roomId,
 			},
+			limit: 15,
 			order: [['id', 'DESC']],
 		});
 	}

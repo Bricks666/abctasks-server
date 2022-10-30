@@ -9,6 +9,8 @@ import {
 	Body,
 	HttpStatus,
 	NotFoundException,
+	CacheInterceptor,
+	UseInterceptors,
 } from '@nestjs/common';
 import {
 	ApiOperation,
@@ -47,6 +49,7 @@ export class TasksController {
 		type: Task,
 		isArray: true,
 	})
+	@UseInterceptors(CacheInterceptor)
 	@Get('/:roomId')
 	async getAll(@Param('roomId', ParseIntPipe) roomId: number): Promise<Task[]> {
 		return this.tasksService.getAll(roomId);
@@ -73,6 +76,7 @@ export class TasksController {
 		status: HttpStatus.NOT_FOUND,
 		type: NotFoundException,
 	})
+	@UseInterceptors(CacheInterceptor)
 	@Get('/:roomId/:id')
 	async getOne(
 		@Param('roomId', ParseIntPipe) roomId: number,

@@ -9,6 +9,8 @@ import {
 	Delete,
 	HttpStatus,
 	NotFoundException,
+	CacheInterceptor,
+	UseInterceptors,
 } from '@nestjs/common';
 import {
 	ApiBody,
@@ -41,6 +43,7 @@ export class RoomsController {
 		isArray: true,
 	})
 	@Auth()
+	@UseInterceptors(CacheInterceptor)
 	@Get('/')
 	async getAll(@AuthToken() token: string): Promise<Room[]> {
 		const { id } = await this.authService.verifyUser(token);
@@ -62,6 +65,7 @@ export class RoomsController {
 		status: HttpStatus.NOT_FOUND,
 		type: NotFoundException,
 	})
+	@UseInterceptors(CacheInterceptor)
 	@Get('/:id')
 	async getOne(@Param('id', ParseIntPipe) id: number): Promise<Room> {
 		return this.roomsService.getOne(id);
