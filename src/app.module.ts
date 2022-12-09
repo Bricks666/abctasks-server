@@ -38,7 +38,9 @@ import { ProgressModule } from './progress/progress.module';
 		TasksModule,
 		GroupsModule,
 		ActivitiesModule,
-		ProgressModule,
+		ProgressModule
 	],
 })
 export class AppModule {}
+
+console.debug(process.env);

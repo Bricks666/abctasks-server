@@ -7,8 +7,7 @@ import { StandardResponseInterceptor } from './interceptors/standard-response.in
 import { CORS } from './const';
 
 async function bootstrap() {
-	const PORT = process.env.PORT || 3000;
-	const HOST = process.env.HOST || 'localhost';
+	const { HOST, PORT, } = process.env;
 	const app = await NestFactory.create(AppModule);
 	app.use(cookieParser());
 	app.enableCors({
