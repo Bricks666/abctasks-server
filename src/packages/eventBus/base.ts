@@ -1,16 +1,17 @@
-import EventEmitter from "events";
-
 export type Listener = (...args: unknown[]) => unknown;
 
-const emitter = new EventEmitter();
+const emitter: Record<string, Set<Listener>> = {};
 
 export const subscribe = (eventName: string, listener: Listener) => {
-	emitter.on(eventName, listener);
+	if (!emitter[eventName]) {
+		emitter[eventName] = new Set<Listener>();
+	}
+	emitter[eventName].add(listener);
 	return () => {
-		emitter.removeListener(eventName, listener);
+		emitter[eventName].delete(listener);
 	};
 };
 
 export const broadcast = (eventName: string, data: unknown[]) => {
-	emitter.emit(eventName, ...data);
+	emitter[eventName].forEach((listener) => listener(...data));
 };

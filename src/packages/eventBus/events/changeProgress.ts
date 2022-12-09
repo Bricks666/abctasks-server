@@ -1,6 +1,6 @@
-import * as base from "../base";
+import * as base from '../base';
 
-const CHANGE_PROGRESS = "events/CHANGE_PROGRESS";
+const CHANGE_PROGRESS = 'events/CHANGE_PROGRESS';
 
 export const subscribe = (callback: base.Listener) => {
 	return base.subscribe(CHANGE_PROGRESS, callback);
