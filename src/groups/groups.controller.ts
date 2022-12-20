@@ -3,6 +3,7 @@ import {
 	CacheInterceptor,
 	Controller,
 	Delete,
+	ForbiddenException,
 	Get,
 	HttpStatus,
 	NotFoundException,
@@ -10,14 +11,14 @@ import {
 	ParseIntPipe,
 	Post,
 	Put,
-	UseInterceptors,
+	UseInterceptors
 } from '@nestjs/common';
 import {
 	ApiBody,
 	ApiOperation,
 	ApiParam,
 	ApiResponse,
-	ApiTags,
+	ApiTags
 } from '@nestjs/swagger';
 import { CreateGroupDto, UpdateGroupDto } from './dto';
 import { GroupsService } from './groups.service';
@@ -26,6 +27,7 @@ import { ActivitiesService } from '@/activities/activities.service';
 import { Auth } from '@/decorators/auth.decorator';
 import { AuthToken } from '@/decorators/auth-token.decorator';
 import { AuthService } from '@/auth/auth.service';
+import { RoomsService } from '@/rooms/rooms.service';
 
 @ApiTags('Группы')
 @Controller('groups')
@@ -33,7 +35,8 @@ export class GroupsController {
 	constructor(
 		private readonly groupsService: GroupsService,
 		private readonly authService: AuthService,
-		private readonly activitiesService: ActivitiesService
+		private readonly activitiesService: ActivitiesService,
+		private readonly roomsService: RoomsService
 	) {}
 
 	@ApiOperation({
@@ -102,6 +105,12 @@ export class GroupsController {
 	@ApiResponse({
 		status: HttpStatus.OK,
 		type: Group,
+		description: 'Созданная группа',
+	})
+	@ApiResponse({
+		status: HttpStatus.FORBIDDEN,
+		type: ForbiddenException,
+		description: 'Пользователь не может совершать действия в данной комнате',
 	})
 	@Auth()
 	@Post('/:roomId/create')
@@ -110,7 +119,14 @@ export class GroupsController {
 		@Body() dto: CreateGroupDto,
 		@AuthToken() token: string
 	): Promise<Group> {
-		const { id: userId } = await this.authService.verifyUser(token);
+		const { id: userId, } = await this.authService.verifyUser(token);
+		const roomExistsUser = await this.roomsService.roomExistsUser(
+			roomId,
+			userId
+		);
+		if (!roomExistsUser) {
+			throw new ForbiddenException('You dont have access');
+		}
 		const group = await this.groupsService.create(roomId, dto);
 		await this.activitiesService.create(roomId, {
 			sphere: 'group',
@@ -140,6 +156,12 @@ export class GroupsController {
 	@ApiResponse({
 		status: HttpStatus.OK,
 		type: Group,
+		description: 'Обновленная группа',
+	})
+	@ApiResponse({
+		status: HttpStatus.FORBIDDEN,
+		type: ForbiddenException,
+		description: 'Пользователь не может совершать действия в данной комнате',
 	})
 	@Auth()
 	@Put('/:roomId/:id/update')
@@ -149,13 +171,22 @@ export class GroupsController {
 		@Body() dto: UpdateGroupDto,
 		@AuthToken() token: string
 	): Promise<Group> {
-		const { id: userId } = await this.authService.verifyUser(token);
+		const { id: userId, } = await this.authService.verifyUser(token);
+		const roomExistsUser = await this.roomsService.roomExistsUser(
+			roomId,
+			userId
+		);
+		if (!roomExistsUser) {
+			throw new ForbiddenException('You dont have access');
+		}
+
 		const group = await this.groupsService.update(roomId, id, dto);
 		await this.activitiesService.create(roomId, {
 			sphere: 'group',
 			type: 'update',
 			activistId: userId,
 		});
+
 		return group;
 	}
 
@@ -175,6 +206,12 @@ export class GroupsController {
 	@ApiResponse({
 		status: HttpStatus.OK,
 		type: Boolean,
+		description: 'Удалось ли удалить группу',
+	})
+	@ApiResponse({
+		status: HttpStatus.FORBIDDEN,
+		type: ForbiddenException,
+		description: 'Пользователь не может совершать действия в данной комнате',
 	})
 	@Auth()
 	@Delete('/:roomId/:id/remove')
@@ -183,13 +220,23 @@ export class GroupsController {
 		@Param('id', ParseIntPipe) id: number,
 		@AuthToken() token: string
 	): Promise<boolean> {
-		const { id: userId } = await this.authService.verifyUser(token);
+		const { id: userId, } = await this.authService.verifyUser(token);
+		const roomExistsUser = await this.roomsService.roomExistsUser(
+			roomId,
+			userId
+		);
+		if (!roomExistsUser) {
+			throw new ForbiddenException('You dont have access');
+		}
+
 		const response = await this.groupsService.remove(roomId, id);
+
 		await this.activitiesService.create(roomId, {
 			sphere: 'group',
 			type: 'remove',
 			activistId: userId,
 		});
+
 		return response;
 	}
 }

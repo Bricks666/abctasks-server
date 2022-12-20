@@ -11,13 +11,14 @@ import {
 	NotFoundException,
 	CacheInterceptor,
 	UseInterceptors,
+	ForbiddenException
 } from '@nestjs/common';
 import {
 	ApiOperation,
 	ApiResponse,
 	ApiParam,
 	ApiBody,
-	ApiTags,
+	ApiTags
 } from '@nestjs/swagger';
 import { TasksService } from './tasks.service';
 import { Task } from './models';
@@ -26,6 +27,7 @@ import { CreateTaskDto, UpdateTaskDto } from './dto';
 import { AuthService } from '@/auth/auth.service';
 import { ActivitiesService } from '@/activities/activities.service';
 import { Auth } from '@/decorators/auth.decorator';
+import { RoomsService } from '@/rooms/rooms.service';
 
 @ApiTags('Задачи')
 @Controller('tasks')
@@ -33,7 +35,8 @@ export class TasksController {
 	constructor(
 		private readonly tasksService: TasksService,
 		private readonly authService: AuthService,
-		private readonly activitiesService: ActivitiesService
+		private readonly activitiesService: ActivitiesService,
+		private readonly roomsService: RoomsService
 	) {}
 
 	@ApiOperation({
@@ -100,6 +103,12 @@ export class TasksController {
 	@ApiResponse({
 		status: HttpStatus.OK,
 		type: Task,
+		description: 'Обновленная задача',
+	})
+	@ApiResponse({
+		status: HttpStatus.FORBIDDEN,
+		type: ForbiddenException,
+		description: 'Пользователь не может совершать действия в данной комнате',
 	})
 	@Auth()
 	@Post('/:roomId/create')
@@ -108,7 +117,14 @@ export class TasksController {
 		@AuthToken() token: string,
 		@Body() dto: CreateTaskDto
 	): Promise<Task> {
-		const { id: userId } = await this.authService.verifyUser(token);
+		const { id: userId, } = await this.authService.verifyUser(token);
+		const roomExistsUser = await this.roomsService.roomExistsUser(
+			roomId,
+			userId
+		);
+		if (!roomExistsUser) {
+			throw new ForbiddenException('You dont have access');
+		}
 		const task = await this.tasksService.create(roomId, userId, dto);
 		await this.activitiesService.create(roomId, {
 			activistId: userId,
@@ -119,7 +135,7 @@ export class TasksController {
 	}
 
 	@ApiOperation({
-		summary: 'Изменение информации о комнате',
+		summary: 'Изменение задачи',
 	})
 	@ApiParam({
 		name: 'roomId',
@@ -138,10 +154,17 @@ export class TasksController {
 	@ApiResponse({
 		status: HttpStatus.OK,
 		type: Task,
+		description: 'Измененная задача',
 	})
 	@ApiResponse({
 		status: HttpStatus.NOT_FOUND,
 		type: NotFoundException,
+		description: 'Такой задачи не существует',
+	})
+	@ApiResponse({
+		status: HttpStatus.FORBIDDEN,
+		type: ForbiddenException,
+		description: 'Пользователь не может совершать действия в данной комнате',
 	})
 	@Auth()
 	@Put('/:roomId/:id/update')
@@ -151,7 +174,14 @@ export class TasksController {
 		@Body() dto: UpdateTaskDto,
 		@AuthToken() token: string
 	): Promise<Task> {
-		const { id: userId } = await this.authService.verifyUser(token);
+		const { id: userId, } = await this.authService.verifyUser(token);
+		const roomExistsUser = await this.roomsService.roomExistsUser(
+			roomId,
+			userId
+		);
+		if (!roomExistsUser) {
+			throw new ForbiddenException('You dont have access');
+		}
 		const task = await this.tasksService.update(roomId, id, dto);
 		await this.activitiesService.create(roomId, {
 			activistId: userId,
@@ -162,7 +192,7 @@ export class TasksController {
 	}
 
 	@ApiOperation({
-		summary: 'Изменение информации о комнате',
+		summary: 'Удаление задачи',
 	})
 	@ApiParam({
 		name: 'roomId',
@@ -176,7 +206,13 @@ export class TasksController {
 	})
 	@ApiResponse({
 		status: HttpStatus.OK,
-		type: undefined,
+		type: Boolean,
+		description: 'Удались ли удалить задачу',
+	})
+	@ApiResponse({
+		status: HttpStatus.FORBIDDEN,
+		type: ForbiddenException,
+		description: 'Пользователь не может совершать действия в данной комнате',
 	})
 	@Auth()
 	@Delete('/:roomId/:id/remove')
@@ -185,7 +221,14 @@ export class TasksController {
 		@Param('id', ParseIntPipe) id: number,
 		@AuthToken() token: string
 	): Promise<boolean> {
-		const { id: userId } = await this.authService.verifyUser(token);
+		const { id: userId, } = await this.authService.verifyUser(token);
+		const roomExistsUser = await this.roomsService.roomExistsUser(
+			roomId,
+			userId
+		);
+		if (!roomExistsUser) {
+			throw new ForbiddenException('You dont have access');
+		}
 		const response = await this.tasksService.remove(roomId, id);
 		await this.activitiesService.create(roomId, {
 			activistId: userId,

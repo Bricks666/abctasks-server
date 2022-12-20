@@ -9,7 +9,8 @@ import { Room, RoomUser } from './models';
 export class RoomsService {
 	constructor(
 		@InjectModel(Room) private readonly roomsRepository: typeof Room,
-		@InjectModel(RoomUser) private readonly roomUserRepository: typeof RoomUser
+		@InjectModel(RoomUser) private readonly roomUserRepository: typeof RoomUser,
+		@InjectModel(User) private readonly usersRepository: typeof User
 	) {}
 
 	async getAll(userId: number): Promise<Room[]> {
@@ -76,22 +77,24 @@ export class RoomsService {
 					},
 				}
 			],
-			rejectOnEmpty: true,
 		});
+
+		if (!room) {
+			throw new NotFoundException('Room was not found');
+		}
 
 		return room.users;
 	}
 
-	async addUser(id: number, dto: RoomUserDto): Promise<boolean> {
-		try {
-			await this.roomUserRepository.findOne({
-				where: {
-					roomId: id,
-					userId: dto.userId,
-					removed: true,
-				},
-				rejectOnEmpty: true,
-			});
+	async addUser(id: number, dto: RoomUserDto): Promise<SecurityUserDto> {
+		const hasPair = await this.roomUserRepository.findOne({
+			where: {
+				roomId: id,
+				userId: dto.userId,
+				removed: true,
+			},
+		});
+		if (hasPair) {
 			await this.roomUserRepository.update(
 				{
 					removed: false,
@@ -103,11 +106,13 @@ export class RoomsService {
 					},
 				}
 			);
-		} catch {
+		} else {
 			await this.roomUserRepository.create({ roomId: id, ...dto, });
 		}
 
-		return true;
+		return this.usersRepository.findByPk(dto.userId, {
+			rejectOnEmpty: true,
+		});
 	}
 
 	async removeUser(id: number, dto: RoomUserDto): Promise<boolean> {
@@ -123,6 +128,14 @@ export class RoomsService {
 			}
 		);
 		return true;
+	}
+
+	async roomExistsUser(roomId: number, userId: number): Promise<boolean> {
+		return this.roomUserRepository
+			.findOne({
+				where: { roomId, userId, removed: false, },
+			})
+			.then((res) => !!res);
 	}
 
 	async remove(id: number): Promise<boolean> {

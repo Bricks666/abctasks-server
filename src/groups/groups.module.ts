@@ -5,9 +5,15 @@ import { GroupsController } from './groups.controller';
 import { Group } from './models';
 import { AuthModule } from '@/auth/auth.module';
 import { ActivitiesModule } from '@/activities/activities.module';
+import { RoomsModule } from '@/rooms/rooms.module';
 
 @Module({
-	imports: [SequelizeModule.forFeature([Group]), AuthModule, ActivitiesModule],
+	imports: [
+		SequelizeModule.forFeature([Group]),
+		AuthModule,
+		ActivitiesModule,
+		RoomsModule
+	],
 	providers: [GroupsService],
 	controllers: [GroupsController],
 })

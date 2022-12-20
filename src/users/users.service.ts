@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { hash } from 'bcrypt';
+import { Op } from 'sequelize';
 import { CreateUserDto } from './dto/create-user.dto';
 import { GetUserByLoginDto } from './dto/get-user-by-login.dto';
 import { GetUserDto } from './dto/get-user.dto';
@@ -43,19 +44,6 @@ export class UsersService {
 		};
 	}
 
-	async create(dto: CreateUserDto): Promise<SecurityUserDto> {
-		const user = await this.usersRepository.create({
-			...dto,
-			password: await hash(dto.password, Number(process.env.ROUND_COUNT)),
-		});
-
-		return {
-			id: user.id,
-			login: user.login,
-			photo: user.photo,
-		};
-	}
-
 	async getOneByLogin(dto: GetUserByLoginDto): Promise<SecurityUserDto> {
 		const user = await this.usersRepository.findOne({
 			attributes: {
@@ -71,6 +59,32 @@ export class UsersService {
 		}
 
 		return user;
+	}
+
+	async getAllByLogin(dto: GetUserByLoginDto): Promise<SecurityUserDto[]> {
+		return this.usersRepository.findAll({
+			attributes: {
+				exclude: ['password'],
+			},
+			where: {
+				login: {
+					[Op.like]: `${dto.login}%`,
+				},
+			},
+		});
+	}
+
+	async create(dto: CreateUserDto): Promise<SecurityUserDto> {
+		const user = await this.usersRepository.create({
+			...dto,
+			password: await hash(dto.password, Number(process.env.ROUND_COUNT)),
+		});
+
+		return {
+			id: user.id,
+			login: user.login,
+			photo: user.photo,
+		};
 	}
 
 	async getInsecure(login: string): Promise<User> {
@@ -100,6 +114,6 @@ export class UsersService {
 			}
 		);
 
-		return this.getOne({ id }) as Promise<SecurityUserDto>;
+		return this.getOne({ id, }) as Promise<SecurityUserDto>;
 	}
 }

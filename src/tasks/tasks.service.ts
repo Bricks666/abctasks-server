@@ -37,9 +37,12 @@ export class TasksService {
 		authorId: number,
 		dto: CreateTaskDto
 	): Promise<Task> {
-		return this.tasksRepository.create({ roomId, authorId, ...dto });
+		return this.tasksRepository.create({ roomId, authorId, ...dto, });
 	}
 
+	/**
+	 * TODO: Сделать сначала поиск, а потом уже изменение, чтобы ошибка кидалась до изменений
+	 */
 	async update(roomId: number, id: number, dto: UpdateTaskDto): Promise<Task> {
 		await this.tasksRepository.update(dto, {
 			where: {
