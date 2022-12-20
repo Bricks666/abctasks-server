@@ -6,5 +6,5 @@ export const Auth = () =>
 	applyDecorators(
 		UseGuards(AuthGuard),
 		ApiBearerAuth(),
-		ApiUnauthorizedResponse({ description: 'Unauthorized' })
+		ApiUnauthorizedResponse({ description: 'Unauthorized', })
 	);

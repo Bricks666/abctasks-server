@@ -24,9 +24,10 @@ import { Room } from './models';
 import { RoomsService } from './rooms.service';
 import { AuthService } from '@/auth/auth.service';
 import { CreateRoomDto, RoomUserDto, UpdateRoomDto } from './dto';
-import { AuthToken } from '@/decorators/auth-token.decorator';
-import { Auth } from '@/decorators/auth.decorator';
+import { AuthToken } from '@/auth/auth-token.decorator';
+import { Auth } from '@/auth/auth.decorator';
 import { SecurityUserDto } from '@/users/dto';
+import { InRoom } from './in-room.decorator';
 
 @ApiTags('Комнаты')
 @Controller('rooms')
@@ -136,23 +137,13 @@ export class RoomsController {
 		type: NotFoundException,
 		description: 'Такой комнаты не существует',
 	})
-	@ApiResponse({
-		status: HttpStatus.FORBIDDEN,
-		type: ForbiddenException,
-		description: 'Пользователь не может совершать действия в данной комнате',
-	})
 	@Auth()
+	@InRoom()
 	@Put('/:id/update')
 	async update(
 		@Param('id', ParseIntPipe) id: number,
-		@AuthToken() token: string,
 		@Body() dto: UpdateRoomDto
 	): Promise<Room> {
-		const { id: userId, } = await this.authService.verifyUser(token);
-		const roomExistsUser = await this.roomsService.roomExistsUser(id, userId);
-		if (!roomExistsUser) {
-			throw new ForbiddenException('You dont have access');
-		}
 		return this.roomsService.update(id, dto);
 	}
 
@@ -168,23 +159,13 @@ export class RoomsController {
 		type: SecurityUserDto,
 		description: 'Добавленный пользователь',
 	})
-	@ApiResponse({
-		status: HttpStatus.FORBIDDEN,
-		type: ForbiddenException,
-		description: 'Пользователь не может совершать действия в данной комнате',
-	})
 	@Auth()
+	@InRoom()
 	@Put('/:id/add-user')
 	async addUser(
 		@Param('id', ParseIntPipe) id: number,
-		@AuthToken() token: string,
 		@Body() dto: RoomUserDto
 	): Promise<SecurityUserDto> {
-		const { id: userId, } = await this.authService.verifyUser(token);
-		const roomExistsUser = await this.roomsService.roomExistsUser(id, userId);
-		if (!roomExistsUser) {
-			throw new ForbiddenException('You dont have access');
-		}
 		return this.roomsService.addUser(id, dto);
 	}
 
@@ -196,22 +177,14 @@ export class RoomsController {
 		type: Boolean,
 		description: 'Удалось ли выйти',
 	})
-	@ApiResponse({
-		status: HttpStatus.FORBIDDEN,
-		type: ForbiddenException,
-		description: 'Пользователь не может совершать действия в данной комнате',
-	})
 	@Auth()
+	@InRoom()
 	@Put('/:id/exit')
 	async removeUser(
 		@Param('id', ParseIntPipe) id: number,
 		@AuthToken() token: string
 	) {
 		const { id: userId, } = await this.authService.verifyUser(token);
-		const roomExistsUser = await this.roomsService.roomExistsUser(id, userId);
-		if (!roomExistsUser) {
-			throw new ForbiddenException('You dont have access');
-		}
 		return this.roomsService.removeUser(id, { userId, });
 	}
 
@@ -229,16 +202,9 @@ export class RoomsController {
 		description: 'Пользователь не может совершать действия в данной комнате',
 	})
 	@Auth()
+	@InRoom()
 	@Delete('/:id/remove')
-	async remove(
-		@Param('id', ParseIntPipe) id: number,
-		@AuthToken() token: string
-	): Promise<boolean> {
-		const { id: userId, } = await this.authService.verifyUser(token);
-		const roomExistsUser = await this.roomsService.roomExistsUser(id, userId);
-		if (!roomExistsUser) {
-			throw new ForbiddenException('You dont have access');
-		}
+	async remove(@Param('id', ParseIntPipe) id: number): Promise<boolean> {
 		return this.roomsService.remove(id);
 	}
 }

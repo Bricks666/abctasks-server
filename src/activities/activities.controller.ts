@@ -6,10 +6,10 @@ import {
 	Param,
 	ParseIntPipe,
 	UseInterceptors,
-	CacheInterceptor,
+	CacheInterceptor
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
-import { Auth } from '@/decorators/auth.decorator';
+import { Auth } from '@/auth/auth.decorator';
 import { ActivitiesService } from './activities.service';
 import { CreateActivityDto } from './dto/create-activity.dto';
 import { Activity } from './models';

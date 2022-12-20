@@ -2,7 +2,7 @@ import { Request } from 'express';
 import {
 	createParamDecorator,
 	ExecutionContext,
-	UnauthorizedException,
+	UnauthorizedException
 } from '@nestjs/common';
 import { extractAccessToken } from '@/utils';
 

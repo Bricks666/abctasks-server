@@ -42,5 +42,3 @@ import { ProgressModule } from './progress/progress.module';
 	],
 })
 export class AppModule {}
-
-console.debug(process.env);

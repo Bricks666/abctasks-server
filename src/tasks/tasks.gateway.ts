@@ -6,13 +6,13 @@ import {
 	OnGatewayDisconnect,
 	WebSocketServer,
 	ConnectedSocket,
-	MessageBody,
+	MessageBody
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { CORS, WS } from '@/const';
 import { CreateTaskDto, UpdateTaskDto } from './dto';
 import { TasksService } from './tasks.service';
-import { WsParam } from '@/decorators/ws-param.decorator';
+import { WsParam } from '@/common/ws-param.decorator';
 import { AuthService } from '@/auth/auth.service';
 
 @WebSocketGateway({
@@ -26,7 +26,7 @@ import { AuthService } from '@/auth/auth.service';
 })
 export class TasksGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	@WebSocketServer()
-	server: Server;
+		server: Server;
 
 	#logger: Logger = new Logger('Tasks gateway');
 
@@ -87,8 +87,8 @@ export class TasksGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	}
 
 	#extractRoomId(client: Socket): number | undefined {
-		const { query } = client.handshake;
-		const { [WS.queries.roomId]: roomId } = query;
+		const { query, } = client.handshake;
+		const { [WS.queries.roomId]: roomId, } = query;
 		if (Number.isNaN(Number(roomId))) {
 			client.disconnect();
 			return;

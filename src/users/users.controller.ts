@@ -19,7 +19,7 @@ import {
 import { SecurityUserDto } from '@/users/dto';
 import { UpdateUserDto } from './dto';
 import { UsersService } from './users.service';
-import { Auth } from '@/decorators/auth.decorator';
+import { Auth } from '@/auth/auth.decorator';
 
 @ApiTags('Пользователи')
 @Controller('users')

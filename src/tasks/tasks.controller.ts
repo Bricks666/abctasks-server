@@ -10,8 +10,7 @@ import {
 	HttpStatus,
 	NotFoundException,
 	CacheInterceptor,
-	UseInterceptors,
-	ForbiddenException
+	UseInterceptors
 } from '@nestjs/common';
 import {
 	ApiOperation,
@@ -22,12 +21,12 @@ import {
 } from '@nestjs/swagger';
 import { TasksService } from './tasks.service';
 import { Task } from './models';
-import { AuthToken } from '@/decorators/auth-token.decorator';
+import { AuthToken } from '@/auth/auth-token.decorator';
 import { CreateTaskDto, UpdateTaskDto } from './dto';
 import { AuthService } from '@/auth/auth.service';
 import { ActivitiesService } from '@/activities/activities.service';
-import { Auth } from '@/decorators/auth.decorator';
-import { RoomsService } from '@/rooms/rooms.service';
+import { Auth } from '@/auth/auth.decorator';
+import { InRoom } from '@/rooms/in-room.decorator';
 
 @ApiTags('Задачи')
 @Controller('tasks')
@@ -35,8 +34,7 @@ export class TasksController {
 	constructor(
 		private readonly tasksService: TasksService,
 		private readonly authService: AuthService,
-		private readonly activitiesService: ActivitiesService,
-		private readonly roomsService: RoomsService
+		private readonly activitiesService: ActivitiesService
 	) {}
 
 	@ApiOperation({
@@ -105,12 +103,8 @@ export class TasksController {
 		type: Task,
 		description: 'Обновленная задача',
 	})
-	@ApiResponse({
-		status: HttpStatus.FORBIDDEN,
-		type: ForbiddenException,
-		description: 'Пользователь не может совершать действия в данной комнате',
-	})
 	@Auth()
+	@InRoom()
 	@Post('/:roomId/create')
 	async create(
 		@Param('roomId', ParseIntPipe) roomId: number,
@@ -118,19 +112,15 @@ export class TasksController {
 		@Body() dto: CreateTaskDto
 	): Promise<Task> {
 		const { id: userId, } = await this.authService.verifyUser(token);
-		const roomExistsUser = await this.roomsService.roomExistsUser(
-			roomId,
-			userId
-		);
-		if (!roomExistsUser) {
-			throw new ForbiddenException('You dont have access');
-		}
+
 		const task = await this.tasksService.create(roomId, userId, dto);
+
 		await this.activitiesService.create(roomId, {
 			activistId: userId,
 			sphere: 'task',
 			type: 'create',
 		});
+
 		return task;
 	}
 
@@ -161,12 +151,8 @@ export class TasksController {
 		type: NotFoundException,
 		description: 'Такой задачи не существует',
 	})
-	@ApiResponse({
-		status: HttpStatus.FORBIDDEN,
-		type: ForbiddenException,
-		description: 'Пользователь не может совершать действия в данной комнате',
-	})
 	@Auth()
+	@InRoom()
 	@Put('/:roomId/:id/update')
 	async update(
 		@Param('roomId', ParseIntPipe) roomId: number,
@@ -175,19 +161,15 @@ export class TasksController {
 		@AuthToken() token: string
 	): Promise<Task> {
 		const { id: userId, } = await this.authService.verifyUser(token);
-		const roomExistsUser = await this.roomsService.roomExistsUser(
-			roomId,
-			userId
-		);
-		if (!roomExistsUser) {
-			throw new ForbiddenException('You dont have access');
-		}
+
 		const task = await this.tasksService.update(roomId, id, dto);
+
 		await this.activitiesService.create(roomId, {
 			activistId: userId,
 			sphere: 'task',
 			type: 'update',
 		});
+
 		return task;
 	}
 
@@ -209,12 +191,8 @@ export class TasksController {
 		type: Boolean,
 		description: 'Удались ли удалить задачу',
 	})
-	@ApiResponse({
-		status: HttpStatus.FORBIDDEN,
-		type: ForbiddenException,
-		description: 'Пользователь не может совершать действия в данной комнате',
-	})
 	@Auth()
+	@InRoom()
 	@Delete('/:roomId/:id/remove')
 	async remove(
 		@Param('roomId', ParseIntPipe) roomId: number,
@@ -222,19 +200,15 @@ export class TasksController {
 		@AuthToken() token: string
 	): Promise<boolean> {
 		const { id: userId, } = await this.authService.verifyUser(token);
-		const roomExistsUser = await this.roomsService.roomExistsUser(
-			roomId,
-			userId
-		);
-		if (!roomExistsUser) {
-			throw new ForbiddenException('You dont have access');
-		}
+
 		const response = await this.tasksService.remove(roomId, id);
+
 		await this.activitiesService.create(roomId, {
 			activistId: userId,
 			sphere: 'task',
 			type: 'remove',
 		});
+
 		return response;
 	}
 }
