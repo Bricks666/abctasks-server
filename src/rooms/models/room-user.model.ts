@@ -20,8 +20,16 @@ import { Room } from './room.model';
 })
 export class RoomUser extends Model<RoomUser> {
 	@ForeignKey(() => Room)
+	@Column({
+		primaryKey: true,
+		type: DataType.INTEGER,
+	})
 	declare roomId: number;
 
+	@Column({
+		primaryKey: true,
+		type: DataType.INTEGER,
+	})
 	@ForeignKey(() => User)
 	declare userId: number;
 

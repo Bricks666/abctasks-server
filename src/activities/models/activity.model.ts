@@ -2,22 +2,22 @@ import {
 	Column,
 	DataType,
 	ForeignKey,
+	BelongsTo,
 	Model,
-	Table,
+	Table
 } from 'sequelize-typescript';
 import { ApiProperty } from '@nestjs/swagger';
 import { IsEnum, IsNumber } from 'class-validator';
 import { Room } from '@/rooms/models';
 import { User } from '@/users/models';
+import { ActivitySphere } from './activity-sphere.model';
 
-export type ActivitySphere = 'group' | 'task';
-
-export type ActivityType = 'update' | 'create' | 'remove';
+export type ActivityAction = 'update' | 'create' | 'remove';
 
 interface CreateActivity {
 	readonly roomId: number;
-	readonly sphere: ActivitySphere;
-	readonly type: ActivityType;
+	readonly sphereId: number;
+	readonly action: ActivityAction;
 	readonly activistId: number;
 }
 
@@ -53,17 +53,15 @@ export class Activity extends Model<Activity, CreateActivity> {
 
 	@ApiProperty({
 		description: 'Направление активности',
-		enum: ['group', 'task'],
-		example: 'group',
+		example: 1,
+		type: Number,
 	})
-	@IsEnum({
-		task: 'task',
-		group: 'group',
-	})
+	@IsNumber()
+	@ForeignKey(() => ActivitySphere)
 	@Column({
-		type: DataType.ENUM<ActivitySphere>('group', 'task'),
+		type: DataType.INTEGER,
 	})
-	declare sphere: ActivitySphere;
+	declare sphereId: number;
 
 	@ApiProperty({
 		description: 'Тип активности',
@@ -76,9 +74,9 @@ export class Activity extends Model<Activity, CreateActivity> {
 		remove: 'remove',
 	})
 	@Column({
-		type: DataType.ENUM<ActivityType>('create', 'remove', 'update'),
+		type: DataType.ENUM<ActivityAction>('create', 'remove', 'update'),
 	})
-	declare type: ActivityType;
+	declare action: ActivityAction;
 
 	@ApiProperty({
 		description: 'Id создателя активности',
@@ -93,4 +91,7 @@ export class Activity extends Model<Activity, CreateActivity> {
 	declare activistId: number;
 
 	declare createdAt: string;
+
+	@BelongsTo(() => ActivitySphere)
+	declare sphere: ActivitySphere;
 }

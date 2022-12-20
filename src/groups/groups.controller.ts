@@ -118,8 +118,8 @@ export class GroupsController {
 		const group = await this.groupsService.create(roomId, dto);
 
 		await this.activitiesService.create(roomId, {
-			sphere: 'group',
-			type: 'create',
+			sphereName: 'group',
+			action: 'create',
 			activistId: userId,
 		});
 		return group;
@@ -161,8 +161,8 @@ export class GroupsController {
 		const group = await this.groupsService.update(roomId, id, dto);
 
 		await this.activitiesService.create(roomId, {
-			sphere: 'group',
-			type: 'update',
+			sphereName: 'group',
+			action: 'update',
 			activistId: userId,
 		});
 
@@ -200,8 +200,8 @@ export class GroupsController {
 		const response = await this.groupsService.remove(roomId, id);
 
 		await this.activitiesService.create(roomId, {
-			sphere: 'group',
-			type: 'remove',
+			sphereName: 'group',
+			action: 'remove',
 			activistId: userId,
 		});
 

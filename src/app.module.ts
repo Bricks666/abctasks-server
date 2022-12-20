@@ -10,7 +10,7 @@ import { Task } from '@/tasks/models';
 import { GroupsModule } from '@/groups/groups.module';
 import { Group } from '@/groups/models';
 import { ActivitiesModule } from '@/activities/activities.module';
-import { Activity } from '@/activities/models';
+import { Activity, ActivitySphere } from '@/activities/models';
 import { AuthModule } from '@/auth/auth.module';
 import { ProgressModule } from './progress/progress.module';
 
@@ -30,7 +30,7 @@ import { ProgressModule } from './progress/progress.module';
 			host: process.env.DB_HOST,
 			port: Number(process.env.DB_PORT),
 			autoLoadModels: true,
-			models: [User, Room, RoomUser, Task, Group, Activity],
+			models: [User, Room, RoomUser, Task, Group, Activity, ActivitySphere],
 		}),
 		AuthModule,
 		UsersModule,
