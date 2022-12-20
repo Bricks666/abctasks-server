@@ -10,19 +10,19 @@ import {
 	HttpStatus,
 	NotFoundException,
 	CacheInterceptor,
-	UseInterceptors,
+	UseInterceptors
 } from '@nestjs/common';
 import {
 	ApiBody,
 	ApiOperation,
 	ApiParam,
 	ApiResponse,
-	ApiTags,
+	ApiTags
 } from '@nestjs/swagger';
 import { Room } from './models';
 import { RoomsService } from './rooms.service';
 import { AuthService } from '@/auth/auth.service';
-import { CreateRoomDto, UpdateRoomDto } from './dto';
+import { CreateRoomDto, RoomUserDto, UpdateRoomDto } from './dto';
 import { AuthToken } from '@/decorators/auth-token.decorator';
 import { Auth } from '@/decorators/auth.decorator';
 
@@ -46,7 +46,7 @@ export class RoomsController {
 	@UseInterceptors(CacheInterceptor)
 	@Get('/')
 	async getAll(@AuthToken() token: string): Promise<Room[]> {
-		const { id } = await this.authService.verifyUser(token);
+		const { id, } = await this.authService.verifyUser(token);
 		return this.roomsService.getAll(id);
 	}
 
@@ -71,6 +71,12 @@ export class RoomsController {
 		return this.roomsService.getOne(id);
 	}
 
+	@UseInterceptors(CacheInterceptor)
+	@Get('/:id/users')
+	async getUsers(@Param('id', ParseIntPipe) id: number) {
+		return this.roomsService.getUsers(id);
+	}
+
 	@ApiOperation({
 		summary: 'Создание комнаты',
 	})
@@ -92,7 +98,7 @@ export class RoomsController {
 		@AuthToken() token: string,
 		@Body() dto: CreateRoomDto
 	): Promise<Room> {
-		const { id } = await this.authService.verifyUser(token);
+		const { id, } = await this.authService.verifyUser(token);
 		return this.roomsService.create(id, dto);
 	}
 
@@ -118,6 +124,25 @@ export class RoomsController {
 		@Body() dto: UpdateRoomDto
 	): Promise<Room> {
 		return this.roomsService.update(id, dto);
+	}
+
+	@Auth()
+	@Put('/:id/add-user')
+	async addUser(
+		@Param('id', ParseIntPipe) id: number,
+		@Body() dto: RoomUserDto
+	) {
+		return this.roomsService.addUser(id, dto);
+	}
+
+	@Auth()
+	@Put('/:id/exit')
+	async removeUser(
+		@Param('id', ParseIntPipe) id: number,
+		@AuthToken() token: string
+	) {
+		const { id: userId, } = await this.authService.verifyUser(token);
+		return this.roomsService.removeUser(id, { userId, });
 	}
 
 	@ApiOperation({

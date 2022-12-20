@@ -1,4 +1,10 @@
-import { ForeignKey, Model, Table } from 'sequelize-typescript';
+import {
+	Column,
+	ForeignKey,
+	Model,
+	Table,
+	DataType
+} from 'sequelize-typescript';
 import { User } from '@/users/models';
 import { Room } from './room.model';
 
@@ -6,6 +12,11 @@ import { Room } from './room.model';
 	tableName: 'room-user',
 	createdAt: false,
 	updatedAt: false,
+	defaultScope: {
+		where: {
+			removed: false,
+		},
+	},
 })
 export class RoomUser extends Model<RoomUser> {
 	@ForeignKey(() => Room)
@@ -13,4 +24,10 @@ export class RoomUser extends Model<RoomUser> {
 
 	@ForeignKey(() => User)
 	declare userId: number;
+
+	@Column({
+		type: DataType.BOOLEAN,
+		defaultValue: false,
+	})
+	declare removed: boolean;
 }
