@@ -1,13 +1,15 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { CreateActivityDto } from './dto';
-import { Activity } from './models';
+import { Activity, ActivitySphere } from './models';
 
 @Injectable()
 export class ActivitiesService {
 	constructor(
 		@InjectModel(Activity)
-		private readonly activitiesRepository: typeof Activity
+		private readonly activitiesRepository: typeof Activity,
+		@InjectModel(ActivitySphere)
+		private readonly activitySpheresRepository: typeof ActivitySphere
 	) {}
 
 	async getAll(roomId: number): Promise<Activity[]> {
@@ -15,6 +17,15 @@ export class ActivitiesService {
 			where: {
 				roomId,
 			},
+			include: [
+				{
+					model: ActivitySphere,
+				}
+			],
+			attributes: {
+				exclude: ['sphereId'],
+			},
+
 			limit: 15,
 			order: [['id', 'DESC']],
 		});
@@ -26,6 +37,15 @@ export class ActivitiesService {
 				roomId,
 				id,
 			},
+			include: [
+				{
+					model: ActivitySphere,
+					attributes: ['name'],
+				}
+			],
+			attributes: {
+				exclude: ['sphereId'],
+			},
 		});
 
 		if (!activity) {
@@ -36,9 +56,19 @@ export class ActivitiesService {
 	}
 
 	async create(roomId: number, dto: CreateActivityDto): Promise<Activity> {
+		const [sphere] = await this.activitySpheresRepository.findOrCreate({
+			where: {
+				name: dto.sphereName,
+			},
+			defaults: {
+				name: dto.sphereName,
+			},
+		});
 		return this.activitiesRepository.create({
 			roomId,
-			...dto,
+			activistId: dto.activistId,
+			action: dto.action,
+			sphereId: sphere.id,
 		});
 	}
 }

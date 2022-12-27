@@ -3,12 +3,15 @@ import {
 	BelongsToMany,
 	Column,
 	DataType,
+	HasMany,
 	Model,
-	Table,
+	Table
 } from 'sequelize-typescript';
 import { IsString, IsNumber } from 'class-validator';
 import { User } from '@/users/models';
 import { RoomUser } from './room-user.model';
+import { Group } from '@/groups/models';
+import { Task } from '@/tasks/models';
 
 interface CreateRoom {
 	readonly roomName: string;
@@ -57,4 +60,10 @@ export class Room extends Model<Room, CreateRoom> {
 
 	@BelongsToMany(() => User, () => RoomUser)
 	declare users: User[];
+
+	@HasMany(() => Group)
+	declare groups: Group[];
+
+	@HasMany(() => Task)
+	declare tasks: Task[];
 }

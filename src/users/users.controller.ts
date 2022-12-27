@@ -3,10 +3,12 @@ import {
 	CacheInterceptor,
 	Controller,
 	Get,
+	HttpStatus,
 	Param,
 	ParseIntPipe,
 	Put,
-	UseInterceptors,
+	Query,
+	UseInterceptors
 } from '@nestjs/common';
 import {
 	ApiTags,
@@ -14,11 +16,12 @@ import {
 	ApiResponse,
 	ApiBody,
 	ApiParam,
+	ApiQuery
 } from '@nestjs/swagger';
-import { SecurityUserDto } from '@/users/dto';
+import { GetUsersQueryDto, SecurityUserDto } from '@/users/dto';
 import { UpdateUserDto } from './dto';
 import { UsersService } from './users.service';
-import { Auth } from '@/decorators/auth.decorator';
+import { Auth } from '@/auth/auth.decorator';
 
 @ApiTags('Пользователи')
 @Controller('users')
@@ -29,14 +32,41 @@ export class UsersController {
 		summary: 'Получение всех пользователей',
 	})
 	@ApiResponse({
-		description: 'Пользователи, зарегистрированные на сайте',
 		isArray: true,
+		status: HttpStatus.OK,
 		type: SecurityUserDto,
+		description: 'Пользователи, зарегистрированные на сайте',
+	})
+	@ApiQuery({
+		type: GetUsersQueryDto,
+		description: 'Параметры фильтрации пользователей',
+		required: false,
 	})
 	@UseInterceptors(CacheInterceptor)
 	@Get('/')
-	async getAll(): Promise<SecurityUserDto[]> {
-		return this.usersService.getAll();
+	async getAll(@Query() dto: GetUsersQueryDto): Promise<SecurityUserDto[]> {
+		return this.usersService.getAll(dto);
+	}
+
+	@ApiOperation({
+		summary: 'Получение пользователя по id',
+	})
+	@ApiParam({
+		name: 'id',
+		type: Number,
+		description: 'Id пользователя',
+	})
+	@ApiResponse({
+		status: HttpStatus.OK,
+		type: SecurityUserDto,
+		description: 'Пользователь с переданным id',
+	})
+	@UseInterceptors(CacheInterceptor)
+	@Get('/:id')
+	async getOne(
+		@Param('id', ParseIntPipe) id: number
+	): Promise<SecurityUserDto> {
+		return this.usersService.getOne({ id, });
 	}
 
 	@ApiOperation({
@@ -47,20 +77,21 @@ export class UsersController {
 		description: 'Новые данные пользователя',
 	})
 	@ApiParam({
-		name: 'userId',
+		name: 'id',
 		type: Number,
 		description: 'Id пользователя',
 	})
 	@ApiResponse({
 		type: SecurityUserDto,
+		status: HttpStatus.OK,
 		description: 'Обновленный пользователь',
 	})
 	@Auth()
-	@Put('/:userId/update')
+	@Put('/:id/update')
 	async updateUser(
-		@Param('userId', ParseIntPipe) userId: number,
+		@Param('id', ParseIntPipe) id: number,
 		@Body() dto: UpdateUserDto
 	): Promise<SecurityUserDto> {
-		return this.usersService.update(userId, dto);
+		return this.usersService.update(id, dto);
 	}
 }

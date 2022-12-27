@@ -3,18 +3,18 @@ import {
 	ExecutionContext,
 	HttpException,
 	Injectable,
-	NestInterceptor,
+	NestInterceptor
 } from '@nestjs/common';
 import { catchError, map, Observable, of } from 'rxjs';
 import {
 	FailResponse,
 	StandardResponse,
-	SuccessResponse,
+	SuccessResponse
 } from '@/types/standard-response';
 
 @Injectable()
 export class StandardResponseInterceptor<T>
-	implements NestInterceptor<T, StandardResponse<T>>
+implements NestInterceptor<T, StandardResponse<T>>
 {
 	intercept(
 		_: ExecutionContext,

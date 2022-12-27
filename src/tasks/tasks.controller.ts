@@ -10,22 +10,23 @@ import {
 	HttpStatus,
 	NotFoundException,
 	CacheInterceptor,
-	UseInterceptors,
+	UseInterceptors
 } from '@nestjs/common';
 import {
 	ApiOperation,
 	ApiResponse,
 	ApiParam,
 	ApiBody,
-	ApiTags,
+	ApiTags
 } from '@nestjs/swagger';
 import { TasksService } from './tasks.service';
 import { Task } from './models';
-import { AuthToken } from '@/decorators/auth-token.decorator';
+import { AuthToken } from '@/auth/auth-token.decorator';
 import { CreateTaskDto, UpdateTaskDto } from './dto';
 import { AuthService } from '@/auth/auth.service';
 import { ActivitiesService } from '@/activities/activities.service';
-import { Auth } from '@/decorators/auth.decorator';
+import { Auth } from '@/auth/auth.decorator';
+import { InRoom } from '@/rooms/in-room.decorator';
 
 @ApiTags('Задачи')
 @Controller('tasks')
@@ -100,26 +101,31 @@ export class TasksController {
 	@ApiResponse({
 		status: HttpStatus.OK,
 		type: Task,
+		description: 'Обновленная задача',
 	})
 	@Auth()
+	@InRoom()
 	@Post('/:roomId/create')
 	async create(
 		@Param('roomId', ParseIntPipe) roomId: number,
 		@AuthToken() token: string,
 		@Body() dto: CreateTaskDto
 	): Promise<Task> {
-		const { id: userId } = await this.authService.verifyUser(token);
+		const { id: userId, } = await this.authService.verifyUser(token);
+
 		const task = await this.tasksService.create(roomId, userId, dto);
+
 		await this.activitiesService.create(roomId, {
 			activistId: userId,
-			sphere: 'task',
-			type: 'create',
+			sphereName: 'task',
+			action: 'create',
 		});
+
 		return task;
 	}
 
 	@ApiOperation({
-		summary: 'Изменение информации о комнате',
+		summary: 'Изменение задачи',
 	})
 	@ApiParam({
 		name: 'roomId',
@@ -138,12 +144,15 @@ export class TasksController {
 	@ApiResponse({
 		status: HttpStatus.OK,
 		type: Task,
+		description: 'Измененная задача',
 	})
 	@ApiResponse({
 		status: HttpStatus.NOT_FOUND,
 		type: NotFoundException,
+		description: 'Такой задачи не существует',
 	})
 	@Auth()
+	@InRoom()
 	@Put('/:roomId/:id/update')
 	async update(
 		@Param('roomId', ParseIntPipe) roomId: number,
@@ -151,18 +160,21 @@ export class TasksController {
 		@Body() dto: UpdateTaskDto,
 		@AuthToken() token: string
 	): Promise<Task> {
-		const { id: userId } = await this.authService.verifyUser(token);
+		const { id: userId, } = await this.authService.verifyUser(token);
+
 		const task = await this.tasksService.update(roomId, id, dto);
+
 		await this.activitiesService.create(roomId, {
 			activistId: userId,
-			sphere: 'task',
-			type: 'update',
+			sphereName: 'task',
+			action: 'update',
 		});
+
 		return task;
 	}
 
 	@ApiOperation({
-		summary: 'Изменение информации о комнате',
+		summary: 'Удаление задачи',
 	})
 	@ApiParam({
 		name: 'roomId',
@@ -176,22 +188,27 @@ export class TasksController {
 	})
 	@ApiResponse({
 		status: HttpStatus.OK,
-		type: undefined,
+		type: Boolean,
+		description: 'Удались ли удалить задачу',
 	})
 	@Auth()
+	@InRoom()
 	@Delete('/:roomId/:id/remove')
 	async remove(
 		@Param('roomId', ParseIntPipe) roomId: number,
 		@Param('id', ParseIntPipe) id: number,
 		@AuthToken() token: string
 	): Promise<boolean> {
-		const { id: userId } = await this.authService.verifyUser(token);
+		const { id: userId, } = await this.authService.verifyUser(token);
+
 		const response = await this.tasksService.remove(roomId, id);
+
 		await this.activitiesService.create(roomId, {
 			activistId: userId,
-			sphere: 'task',
-			type: 'remove',
+			sphereName: 'task',
+			action: 'remove',
 		});
+
 		return response;
 	}
 }
