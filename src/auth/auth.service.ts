@@ -1,5 +1,9 @@
 import { JwtService } from '@nestjs/jwt';
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+	BadRequestException,
+	Injectable,
+	UnauthorizedException
+} from '@nestjs/common';
 import { compare } from 'bcrypt';
 import { UsersService } from '@/users/users.service';
 import { CreateUserDto, SecurityUserDto } from '@/users/dto';
@@ -14,7 +18,7 @@ export class AuthService {
 
 	async authentication(token: string): Promise<AuthenticationResultDto> {
 		const authUser = await this.verifyUser(token);
-		const user = await this.usersService.getOne({ id: authUser.id });
+		const user = await this.usersService.getOne({ id: authUser.id, });
 
 		const tokens = await this.generateToken(user);
 
@@ -45,7 +49,7 @@ export class AuthService {
 
 		const tokens = await this.generateToken(secureUser);
 
-		return { user: secureUser, tokens };
+		return { user: secureUser, tokens, };
 	}
 
 	async refresh(refreshToken: string): Promise<TokensDto> {
@@ -74,8 +78,12 @@ export class AuthService {
 	}
 
 	async verifyUser(token: string): Promise<SecurityUserDto> {
-		return this.jwtService.verifyAsync<SecurityUserDto>(token, {
-			secret: process.env.SECRET,
-		});
+		try {
+			return this.jwtService.verifyAsync<SecurityUserDto>(token, {
+				secret: process.env.SECRET,
+			});
+		} catch (error) {
+			throw new UnauthorizedException('jwt expired');
+		}
 	}
 }

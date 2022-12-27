@@ -1,9 +1,8 @@
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import * as cookieParser from 'cookie-parser';
-import { ValidationPipe } from './common/validation.pipe';
 import { AppModule } from './app.module';
-import { StandardResponseInterceptor } from './common/standard-response.interceptor';
+import { StandardResponseInterceptor, ValidationPipe } from './common';
 import { CORS } from './const';
 
 async function bootstrap() {

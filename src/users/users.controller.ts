@@ -7,6 +7,7 @@ import {
 	Param,
 	ParseIntPipe,
 	Put,
+	Query,
 	UseInterceptors
 } from '@nestjs/common';
 import {
@@ -14,9 +15,10 @@ import {
 	ApiOperation,
 	ApiResponse,
 	ApiBody,
-	ApiParam
+	ApiParam,
+	ApiQuery
 } from '@nestjs/swagger';
-import { SecurityUserDto } from '@/users/dto';
+import { GetUsersQueryDto, SecurityUserDto } from '@/users/dto';
 import { UpdateUserDto } from './dto';
 import { UsersService } from './users.service';
 import { Auth } from '@/auth/auth.decorator';
@@ -35,10 +37,15 @@ export class UsersController {
 		type: SecurityUserDto,
 		description: 'Пользователи, зарегистрированные на сайте',
 	})
+	@ApiQuery({
+		type: GetUsersQueryDto,
+		description: 'Параметры фильтрации пользователей',
+		required: false,
+	})
 	@UseInterceptors(CacheInterceptor)
 	@Get('/')
-	async getAll(): Promise<SecurityUserDto[]> {
-		return this.usersService.getAll();
+	async getAll(@Query() dto: GetUsersQueryDto): Promise<SecurityUserDto[]> {
+		return this.usersService.getAll(dto);
 	}
 
 	@ApiOperation({
@@ -60,29 +67,6 @@ export class UsersController {
 		@Param('id', ParseIntPipe) id: number
 	): Promise<SecurityUserDto> {
 		return this.usersService.getOne({ id, });
-	}
-
-	@ApiOperation({
-		summary:
-			'Получение всех пользователей, логин которых начинается с переданного',
-	})
-	@ApiParam({
-		name: 'login',
-		description: 'Логин искомого пользователя',
-		type: String,
-	})
-	@ApiResponse({
-		status: HttpStatus.OK,
-		description: 'Пользователи, зарегистрированные на сайте',
-		isArray: true,
-		type: SecurityUserDto,
-	})
-	@UseInterceptors(CacheInterceptor)
-	@Get('/search/login/:login')
-	async getAllByLogin(
-		@Param('login') login: string
-	): Promise<SecurityUserDto[]> {
-		return this.usersService.getAllByLogin({ login, });
 	}
 
 	@ApiOperation({

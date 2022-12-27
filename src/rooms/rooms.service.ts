@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+	BadRequestException,
+	Injectable,
+	NotFoundException
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { User } from '@/users/models';
 import { SecurityUserDto } from '@/users/dto';
@@ -87,25 +91,19 @@ export class RoomsService {
 	}
 
 	async addUser(id: number, dto: RoomUserDto): Promise<SecurityUserDto> {
-		const hasPair = await this.roomUserRepository.findOne({
+		const pair = await this.roomUserRepository.findOne({
 			where: {
 				roomId: id,
 				userId: dto.userId,
-				removed: true,
 			},
 		});
-		if (hasPair) {
-			await this.roomUserRepository.update(
-				{
-					removed: false,
-				},
-				{
-					where: {
-						roomId: id,
-						...dto,
-					},
-				}
-			);
+		if (pair) {
+			if (!pair.removed) {
+				throw new BadRequestException('User already exists');
+			}
+			await pair.update({
+				removed: false,
+			});
 		} else {
 			await this.roomUserRepository.create({ roomId: id, ...dto, });
 		}

@@ -1,3 +1,4 @@
+import { ApiProperty } from '@nestjs/swagger';
 import {
 	Column,
 	ForeignKey,
@@ -12,13 +13,13 @@ import { Room } from './room.model';
 	tableName: 'room-user',
 	createdAt: false,
 	updatedAt: false,
-	defaultScope: {
-		where: {
-			removed: false,
-		},
-	},
 })
 export class RoomUser extends Model<RoomUser> {
+	@ApiProperty({
+		type: Number,
+		description: 'Id комнаты',
+		example: 1,
+	})
 	@ForeignKey(() => Room)
 	@Column({
 		primaryKey: true,
@@ -26,6 +27,11 @@ export class RoomUser extends Model<RoomUser> {
 	})
 	declare roomId: number;
 
+	@ApiProperty({
+		type: Number,
+		description: 'Id пользователя',
+		example: 1,
+	})
 	@Column({
 		primaryKey: true,
 		type: DataType.INTEGER,
@@ -33,6 +39,11 @@ export class RoomUser extends Model<RoomUser> {
 	@ForeignKey(() => User)
 	declare userId: number;
 
+	@ApiProperty({
+		type: Boolean,
+		description: 'Удален ли пользователь из комнаты',
+		example: false,
+	})
 	@Column({
 		type: DataType.BOOLEAN,
 		defaultValue: false,

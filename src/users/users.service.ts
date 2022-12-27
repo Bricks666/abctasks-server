@@ -2,12 +2,17 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { hash } from 'bcrypt';
 import { Op } from 'sequelize';
-import { CreateUserDto } from './dto/create-user.dto';
-import { GetUserByLoginDto } from './dto/get-user-by-login.dto';
-import { GetUserDto } from './dto/get-user.dto';
-import { SecurityUserDto } from './dto/security-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
+import { Room } from '@/rooms/models';
+import {
+	GetUsersQueryDto,
+	CreateUserDto,
+	GetUserByLoginDto,
+	GetUserDto,
+	SecurityUserDto,
+	UpdateUserDto
+} from './dto';
 import { User } from './models';
+import { normalizePaginationParams } from '@/utils';
 
 @Injectable()
 export class UsersService {
@@ -15,11 +20,40 @@ export class UsersService {
 		@InjectModel(User) private readonly usersRepository: typeof User
 	) {}
 
-	async getAll(): Promise<SecurityUserDto[]> {
+	async getAll(dto: GetUsersQueryDto): Promise<SecurityUserDto[]> {
+		const where: Record<string, any> = {};
+		const includeWhere: Record<string, any> = {};
+		const throughWhere: Record<string, any> = {};
+
+		const { limit, offset, } = normalizePaginationParams(dto);
+
+		if (typeof dto.login !== 'undefined') {
+			where.login = { [Op.like]: `${dto.login}%`, };
+		}
+
+		if (typeof dto.roomId !== 'undefined') {
+			includeWhere.id = dto.roomId;
+			throughWhere.removed = false;
+		}
+
 		return this.usersRepository.findAll({
 			attributes: {
 				exclude: ['password'],
 			},
+			limit,
+			offset,
+			where,
+			include: [
+				{
+					model: Room,
+					attributes: [],
+					where: includeWhere,
+					through: {
+						where: throughWhere,
+						attributes: [],
+					},
+				}
+			],
 		});
 	}
 
@@ -37,11 +71,7 @@ export class UsersService {
 			throw new NotFoundException();
 		}
 
-		return {
-			login: user.login,
-			id: user.id,
-			photo: user.photo,
-		};
+		return user;
 	}
 
 	async getOneByLogin(dto: GetUserByLoginDto): Promise<SecurityUserDto> {
@@ -59,19 +89,6 @@ export class UsersService {
 		}
 
 		return user;
-	}
-
-	async getAllByLogin(dto: GetUserByLoginDto): Promise<SecurityUserDto[]> {
-		return this.usersRepository.findAll({
-			attributes: {
-				exclude: ['password'],
-			},
-			where: {
-				login: {
-					[Op.like]: `${dto.login}%`,
-				},
-			},
-		});
 	}
 
 	async create(dto: CreateUserDto): Promise<SecurityUserDto> {
@@ -114,6 +131,6 @@ export class UsersService {
 			}
 		);
 
-		return this.getOne({ id, }) as Promise<SecurityUserDto>;
+		return this.getOne({ id, });
 	}
 }
