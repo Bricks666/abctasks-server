@@ -13,6 +13,8 @@ import { ActivitiesModule } from '@/activities/activities.module';
 import { Activity, ActivitySphere } from '@/activities/models';
 import { AuthModule } from '@/auth/auth.module';
 import { ProgressModule } from './progress/progress.module';
+import { CommentsModule } from './comments/comments.module';
+import { Comment } from './comments/models';
 
 @Module({
 	imports: [
@@ -30,7 +32,16 @@ import { ProgressModule } from './progress/progress.module';
 			host: process.env.DB_HOST,
 			port: Number(process.env.DB_PORT),
 			autoLoadModels: true,
-			models: [User, Room, RoomUser, Task, Group, Activity, ActivitySphere],
+			models: [
+				User,
+				Room,
+				RoomUser,
+				Task,
+				Group,
+				Activity,
+				ActivitySphere,
+				Comment
+			],
 		}),
 		AuthModule,
 		UsersModule,
@@ -38,7 +49,8 @@ import { ProgressModule } from './progress/progress.module';
 		TasksModule,
 		GroupsModule,
 		ActivitiesModule,
-		ProgressModule
+		ProgressModule,
+		CommentsModule
 	],
 })
 export class AppModule {}
