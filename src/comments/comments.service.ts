@@ -55,12 +55,8 @@ export class CommentsService {
 	}
 
 	async remove(id: number, taskId: number): Promise<boolean> {
-		await this.commentsRepository.destroy({
-			where: {
-				id,
-				taskId,
-			},
-		});
+		const comment = await this.getOne(id, taskId);
+		await comment.destroy();
 		return true;
 	}
 }
