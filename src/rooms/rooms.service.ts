@@ -57,13 +57,8 @@ export class RoomsService {
 	}
 
 	async update(id: number, dto: UpdateRoomDto): Promise<Room> {
-		await this.roomsRepository.update(dto, {
-			where: {
-				id,
-			},
-		});
-
-		return this.getOne(id);
+		const room = await this.getOne(id);
+		return room.update(dto);
 	}
 
 	async getUsers(id: number): Promise<SecurityUserDto[]> {

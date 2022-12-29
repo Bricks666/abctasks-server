@@ -44,14 +44,8 @@ export class GroupsService {
 		id: number,
 		dto: UpdateGroupDto
 	): Promise<Group> {
-		await this.groupRepository.update(dto, {
-			where: {
-				roomId,
-				id,
-			},
-		});
-
-		return this.getOne(roomId, id);
+		const group = await this.getOne(roomId, id);
+		return group.update(dto);
 	}
 
 	async remove(roomId: number, id: number): Promise<boolean> {

@@ -44,14 +44,8 @@ export class TasksService {
 	 * TODO: Сделать сначала поиск, а потом уже изменение, чтобы ошибка кидалась до изменений
 	 */
 	async update(roomId: number, id: number, dto: UpdateTaskDto): Promise<Task> {
-		await this.tasksRepository.update(dto, {
-			where: {
-				roomId,
-				id,
-			},
-		});
-
-		return this.getOne(roomId, id);
+		const task = await this.getOne(roomId, id);
+		return task.update(dto);
 	}
 
 	async remove(roomId: number, id: number): Promise<boolean> {

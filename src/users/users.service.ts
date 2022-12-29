@@ -8,8 +8,8 @@ import {
 	CreateUserDto,
 	GetUserByLoginDto,
 	GetUserDto,
-	SecurityUserDto,
-	UpdateUserDto
+	UpdateUserDto,
+	SecurityUserDto
 } from './dto';
 import { User } from './models';
 import { normalizePaginationParams } from '@/utils';
@@ -97,11 +97,9 @@ export class UsersService {
 			password: await hash(dto.password, Number(process.env.ROUND_COUNT)),
 		});
 
-		return {
-			id: user.id,
-			login: user.login,
-			photo: user.photo,
-		};
+		user.password = undefined;
+
+		return user;
 	}
 
 	async getInsecure(login: string): Promise<User> {
@@ -119,18 +117,10 @@ export class UsersService {
 	}
 
 	async update(id: number, dto: UpdateUserDto): Promise<SecurityUserDto> {
-		await this.usersRepository.update(
-			{
-				password: dto.password,
-				photo: dto.photo,
-			},
-			{
-				where: {
-					id,
-				},
-			}
-		);
-
-		return this.getOne({ id, });
+		const user = await this.getOne({ id, });
+		return user.update({
+			password: dto.password,
+			photo: dto.photo,
+		});
 	}
 }
