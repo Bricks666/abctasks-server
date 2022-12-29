@@ -8,7 +8,7 @@ import {
 	Table
 } from 'sequelize-typescript';
 import { IsString, IsNumber } from 'class-validator';
-import { User } from '@/users/models';
+import { old_User } from '@/users/models';
 import { RoomUser } from './room-user.model';
 import { Group } from '@/groups/models';
 import { Task } from '@/tasks/models';
@@ -58,8 +58,8 @@ export class Room extends Model<Room, CreateRoom> {
 	})
 	declare description: string;
 
-	@BelongsToMany(() => User, () => RoomUser)
-	declare users: User[];
+	@BelongsToMany(() => old_User, () => RoomUser)
+	declare users: old_User[];
 
 	@HasMany(() => Group)
 	declare groups: Group[];

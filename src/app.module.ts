@@ -1,7 +1,7 @@
 import { CacheModule, Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { SequelizeModule } from '@nestjs/sequelize';
-import { User } from '@/users/models';
+import { old_User } from '@/users/models';
 import { UsersModule } from '@/users/users.module';
 import { RoomsModule } from '@/rooms/rooms.module';
 import { Room, RoomUser } from '@/rooms/models';
@@ -15,13 +15,16 @@ import { AuthModule } from '@/auth/auth.module';
 import { ProgressModule } from './progress/progress.module';
 import { CommentsModule } from './comments/comments.module';
 import { Comment } from './comments/models';
+import { DatabaseModule } from './database/database.module';
 
 @Module({
 	imports: [
 		CacheModule.register({
 			isGlobal: true,
 		}),
-		ConfigModule.forRoot(),
+		ConfigModule.forRoot({
+			envFilePath: '.env',
+		}),
 		SequelizeModule.forRoot({
 			dialect: 'mariadb',
 			database: process.env.DB_NAME,
@@ -31,7 +34,7 @@ import { Comment } from './comments/models';
 			port: Number(process.env.DB_PORT),
 			autoLoadModels: true,
 			models: [
-				User,
+				old_User,
 				Room,
 				RoomUser,
 				Task,
@@ -48,7 +51,8 @@ import { Comment } from './comments/models';
 		GroupsModule,
 		ActivitiesModule,
 		ProgressModule,
-		CommentsModule
+		CommentsModule,
+		DatabaseModule
 	],
 })
 export class AppModule {}

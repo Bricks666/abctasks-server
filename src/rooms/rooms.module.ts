@@ -4,10 +4,10 @@ import { RoomsService } from './rooms.service';
 import { RoomsController } from './rooms.controller';
 import { Room, RoomUser } from './models';
 import { AuthModule } from '@/auth/auth.module';
-import { User } from '@/users/models';
+import { old_User } from '@/users/models';
 
 @Module({
-	imports: [SequelizeModule.forFeature([Room, RoomUser, User]), AuthModule],
+	imports: [SequelizeModule.forFeature([Room, RoomUser, old_User]), AuthModule],
 	providers: [RoomsService],
 	controllers: [RoomsController],
 	exports: [RoomsService],

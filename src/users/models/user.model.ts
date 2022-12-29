@@ -1,3 +1,4 @@
+/* eslint-disable max-classes-per-file */
 import { ApiHideProperty, ApiProperty } from '@nestjs/swagger';
 import {
 	BelongsToMany,
@@ -20,7 +21,7 @@ interface CreateUser {
 	createdAt: false,
 	updatedAt: false,
 })
-export class User extends Model<User, CreateUser> {
+export class old_User extends Model<old_User, CreateUser> {
 	@ApiProperty({
 		type: Number,
 		description: 'Id пользователя',

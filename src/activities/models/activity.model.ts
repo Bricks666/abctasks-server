@@ -9,7 +9,7 @@ import {
 import { ApiProperty } from '@nestjs/swagger';
 import { IsEnum, IsNumber } from 'class-validator';
 import { Room } from '@/rooms/models';
-import { User } from '@/users/models';
+import { old_User } from '@/users/models';
 import { ActivitySphere } from './activity-sphere.model';
 
 export type ActivityAction = 'update' | 'create' | 'remove';
@@ -87,7 +87,7 @@ export class Activity extends Model<Activity, CreateActivity> {
 		type: DataType.INTEGER,
 	})
 	@IsNumber()
-	@ForeignKey(() => User)
+	@ForeignKey(() => old_User)
 	declare activistId: number;
 
 	declare createdAt: string;

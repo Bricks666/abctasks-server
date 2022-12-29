@@ -1,88 +1,28 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { InjectModel } from '@nestjs/sequelize';
 import { hash } from 'bcrypt';
-import { Op } from 'sequelize';
-import { Room } from '@/rooms/models';
+import { normalizePaginationParams } from '@/utils';
 import {
 	GetUsersQueryDto,
 	CreateUserDto,
-	GetUserByLoginDto,
 	GetUserDto,
 	UpdateUserDto,
-	SecurityUserDto
+	SecurityUserDto,
+	UserDto
 } from './dto';
-import { User } from './models';
-import { normalizePaginationParams } from '@/utils';
+import { UserRepository } from './repository';
 
 @Injectable()
 export class UsersService {
-	constructor(
-		@InjectModel(User) private readonly usersRepository: typeof User
-	) {}
+	constructor(private readonly usersRepository: UserRepository) {}
 
 	async getAll(dto: GetUsersQueryDto): Promise<SecurityUserDto[]> {
-		const where: Record<string, any> = {};
-		const includeWhere: Record<string, any> = {};
-		const throughWhere: Record<string, any> = {};
-
 		const { limit, offset, } = normalizePaginationParams(dto);
 
-		if (typeof dto.login !== 'undefined') {
-			where.login = { [Op.like]: `${dto.login}%`, };
-		}
-
-		if (typeof dto.roomId !== 'undefined') {
-			includeWhere.id = dto.roomId;
-			throughWhere.removed = false;
-		}
-
-		return this.usersRepository.findAll({
-			attributes: {
-				exclude: ['password'],
-			},
-			limit,
-			offset,
-			where,
-			include: [
-				{
-					model: Room,
-					attributes: [],
-					where: includeWhere,
-					through: {
-						where: throughWhere,
-						attributes: [],
-					},
-				}
-			],
-		});
+		return this.usersRepository.getAll(dto, limit, offset);
 	}
 
 	async getOne(dto: GetUserDto): Promise<SecurityUserDto> {
-		const user = await this.usersRepository.findOne({
-			attributes: {
-				exclude: ['password'],
-			},
-			where: {
-				id: dto.id,
-			},
-		});
-
-		if (!user) {
-			throw new NotFoundException();
-		}
-
-		return user;
-	}
-
-	async getOneByLogin(dto: GetUserByLoginDto): Promise<SecurityUserDto> {
-		const user = await this.usersRepository.findOne({
-			attributes: {
-				exclude: ['password'],
-			},
-			where: {
-				login: dto.login,
-			},
-		});
+		const user = await this.usersRepository.getOne(dto.id);
 
 		if (!user) {
 			throw new NotFoundException();
@@ -92,22 +32,14 @@ export class UsersService {
 	}
 
 	async create(dto: CreateUserDto): Promise<SecurityUserDto> {
-		const user = await this.usersRepository.create({
+		return this.usersRepository.create({
 			...dto,
 			password: await hash(dto.password, Number(process.env.ROUND_COUNT)),
 		});
-
-		user.password = undefined;
-
-		return user;
 	}
 
-	async getInsecure(login: string): Promise<User> {
-		const user = await this.usersRepository.findOne({
-			where: {
-				login,
-			},
-		});
+	async getInsecure(login: string): Promise<UserDto> {
+		const user = await this.usersRepository.getOneByLogin(login);
 
 		if (!user) {
 			throw new NotFoundException();
@@ -117,10 +49,6 @@ export class UsersService {
 	}
 
 	async update(id: number, dto: UpdateUserDto): Promise<SecurityUserDto> {
-		const user = await this.getOne({ id, });
-		return user.update({
-			password: dto.password,
-			photo: dto.photo,
-		});
+		return this.usersRepository.update(id, dto);
 	}
 }

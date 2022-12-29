@@ -57,6 +57,7 @@
 		"no-useless-constructor": "off",
 		"no-empty-function": "warn",
 		"class-methods-use-this": "off",
+		"camelcase": "warn",
 
 		/* IMPORT */
 		"import/extensions": "off",

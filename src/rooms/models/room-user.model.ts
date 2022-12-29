@@ -6,7 +6,7 @@ import {
 	Table,
 	DataType
 } from 'sequelize-typescript';
-import { User } from '@/users/models';
+import { old_User } from '@/users/models';
 import { Room } from './room.model';
 
 @Table({
@@ -36,7 +36,7 @@ export class RoomUser extends Model<RoomUser> {
 		primaryKey: true,
 		type: DataType.INTEGER,
 	})
-	@ForeignKey(() => User)
+	@ForeignKey(() => old_User)
 	declare userId: number;
 
 	@ApiProperty({

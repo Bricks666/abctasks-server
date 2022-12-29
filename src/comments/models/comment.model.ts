@@ -8,7 +8,7 @@ import {
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNumber, IsString, MinLength } from 'class-validator';
 import { Task } from '@/tasks/models';
-import { User } from '@/users/models';
+import { old_User } from '@/users/models';
 
 interface CreateComment {
 	readonly authorId: number;
@@ -44,7 +44,7 @@ export class Comment extends Model<Comment, CreateComment> {
 	@Column({
 		type: DataType.INTEGER,
 	})
-	@ForeignKey(() => User)
+	@ForeignKey(() => old_User)
 	declare authorId: number;
 
 	@ApiProperty({

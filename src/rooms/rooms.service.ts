@@ -4,7 +4,7 @@ import {
 	NotFoundException
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
-import { User } from '@/users/models';
+import { old_User } from '@/users/models';
 import { SecurityUserDto } from '@/users/dto';
 import { CreateRoomDto, RoomUserDto, UpdateRoomDto } from './dto';
 import { Room, RoomUser } from './models';
@@ -14,13 +14,13 @@ export class RoomsService {
 	constructor(
 		@InjectModel(Room) private readonly roomsRepository: typeof Room,
 		@InjectModel(RoomUser) private readonly roomUserRepository: typeof RoomUser,
-		@InjectModel(User) private readonly usersRepository: typeof User
+		@InjectModel(old_User) private readonly usersRepository: typeof old_User
 	) {}
 
 	async getAll(userId: number): Promise<Room[]> {
 		return this.roomsRepository.findAll({
 			include: {
-				model: User,
+				model: old_User,
 				where: {
 					id: userId,
 				},
@@ -69,7 +69,7 @@ export class RoomsService {
 			attributes: [],
 			include: [
 				{
-					model: User,
+					model: old_User,
 					attributes: { exclude: ['password'], },
 					through: {
 						attributes: [],
@@ -82,7 +82,7 @@ export class RoomsService {
 			throw new NotFoundException('Room was not found');
 		}
 
-		return room.users;
+		return room.users as any;
 	}
 
 	async addUser(id: number, dto: RoomUserDto): Promise<SecurityUserDto> {
@@ -94,7 +94,7 @@ export class RoomsService {
 		});
 		if (pair) {
 			if (!pair.removed) {
-				throw new BadRequestException('User already exists');
+				throw new BadRequestException('old_User already exists');
 			}
 			await pair.update({
 				removed: false,
@@ -105,7 +105,7 @@ export class RoomsService {
 
 		return this.usersRepository.findByPk(dto.userId, {
 			rejectOnEmpty: true,
-		});
+		}) as any;
 	}
 
 	async removeUser(id: number, dto: RoomUserDto): Promise<boolean> {

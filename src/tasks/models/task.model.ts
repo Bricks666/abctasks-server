@@ -5,11 +5,11 @@ import {
 	DataType,
 	ForeignKey,
 	Model,
-	Table,
+	Table
 } from 'sequelize-typescript';
 import { ApiProperty } from '@nestjs/swagger';
 import { Room } from '@/rooms/models';
-import { User } from '@/users/models';
+import { old_User } from '@/users/models';
 import { Group } from '@/groups/models';
 
 export type TaskStatus = 'done' | 'in progress' | 'review' | 'ready';
@@ -73,7 +73,7 @@ export class Task extends Model<Task, CreateTask> {
 	@Column({
 		type: DataType.INTEGER,
 	})
-	@ForeignKey(() => User)
+	@ForeignKey(() => old_User)
 	@IsNumber()
 	declare authorId: number;
 
@@ -108,9 +108,9 @@ export class Task extends Model<Task, CreateTask> {
 	@IsDateString()
 	declare createdAt: string;
 
-	@BelongsTo(() => User)
-	declare author: User;
+	@BelongsTo(() => old_User)
+	declare author: old_User;
 
-	@BelongsTo(() => Group, { onDelete: 'CASCADE' })
+	@BelongsTo(() => Group, { onDelete: 'CASCADE', })
 	declare group: Group;
 }

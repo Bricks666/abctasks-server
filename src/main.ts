@@ -4,10 +4,13 @@ import * as cookieParser from 'cookie-parser';
 import { AppModule } from './app.module';
 import { StandardResponseInterceptor, ValidationPipe } from './common';
 import { CORS } from './const';
+import { DatabaseService } from './database/database.service';
 
 async function bootstrap() {
 	const { HOST, PORT, } = process.env;
 	const app = await NestFactory.create(AppModule);
+	const prismaService = app.get(DatabaseService);
+	await prismaService.enableShutdownHooks(app);
 	app.use(cookieParser());
 	app.enableCors({
 		credentials: true,
