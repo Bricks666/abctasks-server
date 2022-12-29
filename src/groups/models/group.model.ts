@@ -3,11 +3,11 @@ import {
 	Model,
 	Table,
 	DataType,
-	ForeignKey,
+	ForeignKey
 } from 'sequelize-typescript';
 import { ApiProperty } from '@nestjs/swagger';
 import { IsHexColor, IsNumber, IsString } from 'class-validator';
-import { Room } from '@/rooms/models';
+import { old_Room } from '@/rooms/models';
 import { HEX } from '@/types/common';
 
 interface CreateGroup {
@@ -45,7 +45,7 @@ export class Group extends Model<Group, CreateGroup> {
 	@Column({
 		type: DataType.INTEGER,
 	})
-	@ForeignKey(() => Room)
+	@ForeignKey(() => old_Room)
 	declare roomId: number;
 
 	@ApiProperty({

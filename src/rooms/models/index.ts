@@ -1,2 +1,2 @@
-export { RoomUser } from './room-user.model';
-export { Room } from './room.model';
+export * from './room-user.model';
+export * from './room.model';

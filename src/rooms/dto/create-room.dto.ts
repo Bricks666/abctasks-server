@@ -1,4 +1,4 @@
 import { PickType } from '@nestjs/swagger';
-import { Room } from '../models';
+import { RoomDto } from './room.dto';
 
-export class CreateRoomDto extends PickType(Room, ['name', 'description']) {}
+export class CreateRoomDto extends PickType(RoomDto, ['name', 'description']) {}

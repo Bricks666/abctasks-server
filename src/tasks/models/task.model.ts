@@ -8,7 +8,7 @@ import {
 	Table
 } from 'sequelize-typescript';
 import { ApiProperty } from '@nestjs/swagger';
-import { Room } from '@/rooms/models';
+import { old_Room } from '@/rooms/models';
 import { old_User } from '@/users/models';
 import { Group } from '@/groups/models';
 
@@ -49,7 +49,7 @@ export class Task extends Model<Task, CreateTask> {
 	@Column({
 		type: DataType.INTEGER,
 	})
-	@ForeignKey(() => Room)
+	@ForeignKey(() => old_Room)
 	@IsNumber()
 	declare roomId: number;
 

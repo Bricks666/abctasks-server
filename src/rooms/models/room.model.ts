@@ -22,7 +22,7 @@ interface CreateRoom {
 	tableName: 'rooms',
 	updatedAt: true,
 })
-export class Room extends Model<Room, CreateRoom> {
+export class old_Room extends Model<old_Room, CreateRoom> {
 	@ApiProperty({
 		example: 1,
 		description: 'Id комнаты',

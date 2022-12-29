@@ -4,7 +4,7 @@ import { SequelizeModule } from '@nestjs/sequelize';
 import { old_User } from '@/users/models';
 import { UsersModule } from '@/users/users.module';
 import { RoomsModule } from '@/rooms/rooms.module';
-import { Room, RoomUser } from '@/rooms/models';
+import { old_Room, RoomUser } from '@/rooms/models';
 import { TasksModule } from '@/tasks/tasks.module';
 import { Task } from '@/tasks/models';
 import { GroupsModule } from '@/groups/groups.module';
@@ -35,7 +35,7 @@ import { DatabaseModule } from './database/database.module';
 			autoLoadModels: true,
 			models: [
 				old_User,
-				Room,
+				old_Room,
 				RoomUser,
 				Task,
 				Group,

@@ -1,3 +1,4 @@
-export { CreateRoomDto } from './create-room.dto';
-export { UpdateRoomDto } from './update-room.dto';
-export { RoomUserDto } from './room-user.dto';
+export * from './create-room.dto';
+export * from './update-room.dto';
+export * from './room-user.dto';
+export * from './room.dto';

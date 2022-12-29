@@ -8,7 +8,7 @@ import {
 	Table
 } from 'sequelize-typescript';
 import { IsNumber, IsOptional, IsString } from 'class-validator';
-import { Room, RoomUser } from '@/rooms/models';
+import { old_Room, RoomUser } from '@/rooms/models';
 
 interface CreateUser {
 	readonly login: string;
@@ -74,6 +74,6 @@ export class old_User extends Model<old_User, CreateUser> {
 	})
 	declare photo?: string | null;
 
-	@BelongsToMany(() => Room, () => RoomUser)
-	declare rooms: Room[];
+	@BelongsToMany(() => old_Room, () => RoomUser)
+	declare rooms: old_Room[];
 }

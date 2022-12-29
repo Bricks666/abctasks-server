@@ -7,7 +7,7 @@ import {
 	DataType
 } from 'sequelize-typescript';
 import { old_User } from '@/users/models';
-import { Room } from './room.model';
+import { old_Room } from './room.model';
 
 @Table({
 	tableName: 'room-user',
@@ -20,7 +20,7 @@ export class RoomUser extends Model<RoomUser> {
 		description: 'Id комнаты',
 		example: 1,
 	})
-	@ForeignKey(() => Room)
+	@ForeignKey(() => old_Room)
 	@Column({
 		primaryKey: true,
 		type: DataType.INTEGER,

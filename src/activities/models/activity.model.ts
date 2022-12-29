@@ -8,7 +8,7 @@ import {
 } from 'sequelize-typescript';
 import { ApiProperty } from '@nestjs/swagger';
 import { IsEnum, IsNumber } from 'class-validator';
-import { Room } from '@/rooms/models';
+import { old_Room } from '@/rooms/models';
 import { old_User } from '@/users/models';
 import { ActivitySphere } from './activity-sphere.model';
 
@@ -48,7 +48,7 @@ export class Activity extends Model<Activity, CreateActivity> {
 	@Column({
 		type: DataType.INTEGER,
 	})
-	@ForeignKey(() => Room)
+	@ForeignKey(() => old_Room)
 	declare roomId: number;
 
 	@ApiProperty({
