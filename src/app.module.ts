@@ -21,9 +21,7 @@ import { Comment } from './comments/models';
 		CacheModule.register({
 			isGlobal: true,
 		}),
-		ConfigModule.forRoot({
-			envFilePath: '.env.local',
-		}),
+		ConfigModule.forRoot(),
 		SequelizeModule.forRoot({
 			dialect: 'mariadb',
 			database: process.env.DB_NAME,

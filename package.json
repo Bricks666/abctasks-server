@@ -34,6 +34,7 @@
 		"husky": "^8.0.2",
 		"lint-staged": "^13.1.0",
 		"prettier": "^2.8.1",
+		"prisma": "^4.8.0",
 		"typescript": "^4.9.4"
 	},
 	"dependencies": {
@@ -46,6 +47,7 @@
 		"@nestjs/sequelize": "^9.0.0",
 		"@nestjs/swagger": "^6.1.4",
 		"@nestjs/websockets": "^9.2.1",
+		"@prisma/client": "^4.8.0",
 		"bcrypt": "^5.1.0",
 		"cache-manager": "^5.1.4",
 		"class-transformer": "^0.5.1",
