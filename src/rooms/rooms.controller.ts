@@ -165,7 +165,7 @@ export class RoomsController {
 		@Param('id', ParseIntPipe) id: number,
 		@Body() dto: RoomUserDto
 	): Promise<SecurityUserDto> {
-		return this.roomsService.addUser(id, dto);
+		return this.roomsService.addUser(id, dto.userId);
 	}
 
 	@ApiOperation({
@@ -184,7 +184,7 @@ export class RoomsController {
 		@AuthToken() token: string
 	) {
 		const { id: userId, } = await this.authService.verifyUser(token);
-		return this.roomsService.removeUser(id, { userId, });
+		return this.roomsService.removeUser(id, userId);
 	}
 
 	@ApiOperation({

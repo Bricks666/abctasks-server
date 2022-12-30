@@ -1,14 +1,6 @@
-/* eslint-disable max-classes-per-file */
 import { ApiHideProperty, ApiProperty } from '@nestjs/swagger';
-import {
-	BelongsToMany,
-	Column,
-	DataType,
-	Model,
-	Table
-} from 'sequelize-typescript';
+import { Column, DataType, Model, Table } from 'sequelize-typescript';
 import { IsNumber, IsOptional, IsString } from 'class-validator';
-import { old_Room, RoomUser } from '@/rooms/models';
 
 interface CreateUser {
 	readonly login: string;
@@ -73,7 +65,4 @@ export class old_User extends Model<old_User, CreateUser> {
 		defaultValue: null,
 	})
 	declare photo?: string | null;
-
-	@BelongsToMany(() => old_Room, () => RoomUser)
-	declare rooms: old_Room[];
 }

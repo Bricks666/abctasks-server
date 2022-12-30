@@ -1,17 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
-import {
-	BelongsToMany,
-	Column,
-	DataType,
-	HasMany,
-	Model,
-	Table
-} from 'sequelize-typescript';
+import { Column, DataType, HasMany, Model, Table } from 'sequelize-typescript';
 import { IsString, IsNumber } from 'class-validator';
-import { old_User } from '@/users/models';
-import { RoomUser } from './room-user.model';
 import { Group } from '@/groups/models';
-import { Task } from '@/tasks/models';
 
 interface CreateRoom {
 	readonly roomName: string;
@@ -58,12 +48,6 @@ export class old_Room extends Model<old_Room, CreateRoom> {
 	})
 	declare description: string;
 
-	@BelongsToMany(() => old_User, () => RoomUser)
-	declare users: old_User[];
-
 	@HasMany(() => Group)
 	declare groups: Group[];
-
-	@HasMany(() => Task)
-	declare tasks: Task[];
 }

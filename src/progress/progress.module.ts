@@ -1,12 +1,12 @@
 import { Module } from '@nestjs/common';
-import { SequelizeModule } from '@nestjs/sequelize';
+import { DatabaseModule } from '@/database/database.module';
 import { ProgressService } from './progress.service';
 import { ProgressController } from './progress.controller';
-import { Task } from '@/tasks/models';
+import { ProgressRepository } from './repository';
 
 @Module({
-	imports: [SequelizeModule.forFeature([Task])],
-	providers: [ProgressService],
+	imports: [DatabaseModule],
+	providers: [ProgressService, ProgressRepository],
 	controllers: [ProgressController],
 })
 export class ProgressModule {}

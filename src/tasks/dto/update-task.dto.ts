@@ -1,6 +1,6 @@
 import { PartialType, PickType } from '@nestjs/swagger';
-import { Task } from '../models';
+import { CreateTaskDto } from './create-task.dto';
 
 export class UpdateTaskDto extends PartialType(
-	PickType(Task, ['content', 'status'])
+	PickType(CreateTaskDto, ['content', 'status'])
 ) {}

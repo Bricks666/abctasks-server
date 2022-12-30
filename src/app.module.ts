@@ -4,9 +4,8 @@ import { SequelizeModule } from '@nestjs/sequelize';
 import { old_User } from '@/users/models';
 import { UsersModule } from '@/users/users.module';
 import { RoomsModule } from '@/rooms/rooms.module';
-import { old_Room, RoomUser } from '@/rooms/models';
+import { old_Room } from '@/rooms/models';
 import { TasksModule } from '@/tasks/tasks.module';
-import { Task } from '@/tasks/models';
 import { GroupsModule } from '@/groups/groups.module';
 import { Group } from '@/groups/models';
 import { ActivitiesModule } from '@/activities/activities.module';
@@ -31,7 +30,7 @@ import { DatabaseModule } from './database/database.module';
 			host: process.env.DB_HOST,
 			port: Number(process.env.DB_PORT),
 			autoLoadModels: true,
-			models: [old_User, old_Room, RoomUser, Task, Group],
+			models: [old_User, old_Room, Group],
 		}),
 		AuthModule,
 		UsersModule,

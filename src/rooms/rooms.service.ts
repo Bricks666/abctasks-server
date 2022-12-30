@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { SecurityUserDto } from '@/users/dto';
 import { normalizePaginationParams } from '@/utils';
-import { CreateRoomDto, RoomDto, RoomUserDto, UpdateRoomDto } from './dto';
+import { CreateRoomDto, RoomDto, UpdateRoomDto } from './dto';
 import { RoomRepository, RoomUserRepository } from './repository';
 import { UserRepository } from '@/users/repository';
 
@@ -51,18 +51,18 @@ export class RoomsService {
 		return users;
 	}
 
-	async addUser(id: number, dto: RoomUserDto): Promise<SecurityUserDto> {
-		const added = await this.roomUserRepository.addUser(id, dto.userId);
+	async addUser(id: number, userId: number): Promise<SecurityUserDto> {
+		const added = await this.roomUserRepository.addUser(id, userId);
 
 		if (!added) {
-			throw new BadRequestException('old_User already exists');
+			throw new BadRequestException('User already exists');
 		}
 
-		return this.usersRepository.getOne(dto.userId);
+		return this.usersRepository.getOne(userId);
 	}
 
-	async removeUser(id: number, dto: RoomUserDto): Promise<boolean> {
-		return this.roomUserRepository.removeUser(id, dto.userId);
+	async removeUser(id: number, userId: number): Promise<boolean> {
+		return this.roomUserRepository.removeUser(id, userId);
 	}
 
 	async roomExistsUser(roomId: number, userId: number): Promise<boolean> {
