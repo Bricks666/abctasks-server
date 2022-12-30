@@ -1,2 +1,4 @@
-export { CreateActivityDto } from './create-activity.dto';
-export { UpdateActivityDto } from './update-activity.dto';
+export * from './create-activity.dto';
+export * from './update-activity.dto';
+export * from './activity.dto';
+export * from './activity-sphere.dto';

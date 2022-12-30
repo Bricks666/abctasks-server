@@ -1,7 +1,7 @@
 import { PickType } from '@nestjs/swagger';
-import { Activity } from '../models';
+import { ActivityDto } from './activity.dto';
 
-export class CreateActivityDto extends PickType(Activity, [
+export class CreateActivityDto extends PickType(ActivityDto, [
 	'action',
 	'activistId'
 ]) {

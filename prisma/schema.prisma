@@ -14,7 +14,7 @@ model activity {
   action          activity_action
   activistId      Int
   createdAt       DateTime?       @default(now()) @db.DateTime(0)
-  activity_sphere activity_sphere @relation(fields: [sphereId], references: [id], onDelete: NoAction)
+  sphere activity_sphere @relation(fields: [sphereId], references: [id], onDelete: Cascade)
 
   @@index([sphereId], map: "sphereId")
 }

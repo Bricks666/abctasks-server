@@ -1,74 +1,18 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { InjectModel } from '@nestjs/sequelize';
-import { CreateActivityDto } from './dto';
-import { Activity, ActivitySphere } from './models';
+import { Injectable } from '@nestjs/common';
+import { normalizePaginationParams } from '@/utils';
+import { ActivityDto, CreateActivityDto } from './dto';
+import { ActivityRepository } from './repository';
 
 @Injectable()
 export class ActivitiesService {
-	constructor(
-		@InjectModel(Activity)
-		private readonly activitiesRepository: typeof Activity,
-		@InjectModel(ActivitySphere)
-		private readonly activitySpheresRepository: typeof ActivitySphere
-	) {}
+	constructor(private readonly activitiesRepository: ActivityRepository) {}
 
-	async getAll(roomId: number): Promise<Activity[]> {
-		return this.activitiesRepository.findAll({
-			where: {
-				roomId,
-			},
-			include: [
-				{
-					model: ActivitySphere,
-				}
-			],
-			attributes: {
-				exclude: ['sphereId'],
-			},
-
-			limit: 15,
-			order: [['id', 'DESC']],
-		});
+	async getAllByRoomId(roomId: number): Promise<ActivityDto[]> {
+		const pagination = normalizePaginationParams({});
+		return this.activitiesRepository.getAllByRoomId(roomId, pagination);
 	}
 
-	async getOne(roomId: number, id: number): Promise<Activity> {
-		const activity = await this.activitiesRepository.findOne({
-			where: {
-				roomId,
-				id,
-			},
-			include: [
-				{
-					model: ActivitySphere,
-					attributes: ['name'],
-				}
-			],
-			attributes: {
-				exclude: ['sphereId'],
-			},
-		});
-
-		if (!activity) {
-			throw new NotFoundException();
-		}
-
-		return activity;
-	}
-
-	async create(roomId: number, dto: CreateActivityDto): Promise<Activity> {
-		const [sphere] = await this.activitySpheresRepository.findOrCreate({
-			where: {
-				name: dto.sphereName,
-			},
-			defaults: {
-				name: dto.sphereName,
-			},
-		});
-		return this.activitiesRepository.create({
-			roomId,
-			activistId: dto.activistId,
-			action: dto.action,
-			sphereId: sphere.id,
-		});
+	async create(roomId: number, dto: CreateActivityDto): Promise<ActivityDto> {
+		return this.activitiesRepository.create(roomId, dto);
 	}
 }
