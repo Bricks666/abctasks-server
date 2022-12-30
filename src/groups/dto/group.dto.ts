@@ -1,39 +1,15 @@
-import {
-	Column,
-	Model,
-	Table,
-	DataType,
-	ForeignKey
-} from 'sequelize-typescript';
 import { ApiProperty } from '@nestjs/swagger';
+import { group as GroupModel } from '@prisma/client';
 import { IsHexColor, IsNumber, IsString } from 'class-validator';
-import { old_Room } from '@/rooms/models';
 import { HEX } from '@/types/common';
 
-interface CreateGroup {
-	readonly roomId: number;
-	readonly groupName: string;
-	readonly groupMainColor: HEX;
-	readonly groupSecondColor: HEX;
-}
-
-@Table({
-	tableName: 'groups',
-	updatedAt: false,
-	createdAt: false,
-})
-export class Group extends Model<Group, CreateGroup> {
+export class GroupDto implements GroupModel {
 	@ApiProperty({
 		description: 'Id группы',
 		example: 1,
 		type: Number,
 	})
 	@IsNumber()
-	@Column({
-		type: DataType.INTEGER,
-		primaryKey: true,
-		autoIncrement: true,
-	})
 	declare id: number;
 
 	@ApiProperty({
@@ -42,10 +18,6 @@ export class Group extends Model<Group, CreateGroup> {
 		type: Number,
 	})
 	@IsNumber()
-	@Column({
-		type: DataType.INTEGER,
-	})
-	@ForeignKey(() => old_Room)
 	declare roomId: number;
 
 	@ApiProperty({
@@ -54,9 +26,6 @@ export class Group extends Model<Group, CreateGroup> {
 		type: String,
 	})
 	@IsString()
-	@Column({
-		type: DataType.STRING,
-	})
 	declare name: string;
 
 	@ApiProperty({
@@ -65,9 +34,6 @@ export class Group extends Model<Group, CreateGroup> {
 		type: String,
 	})
 	@IsHexColor()
-	@Column({
-		type: DataType.STRING,
-	})
 	declare mainColor: HEX;
 
 	@ApiProperty({
@@ -76,8 +42,5 @@ export class Group extends Model<Group, CreateGroup> {
 		type: String,
 	})
 	@IsHexColor()
-	@Column({
-		type: DataType.STRING,
-	})
 	declare secondColor: HEX;
 }

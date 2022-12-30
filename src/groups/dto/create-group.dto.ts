@@ -1,8 +1,8 @@
 import { PickType } from '@nestjs/swagger';
-import { Group } from '../models';
+import { GroupDto } from './group.dto';
 
-export class CreateGroupDto extends PickType(Group, [
+export class CreateGroupDto extends PickType(GroupDto, [
 	'mainColor',
 	'secondColor',
-	'name',
+	'name'
 ]) {}

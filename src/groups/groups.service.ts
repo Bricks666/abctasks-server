@@ -1,29 +1,17 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { InjectModel } from '@nestjs/sequelize';
-import { CreateGroupDto, UpdateGroupDto } from './dto';
-import { Group } from './models';
+import { CreateGroupDto, GroupDto, UpdateGroupDto } from './dto';
+import { GroupRepository } from './repository';
 
 @Injectable()
 export class GroupsService {
-	constructor(
-		@InjectModel(Group) private readonly groupRepository: typeof Group
-	) {}
+	constructor(private readonly groupRepository: GroupRepository) {}
 
-	async getAll(roomId: number): Promise<Group[]> {
-		return this.groupRepository.findAll({
-			where: {
-				roomId,
-			},
-		});
+	async getAll(roomId: number): Promise<GroupDto[]> {
+		return this.groupRepository.getAll(roomId);
 	}
 
-	async getOne(roomId: number, id: number): Promise<Group> {
-		const group = await this.groupRepository.findOne({
-			where: {
-				roomId,
-				id,
-			},
-		});
+	async getOne(roomId: number, id: number): Promise<GroupDto> {
+		const group = await this.groupRepository.getOne(id, roomId);
 
 		if (!group) {
 			throw new NotFoundException();
@@ -32,30 +20,21 @@ export class GroupsService {
 		return group;
 	}
 
-	async create(roomId: number, dto: CreateGroupDto): Promise<Group> {
-		return this.groupRepository.create({
-			roomId,
-			...dto,
-		});
+	async create(roomId: number, dto: CreateGroupDto): Promise<GroupDto> {
+		return this.groupRepository.create(roomId, dto);
 	}
 
 	async update(
 		roomId: number,
 		id: number,
 		dto: UpdateGroupDto
-	): Promise<Group> {
-		const group = await this.getOne(roomId, id);
-		return group.update(dto);
+	): Promise<GroupDto> {
+		return this.groupRepository.update(id, roomId, dto);
 	}
 
 	async remove(roomId: number, id: number): Promise<boolean> {
-		const a = await this.groupRepository.destroy({
-			where: {
-				roomId,
-				id,
-			},
-		});
+		await this.groupRepository.remove(id, roomId);
 
-		return !!a;
+		return true;
 	}
 }

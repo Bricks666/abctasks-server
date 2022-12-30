@@ -17,7 +17,7 @@
 	"author": "Bricks",
 	"license": "ISC",
 	"devDependencies": {
-		"@nestjs/cli": "^9.1.7",
+		"@nestjs/cli": "^9.1.8",
 		"@nestjs/schematics": "^9.0.4",
 		"@types/bcrypt": "^5.0.0",
 		"@types/cookie-parser": "^1.4.3",
@@ -44,7 +44,6 @@
 		"@nestjs/jwt": "^10.0.1",
 		"@nestjs/platform-express": "^9.2.1",
 		"@nestjs/platform-socket.io": "^9.2.1",
-		"@nestjs/sequelize": "^9.0.0",
 		"@nestjs/swagger": "^6.1.4",
 		"@nestjs/websockets": "^9.2.1",
 		"@prisma/client": "^4.8.0",

@@ -19,14 +19,13 @@ import {
 	ApiResponse,
 	ApiTags
 } from '@nestjs/swagger';
-import { CreateGroupDto, UpdateGroupDto } from './dto';
-import { GroupsService } from './groups.service';
-import { Group } from './models';
 import { ActivitiesService } from '@/activities/activities.service';
 import { AuthService } from '@/auth/auth.service';
 import { InRoom } from '@/rooms/in-room.decorator';
 import { AuthToken } from '@/auth/auth-token.decorator';
 import { Auth } from '@/auth/auth.decorator';
+import { GroupsService } from './groups.service';
+import { CreateGroupDto, GroupDto, UpdateGroupDto } from './dto';
 
 @ApiTags('Группы')
 @Controller('groups')
@@ -47,14 +46,14 @@ export class GroupsController {
 	})
 	@ApiResponse({
 		status: HttpStatus.OK,
-		type: Group,
+		type: GroupDto,
 		isArray: true,
 	})
 	@UseInterceptors(CacheInterceptor)
 	@Get('/:roomId')
 	async getAll(
 		@Param('roomId', ParseIntPipe) roomId: number
-	): Promise<Group[]> {
+	): Promise<GroupDto[]> {
 		return this.groupsService.getAll(roomId);
 	}
 
@@ -73,7 +72,7 @@ export class GroupsController {
 	})
 	@ApiResponse({
 		status: HttpStatus.OK,
-		type: Group,
+		type: GroupDto,
 	})
 	@ApiResponse({
 		status: HttpStatus.NOT_FOUND,
@@ -84,7 +83,7 @@ export class GroupsController {
 	async getOne(
 		@Param('roomId', ParseIntPipe) roomId: number,
 		@Param('id', ParseIntPipe) id: number
-	): Promise<Group> {
+	): Promise<GroupDto> {
 		return this.groupsService.getOne(roomId, id);
 	}
 
@@ -102,7 +101,7 @@ export class GroupsController {
 	})
 	@ApiResponse({
 		status: HttpStatus.OK,
-		type: Group,
+		type: GroupDto,
 		description: 'Созданная группа',
 	})
 	@Auth()
@@ -112,7 +111,7 @@ export class GroupsController {
 		@Param('roomId', ParseIntPipe) roomId: number,
 		@Body() dto: CreateGroupDto,
 		@AuthToken() token: string
-	): Promise<Group> {
+	): Promise<GroupDto> {
 		const { id: userId, } = await this.authService.verifyUser(token);
 
 		const group = await this.groupsService.create(roomId, dto);
@@ -144,7 +143,7 @@ export class GroupsController {
 	})
 	@ApiResponse({
 		status: HttpStatus.OK,
-		type: Group,
+		type: GroupDto,
 		description: 'Обновленная группа',
 	})
 	@Auth()
@@ -155,7 +154,7 @@ export class GroupsController {
 		@Param('id', ParseIntPipe) id: number,
 		@Body() dto: UpdateGroupDto,
 		@AuthToken() token: string
-	): Promise<Group> {
+	): Promise<GroupDto> {
 		const { id: userId, } = await this.authService.verifyUser(token);
 
 		const group = await this.groupsService.update(roomId, id, dto);

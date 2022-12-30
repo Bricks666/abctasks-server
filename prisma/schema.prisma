@@ -44,8 +44,8 @@ model group {
   id          Int    @id @default(autoincrement())
   roomId      Int
   name        String @db.VarChar(255)
-  mainColor   String @db.VarChar(255)
-  secondColor String @db.VarChar(255)
+  mainColor   String @db.VarChar(7)
+  secondColor String @db.VarChar(7)
   room        room   @relation(fields: [roomId], references: [id], onDelete: Cascade, map: "groups_ibfk_1")
   task        task[]
 
