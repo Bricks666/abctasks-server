@@ -8,13 +8,13 @@ datasource db {
 }
 
 model activity {
-  id              Int             @id @default(autoincrement())
-  roomId          Int
-  sphereId        Int
-  action          activity_action
-  activistId      Int
-  createdAt       DateTime?       @default(now()) @db.DateTime(0)
-  sphere activity_sphere @relation(fields: [sphereId], references: [id], onDelete: Cascade)
+  id         Int             @id @default(autoincrement())
+  roomId     Int
+  sphereId   Int
+  action     activity_action
+  activistId Int
+  createdAt  DateTime?       @default(now()) @db.DateTime(0)
+  sphere     activity_sphere @relation(fields: [sphereId], references: [id], onDelete: Cascade)
 
   @@index([sphereId], map: "sphereId")
 }
@@ -34,8 +34,10 @@ model comment {
   taskId    Int
   content   String    @db.VarChar(255)
   createdAt DateTime? @default(now()) @db.DateTime(0)
-  task     task      @relation(fields: [taskId, roomId], references: [id, roomId])
+  task      task      @relation(fields: [taskId, roomId], references: [id, roomId])
   author    room_user @relation(fields: [roomId, authorId], references: [roomId, userId])
+
+  @@unique([id, roomId, taskId])
 }
 
 model group {
@@ -77,16 +79,16 @@ model room {
 }
 
 model task {
-  id         Int         @id @default(autoincrement())
-  roomId     Int
-  groupId    Int
-  authorId   Int
-  status     task_status @default(ready)
-  content    String      @db.VarChar(255)
-  createdAt  DateTime?   @default(now()) @db.DateTime(0)
+  id        Int         @id @default(autoincrement())
+  roomId    Int
+  groupId   Int
+  authorId  Int
+  status    task_status @default(ready)
+  content   String      @db.VarChar(255)
+  createdAt DateTime?   @default(now()) @db.DateTime(0)
   room_user room_user   @relation(fields: [roomId, authorId], references: [roomId, userId], onDelete: Cascade, map: "task_ibfk_1")
   group     group       @relation(fields: [groupId, roomId], references: [id, roomId], onDelete: Cascade, map: "task_ibfk_2")
-  comments   comment[]
+  comments  comment[]
 
   @@unique([id, roomId])
   @@index([authorId], map: "authorId")

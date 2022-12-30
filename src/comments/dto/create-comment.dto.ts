@@ -1,4 +1,4 @@
 import { PickType } from '@nestjs/swagger';
-import { Comment } from '../models';
+import { CommentDto } from './comment.dto';
 
-export class CreateCommentDto extends PickType(Comment, ['content']) {}
+export class CreateCommentDto extends PickType(CommentDto, ['content']) {}
