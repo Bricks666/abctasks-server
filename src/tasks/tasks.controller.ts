@@ -20,9 +20,8 @@ import {
 	ApiTags
 } from '@nestjs/swagger';
 import { TasksService } from './tasks.service';
-import { Task } from './models';
 import { AuthToken } from '@/auth/auth-token.decorator';
-import { CreateTaskDto, UpdateTaskDto } from './dto';
+import { CreateTaskDto, TaskDto, UpdateTaskDto } from './dto';
 import { AuthService } from '@/auth/auth.service';
 import { ActivitiesService } from '@/activities/activities.service';
 import { Auth } from '@/auth/auth.decorator';
@@ -47,12 +46,14 @@ export class TasksController {
 	})
 	@ApiResponse({
 		status: HttpStatus.OK,
-		type: Task,
+		type: TaskDto,
 		isArray: true,
 	})
 	@UseInterceptors(CacheInterceptor)
 	@Get('/:roomId')
-	async getAll(@Param('roomId', ParseIntPipe) roomId: number): Promise<Task[]> {
+	async getAll(
+		@Param('roomId', ParseIntPipe) roomId: number
+	): Promise<TaskDto[]> {
 		return this.tasksService.getAll(roomId);
 	}
 
@@ -71,7 +72,7 @@ export class TasksController {
 	})
 	@ApiResponse({
 		status: HttpStatus.OK,
-		type: Task,
+		type: TaskDto,
 	})
 	@ApiResponse({
 		status: HttpStatus.NOT_FOUND,
@@ -82,7 +83,7 @@ export class TasksController {
 	async getOne(
 		@Param('roomId', ParseIntPipe) roomId: number,
 		@Param('id', ParseIntPipe) id: number
-	): Promise<Task> {
+	): Promise<TaskDto> {
 		return this.tasksService.getOne(roomId, id);
 	}
 
@@ -100,7 +101,7 @@ export class TasksController {
 	})
 	@ApiResponse({
 		status: HttpStatus.OK,
-		type: Task,
+		type: TaskDto,
 		description: 'Обновленная задача',
 	})
 	@Auth()
@@ -110,7 +111,7 @@ export class TasksController {
 		@Param('roomId', ParseIntPipe) roomId: number,
 		@AuthToken() token: string,
 		@Body() dto: CreateTaskDto
-	): Promise<Task> {
+	): Promise<TaskDto> {
 		const { id: userId, } = await this.authService.verifyUser(token);
 
 		const task = await this.tasksService.create(roomId, userId, dto);
@@ -143,7 +144,7 @@ export class TasksController {
 	})
 	@ApiResponse({
 		status: HttpStatus.OK,
-		type: Task,
+		type: TaskDto,
 		description: 'Измененная задача',
 	})
 	@ApiResponse({
@@ -159,7 +160,7 @@ export class TasksController {
 		@Param('id', ParseIntPipe) id: number,
 		@Body() dto: UpdateTaskDto,
 		@AuthToken() token: string
-	): Promise<Task> {
+	): Promise<TaskDto> {
 		const { id: userId, } = await this.authService.verifyUser(token);
 
 		const task = await this.tasksService.update(roomId, id, dto);

@@ -20,10 +20,9 @@ import {
 	ApiResponse,
 	ApiTags
 } from '@nestjs/swagger';
-import { Room } from './models';
 import { RoomsService } from './rooms.service';
 import { AuthService } from '@/auth/auth.service';
-import { CreateRoomDto, RoomUserDto, UpdateRoomDto } from './dto';
+import { CreateRoomDto, RoomDto, RoomUserDto, UpdateRoomDto } from './dto';
 import { AuthToken } from '@/auth/auth-token.decorator';
 import { Auth } from '@/auth/auth.decorator';
 import { SecurityUserDto } from '@/users/dto';
@@ -42,14 +41,14 @@ export class RoomsController {
 	})
 	@ApiResponse({
 		status: HttpStatus.OK,
-		type: Room,
+		type: RoomDto,
 		isArray: true,
 		description: 'Все комнаты, в которых состоит пользователь',
 	})
 	@Auth()
 	@UseInterceptors(CacheInterceptor)
 	@Get('/')
-	async getAll(@AuthToken() token: string): Promise<Room[]> {
+	async getAll(@AuthToken() token: string): Promise<RoomDto[]> {
 		const { id, } = await this.authService.verifyUser(token);
 		return this.roomsService.getAll(id);
 	}
@@ -63,7 +62,7 @@ export class RoomsController {
 	})
 	@ApiResponse({
 		status: HttpStatus.OK,
-		type: Room,
+		type: RoomDto,
 	})
 	@ApiResponse({
 		status: HttpStatus.NOT_FOUND,
@@ -71,7 +70,7 @@ export class RoomsController {
 	})
 	@UseInterceptors(CacheInterceptor)
 	@Get('/:id')
-	async getOne(@Param('id', ParseIntPipe) id: number): Promise<Room> {
+	async getOne(@Param('id', ParseIntPipe) id: number): Promise<RoomDto> {
 		return this.roomsService.getOne(id);
 	}
 
@@ -104,7 +103,7 @@ export class RoomsController {
 	})
 	@ApiResponse({
 		status: HttpStatus.OK,
-		type: Room,
+		type: RoomDto,
 	})
 	@ApiResponse({
 		status: HttpStatus.NOT_FOUND,
@@ -115,7 +114,7 @@ export class RoomsController {
 	async create(
 		@AuthToken() token: string,
 		@Body() dto: CreateRoomDto
-	): Promise<Room> {
+	): Promise<RoomDto> {
 		const { id, } = await this.authService.verifyUser(token);
 		return this.roomsService.create(id, dto);
 	}
@@ -129,7 +128,7 @@ export class RoomsController {
 	})
 	@ApiResponse({
 		status: HttpStatus.OK,
-		type: Room,
+		type: RoomDto,
 		description: 'Обновленная комната',
 	})
 	@ApiResponse({
@@ -143,7 +142,7 @@ export class RoomsController {
 	async update(
 		@Param('id', ParseIntPipe) id: number,
 		@Body() dto: UpdateRoomDto
-	): Promise<Room> {
+	): Promise<RoomDto> {
 		return this.roomsService.update(id, dto);
 	}
 
@@ -166,7 +165,7 @@ export class RoomsController {
 		@Param('id', ParseIntPipe) id: number,
 		@Body() dto: RoomUserDto
 	): Promise<SecurityUserDto> {
-		return this.roomsService.addUser(id, dto);
+		return this.roomsService.addUser(id, dto.userId);
 	}
 
 	@ApiOperation({
@@ -185,7 +184,7 @@ export class RoomsController {
 		@AuthToken() token: string
 	) {
 		const { id: userId, } = await this.authService.verifyUser(token);
-		return this.roomsService.removeUser(id, { userId, });
+		return this.roomsService.removeUser(id, userId);
 	}
 
 	@ApiOperation({

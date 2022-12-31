@@ -1,0 +1,118 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model activity {
+  id         Int             @id @default(autoincrement())
+  roomId     Int
+  sphereId   Int
+  action     activity_action
+  activistId Int
+  createdAt  DateTime?       @default(now()) @db.DateTime(0)
+  sphere     activity_sphere @relation(fields: [sphereId], references: [id], onDelete: Cascade)
+
+  @@index([sphereId], map: "sphereId")
+}
+
+model activity_sphere {
+  id         Int        @id @default(autoincrement())
+  name       String     @unique(map: "name") @db.VarChar(255)
+  activities activity[]
+
+  @@map("activity-sphere")
+}
+
+model comment {
+  id        Int       @id @default(autoincrement())
+  authorId  Int
+  roomId    Int
+  taskId    Int
+  content   String    @db.VarChar(255)
+  createdAt DateTime? @default(now()) @db.DateTime(0)
+  task      task      @relation(fields: [taskId, roomId], references: [id, roomId])
+  author    room_user @relation(fields: [roomId, authorId], references: [roomId, userId])
+
+  @@unique([id, roomId, taskId])
+}
+
+model group {
+  id          Int    @id @default(autoincrement())
+  roomId      Int
+  name        String @db.VarChar(255)
+  mainColor   String @db.VarChar(7)
+  secondColor String @db.VarChar(7)
+  room        room   @relation(fields: [roomId], references: [id], onDelete: Cascade, map: "groups_ibfk_1")
+  task        task[]
+
+  @@unique([id, roomId])
+  @@index([roomId], map: "roomId")
+}
+
+model room_user {
+  roomId   Int
+  userId   Int
+  removed  Boolean   @default(false)
+  room     room      @relation(fields: [roomId], references: [id], onDelete: Cascade, map: "room-user_ibfk_1")
+  user     user      @relation(fields: [userId], references: [id], onDelete: Cascade, map: "room-user_ibfk_2")
+  task     task[]
+  comments comment[]
+
+  @@id([roomId, userId])
+  @@unique([roomId, userId], map: "room-user_roomId_userId_unique")
+  @@index([userId], map: "userId")
+  @@map("room-user")
+}
+
+model room {
+  id          Int         @id @default(autoincrement())
+  name        String      @db.VarChar(255)
+  description String      @db.VarChar(255)
+  createdAt   DateTime?   @default(now()) @db.DateTime(0)
+  updatedAt   DateTime?   @updatedAt @db.DateTime(0)
+  groups      group[]
+  room_user   room_user[]
+}
+
+model task {
+  id        Int         @id @default(autoincrement())
+  roomId    Int
+  groupId   Int
+  authorId  Int
+  status    task_status @default(ready)
+  content   String      @db.VarChar(255)
+  createdAt DateTime?   @default(now()) @db.DateTime(0)
+  room_user room_user   @relation(fields: [roomId, authorId], references: [roomId, userId], onDelete: Cascade, map: "task_ibfk_1")
+  group     group       @relation(fields: [groupId, roomId], references: [id, roomId], onDelete: Cascade, map: "task_ibfk_2")
+  comments  comment[]
+
+  @@unique([id, roomId])
+  @@index([authorId], map: "authorId")
+  @@index([groupId], map: "groupId")
+  @@index([roomId], map: "roomId")
+}
+
+model user {
+  id        Int         @id @default(autoincrement())
+  login     String      @unique(map: "login") @db.VarChar(32)
+  password  String      @db.VarChar(255)
+  photo     String?     @db.VarChar(255)
+  room_user room_user[]
+}
+
+enum activity_action {
+  create
+  remove
+  update
+}
+
+enum task_status {
+  done
+  in_progress @map("in progress")
+  ready
+  review
+}

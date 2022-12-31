@@ -35,30 +35,22 @@ export class AuthService {
 	async login(dto: LoginDto): Promise<AuthenticationResultDto> {
 		const user = await this.usersService.getInsecure(dto.login);
 
-		const isValidPassword = await compare(dto.password, user.get('password'));
+		const isValidPassword = await compare(dto.password, user.password);
 
 		if (!isValidPassword) {
 			throw new BadRequestException();
 		}
 
-		const secureUser: SecurityUserDto = {
-			login: user.login,
-			id: user.id,
-			photo: user.photo,
-		};
+		user.password = undefined;
 
-		const tokens = await this.generateToken(secureUser);
+		const tokens = await this.generateToken(user);
 
-		return { user: secureUser, tokens, };
+		return { user, tokens, };
 	}
 
 	async refresh(refreshToken: string): Promise<TokensDto> {
 		const authUser = await this.verifyUser(refreshToken);
-		return this.generateToken({
-			login: authUser.login,
-			photo: authUser.photo,
-			id: authUser.id,
-		});
+		return this.generateToken(authUser);
 	}
 
 	private async generateToken(user: SecurityUserDto): Promise<TokensDto> {

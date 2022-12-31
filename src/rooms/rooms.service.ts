@@ -3,44 +3,28 @@ import {
 	Injectable,
 	NotFoundException
 } from '@nestjs/common';
-import { InjectModel } from '@nestjs/sequelize';
-import { User } from '@/users/models';
 import { SecurityUserDto } from '@/users/dto';
-import { CreateRoomDto, RoomUserDto, UpdateRoomDto } from './dto';
-import { Room, RoomUser } from './models';
+import { normalizePaginationParams } from '@/utils';
+import { CreateRoomDto, RoomDto, UpdateRoomDto } from './dto';
+import { RoomRepository, RoomUserRepository } from './repository';
+import { UserRepository } from '@/users/repository';
 
 @Injectable()
 export class RoomsService {
 	constructor(
-		@InjectModel(Room) private readonly roomsRepository: typeof Room,
-		@InjectModel(RoomUser) private readonly roomUserRepository: typeof RoomUser,
-		@InjectModel(User) private readonly usersRepository: typeof User
+		private readonly roomsRepository: RoomRepository,
+		private readonly roomUserRepository: RoomUserRepository,
+		private readonly usersRepository: UserRepository
 	) {}
 
-	async getAll(userId: number): Promise<Room[]> {
-		return this.roomsRepository.findAll({
-			include: {
-				model: User,
-				where: {
-					id: userId,
-				},
-				attributes: [],
-				through: {
-					attributes: [],
-					where: {
-						removed: false,
-					},
-				},
-			},
-		});
+	async getAll(userId: number): Promise<RoomDto[]> {
+		const pagination = normalizePaginationParams({});
+
+		return this.roomsRepository.getAllByUser(userId, pagination);
 	}
 
-	async getOne(id: number): Promise<Room> {
-		const room = await this.roomsRepository.findOne({
-			where: {
-				id,
-			},
-		});
+	async getOne(id: number): Promise<RoomDto> {
+		const room = await this.roomsRepository.getOne(id);
 
 		if (!room) {
 			throw new NotFoundException();
@@ -49,95 +33,43 @@ export class RoomsService {
 		return room;
 	}
 
-	async create(userId: number, dto: CreateRoomDto): Promise<Room> {
-		const room = await this.roomsRepository.create(dto);
-		room.$add('users', [userId]);
-
-		return room;
+	async create(userId: number, dto: CreateRoomDto): Promise<RoomDto> {
+		return this.roomsRepository.create(dto, userId);
 	}
 
-	async update(id: number, dto: UpdateRoomDto): Promise<Room> {
-		const room = await this.getOne(id);
-		return room.update(dto);
+	async update(id: number, dto: UpdateRoomDto): Promise<RoomDto> {
+		return this.roomsRepository.update(id, dto);
 	}
 
 	async getUsers(id: number): Promise<SecurityUserDto[]> {
-		const room = await this.roomsRepository.findOne({
-			where: {
-				id,
-			},
-			attributes: [],
-			include: [
-				{
-					model: User,
-					attributes: { exclude: ['password'], },
-					through: {
-						attributes: [],
-					},
-				}
-			],
-		});
+		const users = await this.roomsRepository.getUsers(id);
 
-		if (!room) {
+		if (!users) {
 			throw new NotFoundException('Room was not found');
 		}
 
-		return room.users;
+		return users;
 	}
 
-	async addUser(id: number, dto: RoomUserDto): Promise<SecurityUserDto> {
-		const pair = await this.roomUserRepository.findOne({
-			where: {
-				roomId: id,
-				userId: dto.userId,
-			},
-		});
-		if (pair) {
-			if (!pair.removed) {
-				throw new BadRequestException('User already exists');
-			}
-			await pair.update({
-				removed: false,
-			});
-		} else {
-			await this.roomUserRepository.create({ roomId: id, ...dto, });
+	async addUser(id: number, userId: number): Promise<SecurityUserDto> {
+		const added = await this.roomUserRepository.addUser(id, userId);
+
+		if (!added) {
+			throw new BadRequestException('User already exists');
 		}
 
-		return this.usersRepository.findByPk(dto.userId, {
-			rejectOnEmpty: true,
-		});
+		return this.usersRepository.getOne(userId);
 	}
 
-	async removeUser(id: number, dto: RoomUserDto): Promise<boolean> {
-		await this.roomUserRepository.update(
-			{
-				removed: true,
-			},
-			{
-				where: {
-					roomId: id,
-					...dto,
-				},
-			}
-		);
-		return true;
+	async removeUser(id: number, userId: number): Promise<boolean> {
+		return this.roomUserRepository.removeUser(id, userId);
 	}
 
 	async roomExistsUser(roomId: number, userId: number): Promise<boolean> {
-		return this.roomUserRepository
-			.findOne({
-				where: { roomId, userId, removed: false, },
-			})
-			.then((res) => !!res);
+		return this.roomUserRepository.existsUser(roomId, userId);
 	}
 
 	async remove(id: number): Promise<boolean> {
-		await this.roomsRepository.destroy({
-			where: {
-				id,
-			},
-		});
-
-		return true;
+		return this.roomsRepository.remove(id);
 	}
 }

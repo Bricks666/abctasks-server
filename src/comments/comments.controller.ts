@@ -23,17 +23,18 @@ import { PaginationQueryDto } from '@/common';
 import { Auth } from '@/auth/auth.decorator';
 import { InRoom } from '@/rooms/in-room.decorator';
 import { CommentsService } from './comments.service';
-import { CreateCommentDto, UpdateCommentDto } from './dto';
+import { CommentDto, CreateCommentDto, UpdateCommentDto } from './dto';
 import { AuthToken } from '@/auth/auth-token.decorator';
 import { AuthService } from '@/auth/auth.service';
-import { Comment } from './models';
+import { ActivitiesService } from '@/activities/activities.service';
 
 @ApiTags('Комментарии')
 @Controller('comments')
 export class CommentsController {
 	constructor(
 		private readonly commentsService: CommentsService,
-		private readonly authService: AuthService
+		private readonly authService: AuthService,
+		private readonly activitiesService: ActivitiesService
 	) {}
 
 	@ApiOperation({
@@ -54,7 +55,7 @@ export class CommentsController {
 		description: 'Параметры пагинации',
 	})
 	@ApiResponse({
-		type: Comment,
+		type: CommentDto,
 		isArray: true,
 		description: 'Комментарии задачи',
 		status: HttpStatus.OK,
@@ -62,9 +63,10 @@ export class CommentsController {
 	@Get('/:roomId/:taskId')
 	async getAll(
 		@Param('taskId', ParseIntPipe) taskId: number,
+		@Param('roomId', ParseIntPipe) roomId: number,
 		@Query() dto: PaginationQueryDto
-	): Promise<Comment[]> {
-		return this.commentsService.getAll(taskId, dto);
+	): Promise<CommentDto[]> {
+		return this.commentsService.getAll(roomId, taskId, dto);
 	}
 
 	@ApiOperation({
@@ -86,7 +88,7 @@ export class CommentsController {
 		description: 'Id комментария',
 	})
 	@ApiResponse({
-		type: Comment,
+		type: CommentDto,
 		description: 'Комментарий задачи',
 		status: HttpStatus.OK,
 	})
@@ -98,9 +100,10 @@ export class CommentsController {
 	@Get('/:roomId/:taskId/:id')
 	async getOne(
 		@Param('id', ParseIntPipe) id: number,
-		@Param('taskId', ParseIntPipe) taskId: number
-	): Promise<Comment> {
-		return this.commentsService.getOne(id, taskId);
+		@Param('taskId', ParseIntPipe) taskId: number,
+		@Param('roomId', ParseIntPipe) roomId: number
+	): Promise<CommentDto> {
+		return this.commentsService.getOne(id, taskId, roomId);
 	}
 
 	@ApiOperation({
@@ -121,7 +124,7 @@ export class CommentsController {
 		description: 'Данные для создание комментария',
 	})
 	@ApiResponse({
-		type: Comment,
+		type: CommentDto,
 		description: 'Созданный комментарий',
 		status: HttpStatus.OK,
 	})
@@ -130,11 +133,23 @@ export class CommentsController {
 	@Post('/:roomId/:taskId/create')
 	async create(
 		@Param('taskId', ParseIntPipe) taskId: number,
+		@Param('roomId', ParseIntPipe) roomId: number,
 		@AuthToken() token: string,
 		@Body() createCommentDto: CreateCommentDto
-	): Promise<Comment> {
+	): Promise<CommentDto> {
 		const { id: authorId, } = await this.authService.verifyUser(token);
-		return this.commentsService.create(taskId, authorId, createCommentDto);
+		const comment = await this.commentsService.create(
+			roomId,
+			taskId,
+			authorId,
+			createCommentDto
+		);
+		await this.activitiesService.create(roomId, {
+			action: 'create',
+			activistId: authorId,
+			sphereName: 'comment',
+		});
+		return comment;
 	}
 
 	@ApiOperation({
@@ -160,7 +175,7 @@ export class CommentsController {
 		description: 'Данные для обновления комментария',
 	})
 	@ApiResponse({
-		type: Comment,
+		type: CommentDto,
 		description: 'Обновленный комментарий',
 		status: HttpStatus.OK,
 	})
@@ -175,9 +190,18 @@ export class CommentsController {
 	async update(
 		@Param('id', ParseIntPipe) id: number,
 		@Param('taskId', ParseIntPipe) taskId: number,
+		@Param('roomId', ParseIntPipe) roomId: number,
+		@AuthToken() token: string,
 		@Body() dto: UpdateCommentDto
-	): Promise<Comment> {
-		return this.commentsService.update(id, taskId, dto);
+	): Promise<CommentDto> {
+		const { id: authorId, } = await this.authService.verifyUser(token);
+		const comment = await this.commentsService.update(id, taskId, roomId, dto);
+		await this.activitiesService.create(roomId, {
+			action: 'update',
+			activistId: authorId,
+			sphereName: 'comment',
+		});
+		return comment;
 	}
 
 	@ApiOperation({
@@ -213,8 +237,17 @@ export class CommentsController {
 	@Delete('/:roomId/:taskId/:id/remove')
 	async remove(
 		@Param('id', ParseIntPipe) id: number,
-		@Param('taskId', ParseIntPipe) taskId: number
+		@Param('taskId', ParseIntPipe) taskId: number,
+		@Param('roomId', ParseIntPipe) roomId: number,
+		@AuthToken() token: string
 	): Promise<boolean> {
-		return this.commentsService.remove(id, taskId);
+		const { id: authorId, } = await this.authService.verifyUser(token);
+		const comment = await this.commentsService.remove(id, taskId, roomId);
+		await this.activitiesService.create(roomId, {
+			action: 'update',
+			activistId: authorId,
+			sphereName: 'comment',
+		});
+		return comment;
 	}
 }

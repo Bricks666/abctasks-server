@@ -1,34 +1,28 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { InjectModel } from '@nestjs/sequelize';
 import { PaginationQueryDto } from '@/common';
-import { CreateCommentDto, UpdateCommentDto } from './dto';
-import { Comment } from './models';
 import { normalizePaginationParams } from '@/utils';
+import { CommentDto, CreateCommentDto, UpdateCommentDto } from './dto';
+import { CommentRepository } from './repository';
 
 @Injectable()
 export class CommentsService {
-	constructor(
-		@InjectModel(Comment) private readonly commentsRepository: typeof Comment
-	) {}
+	constructor(private readonly commentsRepository: CommentRepository) {}
 
-	async getAll(taskId: number, dto: PaginationQueryDto): Promise<Comment[]> {
-		const { limit, offset, } = normalizePaginationParams(dto);
-		return this.commentsRepository.findAll({
-			where: {
-				taskId,
-			},
-			limit,
-			offset,
-		});
+	async getAll(
+		roomId: number,
+		taskId: number,
+		dto: PaginationQueryDto
+	): Promise<CommentDto[]> {
+		const pagination = normalizePaginationParams(dto);
+		return this.commentsRepository.getAll(roomId, taskId, pagination);
 	}
 
-	async getOne(id: number, taskId: number): Promise<Comment> {
-		const comment = await this.commentsRepository.findOne({
-			where: {
-				taskId,
-				id,
-			},
-		});
+	async getOne(
+		id: number,
+		taskId: number,
+		roomId: number
+	): Promise<CommentDto> {
+		const comment = await this.commentsRepository.getOne(id, taskId, roomId);
 
 		if (!comment) {
 			throw new NotFoundException();
@@ -38,25 +32,25 @@ export class CommentsService {
 	}
 
 	async create(
+		roomId: number,
 		taskId: number,
 		authorId: number,
 		dto: CreateCommentDto
-	): Promise<Comment> {
-		return this.commentsRepository.create({ ...dto, authorId, taskId, });
+	): Promise<CommentDto> {
+		return this.commentsRepository.create(taskId, roomId, authorId, dto);
 	}
 
 	async update(
 		id: number,
 		taskId: number,
+		roomId: number,
 		dto: UpdateCommentDto
-	): Promise<Comment> {
-		const comment = await this.getOne(id, taskId);
-		return comment.update(dto);
+	): Promise<CommentDto> {
+		return this.commentsRepository.update(id, taskId, roomId, dto);
 	}
 
-	async remove(id: number, taskId: number): Promise<boolean> {
-		const comment = await this.getOne(id, taskId);
-		await comment.destroy();
+	async remove(id: number, taskId: number, roomId: number): Promise<boolean> {
+		await this.commentsRepository.remove(id, taskId, roomId);
 		return true;
 	}
 }

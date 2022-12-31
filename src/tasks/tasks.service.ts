@@ -1,29 +1,17 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { InjectModel } from '@nestjs/sequelize';
-import { CreateTaskDto, UpdateTaskDto } from './dto';
-import { Task } from './models';
+import { CreateTaskDto, TaskDto, UpdateTaskDto } from './dto';
+import { TaskRepository } from './repository';
 
 @Injectable()
 export class TasksService {
-	constructor(
-		@InjectModel(Task) private readonly tasksRepository: typeof Task
-	) {}
+	constructor(private readonly tasksRepository: TaskRepository) {}
 
-	async getAll(roomId: number): Promise<Task[]> {
-		return this.tasksRepository.findAll({
-			where: {
-				roomId,
-			},
-		});
+	async getAll(roomId: number): Promise<TaskDto[]> {
+		return this.tasksRepository.getAll(roomId);
 	}
 
-	async getOne(roomId: number, id: number): Promise<Task> {
-		const task = await this.tasksRepository.findOne({
-			where: {
-				roomId,
-				id,
-			},
-		});
+	async getOne(roomId: number, id: number): Promise<TaskDto> {
+		const task = await this.tasksRepository.getOne(id, roomId);
 
 		if (!task) {
 			throw new NotFoundException();
@@ -36,25 +24,23 @@ export class TasksService {
 		roomId: number,
 		authorId: number,
 		dto: CreateTaskDto
-	): Promise<Task> {
-		return this.tasksRepository.create({ roomId, authorId, ...dto, });
+	): Promise<TaskDto> {
+		return this.tasksRepository.create(roomId, authorId, dto);
 	}
 
 	/**
 	 * TODO: Сделать сначала поиск, а потом уже изменение, чтобы ошибка кидалась до изменений
 	 */
-	async update(roomId: number, id: number, dto: UpdateTaskDto): Promise<Task> {
-		const task = await this.getOne(roomId, id);
-		return task.update(dto);
+	async update(
+		roomId: number,
+		id: number,
+		dto: UpdateTaskDto
+	): Promise<TaskDto> {
+		return this.tasksRepository.update(id, roomId, dto);
 	}
 
 	async remove(roomId: number, id: number): Promise<boolean> {
-		await this.tasksRepository.destroy({
-			where: {
-				roomId,
-				id,
-			},
-		});
+		await this.tasksRepository.remove(id, roomId);
 
 		return true;
 	}
