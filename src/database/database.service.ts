@@ -28,9 +28,12 @@ export class DatabaseService extends PrismaClient implements OnModuleInit {
 
 	async onModuleInit() {
 		await this.$connect();
-		/*
-    TODO: Добавить логи
-     */
+
+		this.$on('query' as any, (e: Record<string, any>) => {
+			console.log(`Query: ${e.query}`);
+			console.log(`Params: ${e.params}`);
+			console.log(`Duration: ${e.duration}ms`);
+		});
 	}
 
 	async enableShutdownHooks(app: INestApplication) {

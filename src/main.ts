@@ -9,8 +9,10 @@ import { DatabaseService } from './database/database.service';
 async function bootstrap() {
 	const { HOST, PORT, } = process.env;
 	const app = await NestFactory.create(AppModule);
+
 	const prismaService = app.get(DatabaseService);
 	await prismaService.enableShutdownHooks(app);
+
 	app.use(cookieParser());
 	app.enableCors({
 		credentials: true,
@@ -28,8 +30,14 @@ async function bootstrap() {
 		.addBearerAuth()
 		.build();
 	const document = SwaggerModule.createDocument(app, config);
-
 	SwaggerModule.setup('docs', app, document);
+
+	/**
+	 * Для преобразования BigInt в JSON
+	 */
+	(BigInt.prototype as any).toJSON = function () {
+		return (this as bigint).toString();
+	};
 	await app.listen(PORT, HOST, () => {
 		console.log(`server start PORT: ${PORT} and HOST: ${HOST}`);
 	});
