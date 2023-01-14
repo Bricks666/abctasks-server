@@ -1,15 +1,19 @@
+import { Injectable } from '@nestjs/common';
 import { DatabaseService } from '@/database/database.service';
 import { CreateTaskDto, TaskDto, UpdateTaskDto } from '../dto';
 
+@Injectable()
 export class TaskRepository {
 	constructor(private readonly databaseService: DatabaseService) {}
 
 	async getAll(roomId: number): Promise<TaskDto[]> {
-		return this.databaseService.task.findMany({
+		const tasks = await this.databaseService.task.findMany({
 			where: {
 				roomId,
 			},
 		});
+
+		return tasks;
 	}
 
 	async getOne(id: number, roomId: number): Promise<TaskDto | null> {

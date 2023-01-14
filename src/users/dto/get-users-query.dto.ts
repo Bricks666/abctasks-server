@@ -5,6 +5,4 @@ import { PaginationQueryDto } from '@/common';
 export class GetUsersQueryDto extends IntersectionType(
 	PartialType(PickType(UserDto, ['login'])),
 	PaginationQueryDto
-) {
-	declare roomId: number;
-}
+) {}

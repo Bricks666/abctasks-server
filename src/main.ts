@@ -1,8 +1,9 @@
+import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import * as cookieParser from 'cookie-parser';
 import { AppModule } from './app.module';
-import { StandardResponseInterceptor, ValidationPipe } from './common';
+import { StandardResponseInterceptor, TransformPipe } from './common';
 import { CORS } from './const';
 import { DatabaseService } from './database/database.service';
 
@@ -18,12 +19,12 @@ async function bootstrap() {
 		credentials: true,
 		origin: CORS.ORIGIN,
 	});
-	app.useGlobalPipes(new ValidationPipe());
+	app.useGlobalPipes(new ValidationPipe(), new TransformPipe());
 	app.useGlobalInterceptors(new StandardResponseInterceptor());
 	app.setGlobalPrefix('api');
 
 	const config = new DocumentBuilder()
-		.setTitle('Документация по API сервера "Todo"')
+		.setTitle('Документация по API сервера "Task manager"')
 		.setDescription('Документация по API приложения дел')
 		.setVersion('1.0.0')
 		.addCookieAuth(process.env.COOKIE_NAME)

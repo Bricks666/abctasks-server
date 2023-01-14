@@ -8,7 +8,7 @@ export interface Pagination {
 export const normalizePaginationParams = (
 	params: PaginationQueryDto
 ): Required<Pagination> => {
-	const limit = params.count ?? 100;
+	const limit = params.count ?? 50;
 	const offset = ((params.page ?? 1) - 1) * limit;
 	return {
 		limit,

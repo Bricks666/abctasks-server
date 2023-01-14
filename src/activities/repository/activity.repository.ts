@@ -1,7 +1,9 @@
 import { Injectable } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
 import { DatabaseService } from '@/database/database.service';
-import { ActivityDto, CreateActivityDto } from '../dto';
+import { ActivityDto, CreateActivityDto, GetActivitiesQueryDto } from '../dto';
 import { Pagination } from '@/utils';
+import { PaginationQueryDto } from '@/common';
 
 @Injectable()
 export class ActivityRepository {
@@ -9,13 +11,26 @@ export class ActivityRepository {
 
 	async getAllByRoomId(
 		roomId: number,
+		filters: Omit<GetActivitiesQueryDto, keyof PaginationQueryDto>,
 		pagination: Pagination
 	): Promise<ActivityDto[]> {
 		const { limit, offset, } = pagination;
-		return this.databaseService.activity.findMany({
-			where: {
-				roomId,
+
+		const where: Prisma.activityWhereInput = {
+			roomId,
+			action: filters.action,
+			activistId: filters.activistId,
+			createdAt: {
+				gte: filters.after,
+				lte: filters.before,
 			},
+			sphere: {
+				name: filters.sphereName,
+			},
+		};
+
+		return this.databaseService.activity.findMany({
+			where,
 			take: limit,
 			skip: offset,
 			include: {
@@ -26,6 +41,33 @@ export class ActivityRepository {
 					},
 				},
 			},
+			orderBy: {
+				id: 'desc',
+			},
+		});
+	}
+
+	async getTotalCountInRoom(
+		roomId: number,
+		filters: Omit<GetActivitiesQueryDto, keyof PaginationQueryDto>
+	): Promise<number> {
+		/*
+    TODO: Исправить дублирование кода, может вынести куда нибудь
+    */
+		const where: Prisma.activityWhereInput = {
+			roomId,
+			action: filters.action,
+			activistId: filters.activistId,
+			createdAt: {
+				gte: filters.after,
+				lte: filters.before,
+			},
+			sphere: {
+				name: filters.sphereName,
+			},
+		};
+		return this.databaseService.activity.count({
+			where,
 		});
 	}
 
@@ -60,10 +102,10 @@ export class ActivityRepository {
 				sphere: {
 					connectOrCreate: {
 						create: {
-							name: dto.action,
+							name: dto.sphereName,
 						},
 						where: {
-							name: dto.action,
+							name: dto.sphereName,
 						},
 					},
 				},

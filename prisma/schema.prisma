@@ -11,12 +11,19 @@ model activity {
   id         Int             @id @default(autoincrement())
   roomId     Int
   sphereId   Int
-  action     activity_action
+  actionId   Int
   activistId Int
-  createdAt  DateTime?       @default(now()) @db.DateTime(0)
+  createdAt  DateTime?       @default(now())
+  action     activity_action @relation(fields: [actionId], references: [id])
   sphere     activity_sphere @relation(fields: [sphereId], references: [id], onDelete: Cascade)
 
   @@index([sphereId], map: "sphereId")
+}
+
+model activity_action {
+  id       Int        @id @default(autoincrement())
+  name     String     @unique() @db.VarChar(32)
+  activity activity[]
 }
 
 model activity_sphere {
@@ -33,7 +40,7 @@ model comment {
   roomId    Int
   taskId    Int
   content   String    @db.VarChar(255)
-  createdAt DateTime? @default(now()) @db.DateTime(0)
+  createdAt DateTime? @default(now())
   task      task      @relation(fields: [taskId, roomId], references: [id, roomId])
   author    room_user @relation(fields: [roomId, authorId], references: [roomId, userId])
 
@@ -72,8 +79,8 @@ model room {
   id          Int         @id @default(autoincrement())
   name        String      @db.VarChar(255)
   description String      @db.VarChar(255)
-  createdAt   DateTime?   @default(now()) @db.DateTime(0)
-  updatedAt   DateTime?   @updatedAt @db.DateTime(0)
+  createdAt   DateTime?   @default(now())
+  updatedAt   DateTime?   @updatedAt
   groups      group[]
   room_user   room_user[]
 }
@@ -85,7 +92,7 @@ model task {
   authorId  Int
   status    task_status @default(ready)
   content   String      @db.VarChar(255)
-  createdAt DateTime?   @default(now()) @db.DateTime(0)
+  createdAt DateTime?   @default(now())
   room_user room_user   @relation(fields: [roomId, authorId], references: [roomId, userId], onDelete: Cascade, map: "task_ibfk_1")
   group     group       @relation(fields: [groupId, roomId], references: [id, roomId], onDelete: Cascade, map: "task_ibfk_2")
   comments  comment[]
@@ -102,12 +109,6 @@ model user {
   password  String      @db.VarChar(255)
   photo     String?     @db.VarChar(255)
   room_user room_user[]
-}
-
-enum activity_action {
-  create
-  remove
-  update
 }
 
 enum task_status {

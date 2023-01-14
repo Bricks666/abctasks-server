@@ -13,7 +13,7 @@ export class RoomUserRepository {
 			},
 		});
 
-		if (pair) {
+		if (pair.removed) {
 			await this.databaseService.room_user.update({
 				data: {
 					removed: false,
@@ -27,6 +27,10 @@ export class RoomUserRepository {
 			});
 
 			return true;
+		}
+
+		if (!pair.removed) {
+			return false;
 		}
 
 		await this.databaseService.room_user.create({
@@ -47,14 +51,14 @@ export class RoomUserRepository {
 			},
 		});
 
-		if (pair.removed === false) {
+		if (!pair || pair.removed) {
 			return false;
 		}
 
-		if (pair.removed) {
+		if (!pair.removed) {
 			await this.databaseService.room_user.update({
 				data: {
-					removed: false,
+					removed: true,
 				},
 
 				where: {

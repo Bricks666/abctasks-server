@@ -26,13 +26,6 @@ export class UserRepository {
 			};
 		}
 
-		if (typeof dto.roomId !== 'undefined') {
-			where.room_user.some.AND = {
-				roomId: dto.roomId,
-				removed: false,
-			};
-		}
-
 		return this.databaseService.user.findMany({
 			where,
 			skip: offset,
@@ -49,6 +42,11 @@ export class UserRepository {
 		return this.databaseService.user.findFirst({
 			where: {
 				id,
+			},
+			select: {
+				id: true,
+				login: true,
+				photo: true,
 			},
 		});
 	}

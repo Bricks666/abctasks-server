@@ -50,13 +50,17 @@ export class AuthService {
 
 	async refresh(refreshToken: string): Promise<TokensDto> {
 		const authUser = await this.verifyUser(refreshToken);
-		return this.generateToken(authUser);
+		return this.generateToken({
+			id: authUser.id,
+			login: authUser.login,
+			photo: authUser.photo,
+		});
 	}
 
 	private async generateToken(user: SecurityUserDto): Promise<TokensDto> {
 		const accessToken = this.jwtService.signAsync(user, {
 			secret: process.env.SECRET,
-			expiresIn: '15m',
+			expiresIn: '10m',
 		});
 		const refreshToke = this.jwtService.signAsync(user, {
 			secret: process.env.SECRET,
@@ -71,11 +75,11 @@ export class AuthService {
 
 	async verifyUser(token: string): Promise<SecurityUserDto> {
 		try {
-			return this.jwtService.verifyAsync<SecurityUserDto>(token, {
+			return await this.jwtService.verifyAsync<SecurityUserDto>(token, {
 				secret: process.env.SECRET,
 			});
 		} catch (error) {
-			throw new UnauthorizedException('jwt expired');
+			throw new UnauthorizedException('jwt expired', { cause: error, });
 		}
 	}
 }
