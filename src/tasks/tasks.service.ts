@@ -1,20 +1,29 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { CreateTaskDto, TaskDto, UpdateTaskDto } from './dto';
+import { Prisma } from '@prisma/client';
+import { CreateTaskDto, GetTasksQueryDto, TaskDto, UpdateTaskDto } from './dto';
 import { TaskRepository } from './repository';
 
 @Injectable()
 export class TasksService {
 	constructor(private readonly tasksRepository: TaskRepository) {}
 
-	async getAll(roomId: number): Promise<TaskDto[]> {
-		return this.tasksRepository.getAll(roomId);
+	async getAll(roomId: number, filters: GetTasksQueryDto): Promise<TaskDto[]> {
+		const where: Prisma.taskWhereInput = {
+			authorId: filters.authorId,
+			groupId: filters.groupId,
+			createdAt: {
+				gte: filters.after,
+				lte: filters.before,
+			},
+		};
+		return this.tasksRepository.getAll(roomId, where);
 	}
 
 	async getOne(roomId: number, id: number): Promise<TaskDto> {
 		const task = await this.tasksRepository.getOne(id, roomId);
 
 		if (!task) {
-			throw new NotFoundException();
+			throw new NotFoundException('Task was not found');
 		}
 
 		return task;

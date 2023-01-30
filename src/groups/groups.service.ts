@@ -14,7 +14,7 @@ export class GroupsService {
 		const group = await this.groupRepository.getOne(id, roomId);
 
 		if (!group) {
-			throw new NotFoundException();
+			throw new NotFoundException('Group was not found');
 		}
 
 		return group;

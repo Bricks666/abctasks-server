@@ -1,5 +1,5 @@
 import {
-	BadRequestException,
+	ConflictException,
 	Injectable,
 	NotFoundException
 } from '@nestjs/common';
@@ -27,7 +27,7 @@ export class RoomsService {
 		const room = await this.roomsRepository.getOne(id);
 
 		if (!room) {
-			throw new NotFoundException();
+			throw new NotFoundException('Room was not found');
 		}
 
 		return room;
@@ -55,14 +55,20 @@ export class RoomsService {
 		const added = await this.roomUserRepository.addUser(id, userId);
 
 		if (!added) {
-			throw new BadRequestException('User already exists');
+			throw new ConflictException('User already exists');
 		}
 
 		return this.usersRepository.getOne(userId);
 	}
 
 	async removeUser(id: number, userId: number): Promise<boolean> {
-		return this.roomUserRepository.removeUser(id, userId);
+		const isSuccess = await this.roomUserRepository.removeUser(id, userId);
+
+		if (!isSuccess) {
+			throw new ConflictException("Room doesn't already exist this user");
+		}
+
+		return isSuccess;
 	}
 
 	async roomExistsUser(roomId: number, userId: number): Promise<boolean> {

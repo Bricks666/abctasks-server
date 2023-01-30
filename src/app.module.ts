@@ -14,6 +14,7 @@ import { DatabaseModule } from './database/database.module';
 	imports: [
 		CacheModule.register({
 			isGlobal: true,
+			max: 50,
 		}),
 		ConfigModule.forRoot({
 			envFilePath: '.env',

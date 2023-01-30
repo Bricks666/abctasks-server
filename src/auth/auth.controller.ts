@@ -1,14 +1,13 @@
-/* eslint-disable class-methods-use-this */
 import {
 	Body,
 	Controller,
 	Delete,
+	ForbiddenException,
 	Get,
 	HttpStatus,
 	Post,
 	Req,
-	Res,
-	UnauthorizedException,
+	Res
 } from '@nestjs/common';
 import { Request, Response } from 'express';
 import {
@@ -16,7 +15,7 @@ import {
 	ApiCookieAuth,
 	ApiOperation,
 	ApiResponse,
-	ApiTags,
+	ApiTags
 } from '@nestjs/swagger';
 import { BASE_COOKIE_OPTIONS, COOKIE_NAME, COOKIE_TIME } from '@/const/cookie';
 import { CreateUserDto, SecurityUserDto } from '@/users/dto';
@@ -25,7 +24,7 @@ import {
 	AuthenticationResultDto,
 	LoginDto,
 	LoginRequestDto,
-	TokensDto,
+	TokensDto
 } from './dto';
 
 @ApiTags('Авторизация')
@@ -44,11 +43,11 @@ export class AuthController {
 	@Get('/')
 	async authentication(
 		@Req() req: Request,
-		@Res({ passthrough: true }) res: Response
+		@Res({ passthrough: true, }) res: Response
 	): Promise<AuthenticationResultDto> {
 		const refreshToken = req.cookies[COOKIE_NAME];
 		if (!refreshToken) {
-			throw new UnauthorizedException();
+			throw new ForbiddenException('There is not refresh token');
 		}
 
 		const result = await this.authService.authentication(refreshToken);
@@ -61,7 +60,7 @@ export class AuthController {
 		return result;
 	}
 
-	@ApiOperation({ summary: 'Регистрация нового пользователя' })
+	@ApiOperation({ summary: 'Регистрация нового пользователя', })
 	@ApiBody({
 		type: CreateUserDto,
 		description: 'Данные для регистрации в системе',
@@ -76,8 +75,8 @@ export class AuthController {
 		return this.authService.registration(dto);
 	}
 
-	@ApiOperation({ summary: 'Вход пользователя в аккаунт' })
-	@ApiBody({ type: LoginDto, description: 'Данные для входа в систему' })
+	@ApiOperation({ summary: 'Вход пользователя в аккаунт', })
+	@ApiBody({ type: LoginDto, description: 'Данные для входа в систему', })
 	@ApiResponse({
 		status: 201,
 		type: AuthenticationResultDto,
@@ -85,7 +84,7 @@ export class AuthController {
 	})
 	@Post('login')
 	async login(
-		@Res({ passthrough: true }) res: Response,
+		@Res({ passthrough: true, }) res: Response,
 		@Body() dto: LoginRequestDto
 	): Promise<AuthenticationResultDto> {
 		const { rememberMe, ...loginDto } = dto;
@@ -101,19 +100,19 @@ export class AuthController {
 		return result;
 	}
 
-	@ApiOperation({ summary: 'Выход их аккаунта' })
+	@ApiOperation({ summary: 'Выход их аккаунта', })
 	@ApiResponse({
 		status: 200,
 		type: Boolean,
 		description: 'Подтверждение успешности выхода',
 	})
 	@Delete('logout')
-	async logout(@Res({ passthrough: true }) res: Response): Promise<boolean> {
+	async logout(@Res({ passthrough: true, }) res: Response): Promise<boolean> {
 		res.clearCookie(COOKIE_NAME);
 		return true;
 	}
 
-	@ApiOperation({ summary: 'Обновление токена доступа' })
+	@ApiOperation({ summary: 'Обновление токена доступа', })
 	@ApiResponse({
 		status: 200,
 		type: TokensDto,
@@ -123,12 +122,12 @@ export class AuthController {
 	@Get('refresh')
 	async refresh(
 		@Req() req: Request,
-		@Res({ passthrough: true }) res: Response
+		@Res({ passthrough: true, }) res: Response
 	): Promise<TokensDto> {
 		const refreshToken = req.cookies[COOKIE_NAME];
 
 		if (!refreshToken) {
-			throw new UnauthorizedException();
+			throw new ForbiddenException('There is not refresh token');
 		}
 
 		const tokens = await this.authService.refresh(refreshToken);

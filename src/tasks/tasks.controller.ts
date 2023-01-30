@@ -10,18 +10,20 @@ import {
 	HttpStatus,
 	NotFoundException,
 	CacheInterceptor,
-	UseInterceptors
+	UseInterceptors,
+	Query
 } from '@nestjs/common';
 import {
 	ApiOperation,
 	ApiResponse,
 	ApiParam,
 	ApiBody,
-	ApiTags
+	ApiTags,
+	ApiQuery
 } from '@nestjs/swagger';
 import { TasksService } from './tasks.service';
 import { AuthToken } from '@/auth/auth-token.decorator';
-import { CreateTaskDto, TaskDto, UpdateTaskDto } from './dto';
+import { CreateTaskDto, GetTasksQueryDto, TaskDto, UpdateTaskDto } from './dto';
 import { AuthService } from '@/auth/auth.service';
 import { ActivitiesService } from '@/activities/activities.service';
 import { Auth } from '@/auth/auth.decorator';
@@ -49,12 +51,16 @@ export class TasksController {
 		type: TaskDto,
 		isArray: true,
 	})
+	@ApiQuery({
+		type: GetTasksQueryDto,
+	})
 	@UseInterceptors(CacheInterceptor)
 	@Get('/:roomId')
 	async getAll(
-		@Param('roomId', ParseIntPipe) roomId: number
+		@Param('roomId', ParseIntPipe) roomId: number,
+		@Query() filters: GetTasksQueryDto
 	): Promise<TaskDto[]> {
-		return this.tasksService.getAll(roomId);
+		return this.tasksService.getAll(roomId, filters);
 	}
 
 	@ApiOperation({

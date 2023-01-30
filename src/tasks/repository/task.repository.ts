@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
 import { DatabaseService } from '@/database/database.service';
 import { CreateTaskDto, TaskDto, UpdateTaskDto } from '../dto';
 
@@ -6,9 +7,13 @@ import { CreateTaskDto, TaskDto, UpdateTaskDto } from '../dto';
 export class TaskRepository {
 	constructor(private readonly databaseService: DatabaseService) {}
 
-	async getAll(roomId: number): Promise<TaskDto[]> {
+	async getAll(
+		roomId: number,
+		where?: Prisma.taskWhereInput
+	): Promise<TaskDto[]> {
 		const tasks = await this.databaseService.task.findMany({
 			where: {
+				...where,
 				roomId,
 			},
 		});

@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+	ConflictException,
+	Injectable,
+	NotFoundException
+} from '@nestjs/common';
 import { hash } from 'bcrypt';
 import { normalizePaginationParams } from '@/utils';
 import {
@@ -25,24 +29,28 @@ export class UsersService {
 		const user = await this.usersRepository.getOne(dto.id);
 
 		if (!user) {
-			throw new NotFoundException();
+			throw new NotFoundException('User was not found');
 		}
 
 		return user;
 	}
 
 	async create(dto: CreateUserDto): Promise<SecurityUserDto> {
-		return this.usersRepository.create({
-			...dto,
-			password: await hash(dto.password, Number(process.env.ROUND_COUNT)),
-		});
+		try {
+			return await this.usersRepository.create({
+				...dto,
+				password: await hash(dto.password, Number(process.env.ROUND_COUNT)),
+			});
+		} catch (error) {
+			throw new ConflictException('User already exists');
+		}
 	}
 
 	async getInsecure(login: string): Promise<UserDto> {
 		const user = await this.usersRepository.getOneByLogin(login);
 
 		if (!user) {
-			throw new NotFoundException();
+			throw new NotFoundException('User was not found');
 		}
 
 		return user;

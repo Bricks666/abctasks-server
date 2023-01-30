@@ -25,7 +25,7 @@ export class CommentsService {
 		const comment = await this.commentsRepository.getOne(id, taskId, roomId);
 
 		if (!comment) {
-			throw new NotFoundException();
+			throw new NotFoundException('Comment was not found');
 		}
 
 		return comment;

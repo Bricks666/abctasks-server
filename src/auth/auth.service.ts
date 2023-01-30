@@ -1,6 +1,6 @@
 import { JwtService } from '@nestjs/jwt';
 import {
-	BadRequestException,
+	ForbiddenException,
 	Injectable,
 	UnauthorizedException
 } from '@nestjs/common';
@@ -38,7 +38,7 @@ export class AuthService {
 		const isValidPassword = await compare(dto.password, user.password);
 
 		if (!isValidPassword) {
-			throw new BadRequestException();
+			throw new UnauthorizedException('Incorrect password');
 		}
 
 		user.password = undefined;
@@ -49,12 +49,19 @@ export class AuthService {
 	}
 
 	async refresh(refreshToken: string): Promise<TokensDto> {
-		const authUser = await this.verifyUser(refreshToken);
-		return this.generateToken({
-			id: authUser.id,
-			login: authUser.login,
-			photo: authUser.photo,
-		});
+		try {
+			const authUser = await this.verifyUser(refreshToken);
+
+			return this.generateToken({
+				id: authUser.id,
+				login: authUser.login,
+				photo: authUser.photo,
+			});
+		} catch (error) {
+			throw new ForbiddenException('Refresh token is incorrect', {
+				cause: error,
+			});
+		}
 	}
 
 	private async generateToken(user: SecurityUserDto): Promise<TokensDto> {
