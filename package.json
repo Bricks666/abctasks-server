@@ -11,7 +11,8 @@
 		"lint": "eslint --ext .ts src/",
 		"lint:fix": "eslint --ext .ts src/ --fix",
 		"prettier": "prettier --write --config ./.prettierrc src",
-		"prepare": "husky install"
+		"prepare": "husky install",
+    "start:prod": "npx prisma migrate deploy && node ./main.js"
 	},
 	"keywords": [],
 	"author": "Bricks",

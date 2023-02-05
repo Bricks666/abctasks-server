@@ -11,19 +11,18 @@ model activity {
   id         Int             @id @default(autoincrement())
   roomId     Int
   sphereId   Int
-  actionId   Int
   activistId Int
-  createdAt  DateTime?       @default(now())
-  action     activity_action @relation(fields: [actionId], references: [id])
+  createdAt  DateTime?       @default(now()) @db.DateTime(0)
+  action     activity_action
   sphere     activity_sphere @relation(fields: [sphereId], references: [id], onDelete: Cascade)
 
   @@index([sphereId], map: "sphereId")
 }
 
-model activity_action {
-  id       Int        @id @default(autoincrement())
-  name     String     @unique() @db.VarChar(32)
-  activity activity[]
+enum activity_action {
+  create
+  remove
+  update
 }
 
 model activity_sphere {

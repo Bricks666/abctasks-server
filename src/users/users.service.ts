@@ -42,7 +42,7 @@ export class UsersService {
 				password: await hash(dto.password, Number(process.env.ROUND_COUNT)),
 			});
 		} catch (error) {
-			throw new ConflictException('User already exists');
+			throw new ConflictException('User already exists', { cause: error, });
 		}
 	}
 

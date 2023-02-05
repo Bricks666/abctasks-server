@@ -1,0 +1,32 @@
+version: '3'
+services:
+  server:
+    build: .
+    ports:
+      - '5000:5000'
+    container_name: server-container
+    environment:
+      ROUND_COUNT: 4
+      SECRET: 123
+      DATABASE_URL: mysql://root:Root123@db-container:3306/Todo
+      PORT: 5000
+    depends_on:
+      - db
+    restart:
+      on-failure
+  db:
+    image: mariadb:latest
+    restart: always
+    ports:
+      - '3308:3306'
+    volumes:
+      - db-data:/var/lib/mysql
+    environment:
+      MYSQL_DATABASE: Todo
+      MYSQL_USER: root
+      MYSQL_PASSWORD: Root123
+      MYSQL_ROOT_PASSWORD: Root123
+      MYSQL_TCP_PORT: 3306
+    container_name: db-container
+volumes:
+  db-data:
