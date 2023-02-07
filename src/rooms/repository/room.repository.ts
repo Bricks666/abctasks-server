@@ -1,68 +1,161 @@
 import { Injectable } from '@nestjs/common';
 import { DatabaseService } from '@/database/database.service';
 import { Pagination } from '@/utils';
-import { CreateRoomDto, RoomDto, UpdateRoomDto } from '../dto';
+import { RoomDto } from '../dto';
+import { RepositoryParams, RepositoryParamsWithData } from '@/common';
+import {
+	CreateData,
+	CreateFilters,
+	GetAllByUserFilters,
+	GetAllFilters,
+	GetOneFilters,
+	HasCanChange,
+	RemoveFilters,
+	UpdateData,
+	UpdateFilters,
+	WithCanChange
+} from './types/room';
 
 @Injectable()
 export class RoomRepository {
 	constructor(private readonly databaseService: DatabaseService) {}
 
-	async getAll(pagination: Pagination): Promise<RoomDto[]> {
-		return this.databaseService.room.findMany({
-			skip: pagination.offset,
-			take: pagination.limit,
-		});
-	}
-
-	async getAllByUser(
-		userId: number,
-		pagination: Pagination
+	async getAll(
+		params: RepositoryParams<GetAllFilters, never, Pagination>
 	): Promise<RoomDto[]> {
-		return this.databaseService.room.findMany({
+		const { filters, pagination, } = params;
+		const rooms = await this.databaseService.room.findMany({
 			skip: pagination.offset,
 			take: pagination.limit,
-			where: {
+			include: {
 				room_user: {
-					some: {
-						userId,
-						removed: false,
+					where: filters,
+					select: {
+						canChange: true,
 					},
 				},
 			},
 		});
+
+		return rooms.map(this.#withCanChange);
 	}
 
-	async getOne(id: number): Promise<RoomDto | null> {
-		return this.databaseService.room.findFirst({
+	async getAllByUser(
+		params: RepositoryParams<GetAllByUserFilters, undefined, Pagination>
+	): Promise<RoomDto[]> {
+		const { filters, pagination, } = params;
+
+		const rooms = await this.databaseService.room.findMany({
+			skip: pagination?.offset,
+			take: pagination?.limit,
 			where: {
-				id,
+				room_user: {
+					some: {
+						userId: filters.userId,
+						removed: false,
+					},
+				},
+			},
+
+			include: {
+				room_user: {
+					where: {
+						userId: filters.userId,
+					},
+					select: {
+						canChange: true,
+					},
+				},
 			},
 		});
+
+		return rooms.map(this.#withCanChange);
 	}
 
-	async create(data: CreateRoomDto, userId: number): Promise<RoomDto> {
-		return this.databaseService.room.create({
+	async getOne(
+		params: RepositoryParams<GetOneFilters>
+	): Promise<RoomDto | null> {
+		const { filters, } = params;
+		const room = await this.databaseService.room.findFirst({
+			where: {
+				id: filters.id,
+			},
+			include: {
+				room_user: {
+					where: {
+						userId: filters.userId,
+					},
+					select: {
+						canChange: true,
+					},
+				},
+			},
+		});
+
+		return room ? this.#withCanChange(room) : null;
+	}
+
+	async create(
+		params: RepositoryParamsWithData<CreateData, CreateFilters>
+	): Promise<RoomDto> {
+		const { filters, data, } = params;
+		const { userId, ...rest } = data;
+
+		const room = await this.databaseService.room.create({
 			data: {
-				...data,
+				...rest,
+				creatorId: userId,
 				room_user: {
 					create: {
 						userId,
 					},
 				},
 			},
+			include: {
+				room_user: {
+					where: {
+						userId: filters.userId,
+					},
+					select: {
+						canChange: true,
+					},
+				},
+			},
 		});
+
+		return this.#withCanChange(room);
 	}
 
-	async update(id: number, data: UpdateRoomDto): Promise<RoomDto> {
-		return this.databaseService.room.update({
+	async update(
+		params: RepositoryParamsWithData<UpdateData, UpdateFilters>
+	): Promise<RoomDto> {
+		const { data, filters, } = params;
+		const { id, userId, } = filters;
+
+		const room = await this.databaseService.room.update({
 			where: {
 				id,
 			},
+			include: {
+				room_user: {
+					where: {
+						userId,
+					},
+					select: {
+						canChange: true,
+					},
+				},
+			},
 			data,
 		});
+
+		return this.#withCanChange(room);
 	}
 
-	async remove(id: number): Promise<boolean> {
+	async remove(params: RepositoryParams<RemoveFilters>): Promise<boolean> {
+		const { filters, } = params;
+		const { id, } = filters;
+
 		await this.databaseService.room.delete({
 			where: {
 				id,
@@ -70,5 +163,10 @@ export class RoomRepository {
 		});
 
 		return true;
+	}
+
+	#withCanChange<T extends HasCanChange>(data: T): WithCanChange<T> {
+		const { room_user, ...rest } = data;
+		return { ...rest, ...room_user[0], };
 	}
 }

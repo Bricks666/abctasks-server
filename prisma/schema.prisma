@@ -1,5 +1,5 @@
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
 }
 
 datasource db {
@@ -60,13 +60,14 @@ model group {
 }
 
 model room_user {
-  roomId   Int
-  userId   Int
-  removed  Boolean   @default(false)
-  room     room      @relation(fields: [roomId], references: [id], onDelete: Cascade, map: "room-user_ibfk_1")
-  user     user      @relation(fields: [userId], references: [id], onDelete: Cascade, map: "room-user_ibfk_2")
-  task     task[]
-  comments comment[]
+  roomId    Int
+  userId    Int
+  canChange Boolean   @default(false)
+  removed   Boolean   @default(false)
+  room      room      @relation(fields: [roomId], references: [id], onDelete: Cascade, map: "room-user_ibfk_1")
+  user      user      @relation(fields: [userId], references: [id], onDelete: Cascade, map: "room-user_ibfk_2")
+  task      task[]
+  comments  comment[]
 
   @@id([roomId, userId])
   @@unique([roomId, userId], map: "room-user_roomId_userId_unique")

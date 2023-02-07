@@ -1,5 +1,12 @@
 import { task as TaskModel, task_status } from '@prisma/client';
-import { IsDate, IsEnum, IsNumber, IsString } from 'class-validator';
+import {
+	IsDate,
+	IsEnum,
+	IsNumber,
+	IsOptional,
+	IsString,
+	MaxLength
+} from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export type TaskStatus = task_status;
@@ -38,6 +45,26 @@ export class TaskDto implements TaskModel {
 	declare authorId: number;
 
 	@ApiProperty({
+		type: String,
+		description: 'Заголовок задачи',
+		example: 'Некоторый заголовок задачи',
+	})
+	@IsString()
+	@MaxLength(32)
+	declare title: string;
+
+	@ApiProperty({
+		type: String,
+		description: 'Текст задачи',
+		example: 'Текс текст текст',
+		nullable: true,
+	})
+	@IsOptional()
+	@IsString()
+	@MaxLength(255)
+	declare description: string;
+
+	@ApiProperty({
 		enum: ['done', 'ready', 'review', 'in progress'],
 		description: 'Статус задачи',
 		example: 'done',
@@ -49,14 +76,6 @@ export class TaskDto implements TaskModel {
 		ready: 'ready',
 	})
 	declare status: TaskStatus;
-
-	@ApiProperty({
-		type: String,
-		description: 'Текст задачи',
-		example: 'Текс текст текст',
-	})
-	@IsString()
-	declare content: string;
 
 	@ApiProperty({
 		type: String,

@@ -12,6 +12,14 @@ export class RoomDto implements RoomModel {
 	declare id: number;
 
 	@ApiProperty({
+		example: 1,
+		description: 'ID создателя комнаты',
+		type: Number,
+	})
+	@IsNumber()
+	declare creatorId: number;
+
+	@ApiProperty({
 		example: 'Room name',
 		description: 'Имя комнаты',
 		type: String,
@@ -24,8 +32,15 @@ export class RoomDto implements RoomModel {
 		description: 'Описание комнаты',
 		type: String,
 	})
-	@IsString({})
+	@IsString()
 	declare description: string;
+
+	@ApiProperty({
+		example: true,
+		description: 'Может ли пользователь изменять состояние комнаты',
+		type: Boolean,
+	})
+	declare canChange: boolean;
 
 	@IsDateString()
 	declare createdAt: Date;

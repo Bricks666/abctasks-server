@@ -1,12 +1,24 @@
 import { Injectable } from '@nestjs/common';
 import { DatabaseService } from '@/database/database.service';
 import { SecurityUserDto } from '@/users/dto';
+import { RepositoryParams, RepositoryParamsWithData } from '@/common';
+import {
+	AddUserData,
+	ExistsUserFilters,
+	GetUsersFilters,
+	RemoveUserData
+} from './types/room-user';
 
 @Injectable()
 export class RoomUserRepository {
 	constructor(private readonly databaseService: DatabaseService) {}
 
-	async getUsers(roomId: number): Promise<SecurityUserDto[]> {
+	async getUsers(
+		params: RepositoryParams<GetUsersFilters>
+	): Promise<SecurityUserDto[]> {
+		const { filters, } = params;
+		const { roomId, } = filters;
+
 		const pairs = await this.databaseService.room_user.findMany({
 			where: {
 				roomId,
@@ -26,7 +38,12 @@ export class RoomUserRepository {
 		return pairs.map((pair) => pair.user);
 	}
 
-	async addUser(roomId: number, userId: number): Promise<boolean> {
+	async addUser(
+		params: RepositoryParamsWithData<AddUserData, never>
+	): Promise<boolean> {
+		const { data, } = params;
+		const { roomId, userId, } = data;
+
 		const pair = await this.databaseService.room_user.findFirst({
 			where: {
 				roomId,
@@ -64,7 +81,12 @@ export class RoomUserRepository {
 		return true;
 	}
 
-	async removeUser(roomId: number, userId: number): Promise<boolean> {
+	async removeUser(
+		params: RepositoryParamsWithData<RemoveUserData, never>
+	): Promise<boolean> {
+		const { data, } = params;
+		const { roomId, userId, } = data;
+
 		const pair = await this.databaseService.room_user.findFirst({
 			where: {
 				roomId,
@@ -103,7 +125,12 @@ export class RoomUserRepository {
 		return true;
 	}
 
-	async existsUser(roomId: number, userId: number): Promise<boolean> {
+	async existsUser(
+		params: RepositoryParams<ExistsUserFilters>
+	): Promise<boolean> {
+		const { filters, } = params;
+		const { roomId, userId, } = filters;
+
 		return this.databaseService.room_user
 			.count({
 				where: {

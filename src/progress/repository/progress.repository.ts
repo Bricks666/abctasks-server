@@ -8,7 +8,7 @@ export class ProgressRepository {
 	constructor(private readonly databaseService: DatabaseService) {}
 
 	async getAll(roomId: number): Promise<ProgressDto[]> {
-		const b = await this.databaseService.$queryRawUnsafe<ProgressDto[]>(
+		return this.databaseService.$queryRawUnsafe<ProgressDto[]>(
 			`SELECT ${Prisma.TaskScalarFieldEnum.groupId}, \
 COUNT(${Prisma.TaskScalarFieldEnum.id}) as totalCount, \
 COUNT(IF(${Prisma.TaskScalarFieldEnum.status} = ?, \
@@ -18,6 +18,5 @@ GROUP BY ${Prisma.TaskScalarFieldEnum.groupId};`,
 			task_status.done,
 			roomId
 		);
-		return b;
 	}
 }

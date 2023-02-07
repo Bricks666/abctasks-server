@@ -50,7 +50,7 @@ export class RoomsController {
 	@Get('/')
 	async getAll(@AuthToken() token: string): Promise<RoomDto[]> {
 		const { id, } = await this.authService.verifyUser(token);
-		return this.roomsService.getAll(id);
+		return this.roomsService.getAll({ data: { userId: id, }, });
 	}
 
 	@ApiOperation({
@@ -68,10 +68,15 @@ export class RoomsController {
 		status: HttpStatus.NOT_FOUND,
 		type: NotFoundException,
 	})
+	@Auth()
 	@UseInterceptors(CacheInterceptor)
 	@Get('/:id')
-	async getOne(@Param('id', ParseIntPipe) id: number): Promise<RoomDto> {
-		return this.roomsService.getOne(id);
+	async getOne(
+		@AuthToken() token: string,
+		@Param('id', ParseIntPipe) id: number
+	): Promise<RoomDto> {
+		const { id: userId, } = await this.authService.verifyUser(token);
+		return this.roomsService.getOne({ data: { id, userId, }, });
 	}
 
 	@ApiOperation({
@@ -88,10 +93,11 @@ export class RoomsController {
 		type: NotFoundException,
 		description: 'Такой комнаты не существует',
 	})
+	@Auth()
 	@UseInterceptors(CacheInterceptor)
 	@Get('/:id/users')
 	async getUsers(@Param('id', ParseIntPipe) id: number) {
-		return this.roomsService.getUsers(id);
+		return this.roomsService.getUsers({ data: { id, }, });
 	}
 
 	@ApiOperation({
@@ -115,8 +121,13 @@ export class RoomsController {
 		@AuthToken() token: string,
 		@Body() dto: CreateRoomDto
 	): Promise<RoomDto> {
-		const { id, } = await this.authService.verifyUser(token);
-		return this.roomsService.create(id, dto);
+		const { id: userId, } = await this.authService.verifyUser(token);
+		return this.roomsService.create({
+			data: {
+				...dto,
+				userId,
+			},
+		});
 	}
 
 	@ApiOperation({
@@ -140,10 +151,13 @@ export class RoomsController {
 	@InRoom()
 	@Put('/:id/update')
 	async update(
+		@AuthToken() token: string,
 		@Param('id', ParseIntPipe) id: number,
 		@Body() dto: UpdateRoomDto
 	): Promise<RoomDto> {
-		return this.roomsService.update(id, dto);
+		const { id: userId, } = await this.authService.verifyUser(token);
+
+		return this.roomsService.update({ data: { ...dto, id, userId, }, });
 	}
 
 	@ApiOperation({
@@ -165,7 +179,7 @@ export class RoomsController {
 		@Param('id', ParseIntPipe) id: number,
 		@Body() dto: RoomUserDto
 	): Promise<SecurityUserDto> {
-		return this.roomsService.addUser(id, dto.userId);
+		return this.roomsService.addUser({ data: { ...dto, id, }, });
 	}
 
 	@ApiOperation({
@@ -184,7 +198,7 @@ export class RoomsController {
 		@AuthToken() token: string
 	) {
 		const { id: userId, } = await this.authService.verifyUser(token);
-		return this.roomsService.removeUser(id, userId);
+		return this.roomsService.removeUser({ data: { id, userId, }, });
 	}
 
 	@ApiOperation({
@@ -204,6 +218,6 @@ export class RoomsController {
 	@InRoom()
 	@Delete('/:id/remove')
 	async remove(@Param('id', ParseIntPipe) id: number): Promise<boolean> {
-		return this.roomsService.remove(id);
+		return this.roomsService.remove({ data: { id, }, });
 	}
 }
