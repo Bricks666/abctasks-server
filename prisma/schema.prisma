@@ -27,7 +27,7 @@ enum activity_action {
 
 model activity_sphere {
   id         Int        @id @default(autoincrement())
-  name       String     @unique(map: "name") @db.VarChar(255)
+  name       String     @unique(map: "name") @db.VarChar(32)
   activities activity[]
 
   @@map("activity-sphere")
@@ -49,7 +49,7 @@ model comment {
 model group {
   id          Int    @id @default(autoincrement())
   roomId      Int
-  name        String @db.VarChar(255)
+  name        String @db.VarChar(32)
   mainColor   String @db.VarChar(7)
   secondColor String @db.VarChar(7)
   room        room   @relation(fields: [roomId], references: [id], onDelete: Cascade, map: "groups_ibfk_1")
@@ -76,25 +76,28 @@ model room_user {
 
 model room {
   id          Int         @id @default(autoincrement())
-  name        String      @db.VarChar(255)
+  creatorId   Int
+  name        String      @db.VarChar(32)
   description String      @db.VarChar(255)
   createdAt   DateTime?   @default(now())
   updatedAt   DateTime?   @updatedAt
+  creator     user        @relation(fields: [creatorId], references: [id], onDelete: Cascade)
   groups      group[]
   room_user   room_user[]
 }
 
 model task {
-  id        Int         @id @default(autoincrement())
-  roomId    Int
-  groupId   Int
-  authorId  Int
-  status    task_status @default(ready)
-  content   String      @db.VarChar(255)
-  createdAt DateTime?   @default(now())
-  room_user room_user   @relation(fields: [roomId, authorId], references: [roomId, userId], onDelete: Cascade, map: "task_ibfk_1")
-  group     group       @relation(fields: [groupId, roomId], references: [id, roomId], onDelete: Cascade, map: "task_ibfk_2")
-  comments  comment[]
+  id          Int         @id @default(autoincrement())
+  roomId      Int
+  groupId     Int
+  authorId    Int
+  title       String      @db.VarChar(32)
+  description String?     @db.VarChar(255)
+  status      task_status @default(ready)
+  createdAt   DateTime?   @default(now())
+  room_user   room_user   @relation(fields: [roomId, authorId], references: [roomId, userId], onDelete: Cascade, map: "task_ibfk_1")
+  group       group       @relation(fields: [groupId, roomId], references: [id, roomId], onDelete: Cascade, map: "task_ibfk_2")
+  comments    comment[]
 
   @@unique([id, roomId])
   @@index([authorId], map: "authorId")
@@ -108,6 +111,7 @@ model user {
   password  String      @db.VarChar(255)
   photo     String?     @db.VarChar(255)
   room_user room_user[]
+  room      room[]
 }
 
 enum task_status {
