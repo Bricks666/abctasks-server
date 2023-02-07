@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import { DatabaseService } from '@/database/database.service';
-import { SecurityUserDto } from '@/users/dto';
 import { Pagination } from '@/utils';
 import { CreateRoomDto, RoomDto, UpdateRoomDto } from '../dto';
 
@@ -61,29 +60,6 @@ export class RoomRepository {
 			},
 			data,
 		});
-	}
-
-	async getUsers(id: number): Promise<SecurityUserDto[] | null> {
-		const room = await this.databaseService.room.findUnique({
-			where: {
-				id,
-			},
-			include: {
-				room_user: {
-					include: {
-						user: {
-							select: {
-								id: true,
-								login: true,
-								photo: true,
-							},
-						},
-					},
-				},
-			},
-		});
-
-		return room.room_user.map((u) => u.user);
 	}
 
 	async remove(id: number): Promise<boolean> {

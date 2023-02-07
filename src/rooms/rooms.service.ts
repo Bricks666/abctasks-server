@@ -42,7 +42,7 @@ export class RoomsService {
 	}
 
 	async getUsers(id: number): Promise<SecurityUserDto[]> {
-		const users = await this.roomsRepository.getUsers(id);
+		const users = await this.roomUserRepository.getUsers(id);
 
 		if (!users) {
 			throw new NotFoundException('Room was not found');

@@ -1,9 +1,30 @@
 import { Injectable } from '@nestjs/common';
 import { DatabaseService } from '@/database/database.service';
+import { SecurityUserDto } from '@/users/dto';
 
 @Injectable()
 export class RoomUserRepository {
 	constructor(private readonly databaseService: DatabaseService) {}
+
+	async getUsers(roomId: number): Promise<SecurityUserDto[]> {
+		const pairs = await this.databaseService.room_user.findMany({
+			where: {
+				roomId,
+				removed: false,
+			},
+			include: {
+				user: {
+					select: {
+						id: true,
+						login: true,
+						photo: true,
+					},
+				},
+			},
+		});
+
+		return pairs.map((pair) => pair.user);
+	}
 
 	async addUser(roomId: number, userId: number): Promise<boolean> {
 		const pair = await this.databaseService.room_user.findFirst({

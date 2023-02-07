@@ -1,9 +1,11 @@
 import { ValidationPipe } from '@nestjs/common';
+import * as validatorPackage from 'class-validator';
+import * as transformerPackage from 'class-transformer';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import * as cookieParser from 'cookie-parser';
 import { AppModule } from './app.module';
-import { StandardResponseInterceptor, TransformPipe } from './common';
+import { StandardResponseInterceptor } from './common';
 import { CORS } from './const';
 import { DatabaseService } from './database/database.service';
 
@@ -19,7 +21,13 @@ async function bootstrap() {
 		credentials: true,
 		origin: CORS.ORIGIN,
 	});
-	app.useGlobalPipes(new ValidationPipe(), new TransformPipe());
+	app.useGlobalPipes(
+		new ValidationPipe({
+			validatorPackage,
+			transformerPackage,
+			forbidUnknownValues: false,
+		})
+	);
 	app.useGlobalInterceptors(new StandardResponseInterceptor());
 	app.setGlobalPrefix('api');
 
