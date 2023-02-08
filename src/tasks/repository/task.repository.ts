@@ -1,16 +1,31 @@
 import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { DatabaseService } from '@/database/database.service';
-import { CreateTaskDto, TaskDto, UpdateTaskDto } from '../dto';
+import { TaskDto } from '../dto';
+import {
+	CreateParams,
+	GetAllParams,
+	GetOneParams,
+	RemoveParams,
+	UpdateParams
+} from './types';
 
 @Injectable()
 export class TaskRepository {
 	constructor(private readonly databaseService: DatabaseService) {}
 
-	async getAll(
-		roomId: number,
-		where?: Prisma.taskWhereInput
-	): Promise<TaskDto[]> {
+	async getAll(params: GetAllParams): Promise<TaskDto[]> {
+		const { roomId, ...filters } = params;
+
+		const where: Prisma.taskWhereInput = {
+			authorId: filters.authorId,
+			groupId: filters.groupId,
+			createdAt: {
+				gte: filters.after,
+				lte: filters.before,
+			},
+		};
+
 		const tasks = await this.databaseService.task.findMany({
 			where: {
 				...where,
@@ -21,36 +36,23 @@ export class TaskRepository {
 		return tasks;
 	}
 
-	async getOne(id: number, roomId: number): Promise<TaskDto | null> {
+	async getOne(params: GetOneParams): Promise<TaskDto | null> {
 		return this.databaseService.task.findUnique({
 			where: {
-				id_roomId: {
-					id,
-					roomId,
-				},
+				id_roomId: params,
 			},
 		});
 	}
 
-	async create(
-		roomId: number,
-		authorId: number,
-		data: CreateTaskDto
-	): Promise<TaskDto> {
+	async create(params: CreateParams): Promise<TaskDto> {
 		return this.databaseService.task.create({
-			data: {
-				...data,
-				authorId,
-				roomId,
-			},
+			data: params,
 		});
 	}
 
-	async update(
-		id: number,
-		roomId: number,
-		data: UpdateTaskDto
-	): Promise<TaskDto> {
+	async update(params: UpdateParams): Promise<TaskDto> {
+		const { id, roomId, ...data } = params;
+
 		return this.databaseService.task.update({
 			where: {
 				id_roomId: {
@@ -62,13 +64,10 @@ export class TaskRepository {
 		});
 	}
 
-	async remove(id: number, roomId: number): Promise<void> {
+	async remove(params: RemoveParams): Promise<void> {
 		await this.databaseService.task.delete({
 			where: {
-				id_roomId: {
-					id,
-					roomId,
-				},
+				id_roomId: params,
 			},
 		});
 	}

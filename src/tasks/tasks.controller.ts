@@ -23,7 +23,7 @@ import {
 } from '@nestjs/swagger';
 import { TasksService } from './tasks.service';
 import { AuthToken } from '@/auth/auth-token.decorator';
-import { CreateTaskDto, GetTasksQueryDto, TaskDto, UpdateTaskDto } from './dto';
+import { CreateTaskDto, TasksFiltersDto, TaskDto, UpdateTaskDto } from './dto';
 import { AuthService } from '@/auth/auth.service';
 import { ActivitiesService } from '@/activities/activities.service';
 import { Auth } from '@/auth/auth.decorator';
@@ -52,15 +52,15 @@ export class TasksController {
 		isArray: true,
 	})
 	@ApiQuery({
-		type: GetTasksQueryDto,
+		type: TasksFiltersDto,
 	})
 	@UseInterceptors(CacheInterceptor)
 	@Get('/:roomId')
 	async getAll(
 		@Param('roomId', ParseIntPipe) roomId: number,
-		@Query() filters: GetTasksQueryDto
+		@Query() filters: TasksFiltersDto
 	): Promise<TaskDto[]> {
-		return this.tasksService.getAll(roomId, filters);
+		return this.tasksService.getAll({ roomId, ...filters, });
 	}
 
 	@ApiOperation({
@@ -90,7 +90,7 @@ export class TasksController {
 		@Param('roomId', ParseIntPipe) roomId: number,
 		@Param('id', ParseIntPipe) id: number
 	): Promise<TaskDto> {
-		return this.tasksService.getOne(roomId, id);
+		return this.tasksService.getOne({ roomId, id, });
 	}
 
 	@ApiOperation({
@@ -116,14 +116,19 @@ export class TasksController {
 	async create(
 		@Param('roomId', ParseIntPipe) roomId: number,
 		@AuthToken() token: string,
-		@Body() dto: CreateTaskDto
+		@Body() body: CreateTaskDto
 	): Promise<TaskDto> {
-		const { id: userId, } = await this.authService.verifyUser(token);
+		const { id: authorId, } = await this.authService.verifyUser({ token, });
 
-		const task = await this.tasksService.create(roomId, userId, dto);
+		const task = await this.tasksService.create({
+			roomId,
+			authorId,
+			...body,
+		});
 
-		await this.activitiesService.create(roomId, {
-			activistId: userId,
+		await this.activitiesService.create({
+			roomId,
+			activistId: authorId,
 			sphereName: 'task',
 			action: 'create',
 		});
@@ -164,14 +169,15 @@ export class TasksController {
 	async update(
 		@Param('roomId', ParseIntPipe) roomId: number,
 		@Param('id', ParseIntPipe) id: number,
-		@Body() dto: UpdateTaskDto,
-		@AuthToken() token: string
+		@AuthToken() token: string,
+		@Body() body: UpdateTaskDto
 	): Promise<TaskDto> {
-		const { id: userId, } = await this.authService.verifyUser(token);
+		const { id: userId, } = await this.authService.verifyUser({ token, });
 
-		const task = await this.tasksService.update(roomId, id, dto);
+		const task = await this.tasksService.update({ roomId, id, ...body, });
 
-		await this.activitiesService.create(roomId, {
+		await this.activitiesService.create({
+			roomId,
 			activistId: userId,
 			sphereName: 'task',
 			action: 'update',
@@ -206,11 +212,12 @@ export class TasksController {
 		@Param('id', ParseIntPipe) id: number,
 		@AuthToken() token: string
 	): Promise<boolean> {
-		const { id: userId, } = await this.authService.verifyUser(token);
+		const { id: userId, } = await this.authService.verifyUser({ token, });
 
-		const response = await this.tasksService.remove(roomId, id);
+		const response = await this.tasksService.remove({ roomId, id, });
 
-		await this.activitiesService.create(roomId, {
+		await this.activitiesService.create({
+			roomId,
 			activistId: userId,
 			sphereName: 'task',
 			action: 'remove',

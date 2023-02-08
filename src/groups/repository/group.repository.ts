@@ -1,44 +1,41 @@
 import { Injectable } from '@nestjs/common';
 import { DatabaseService } from '@/database/database.service';
-import { CreateGroupDto, GroupDto, UpdateGroupDto } from '../dto';
+import { GroupDto } from '../dto';
+import {
+	CreateParams,
+	GetAllParams,
+	GetOneParams,
+	RemoveParams,
+	UpdateParams
+} from './types';
 
 @Injectable()
 export class GroupRepository {
 	constructor(private readonly databaseService: DatabaseService) {}
 
-	async getAll(roomId: number): Promise<GroupDto[]> {
+	async getAll(params: GetAllParams): Promise<GroupDto[]> {
 		return this.databaseService.group.findMany({
-			where: {
-				roomId,
-			},
+			where: params,
 		}) as Promise<GroupDto[]>;
 	}
 
-	async getOne(id: number, roomId: number): Promise<GroupDto | null> {
+	async getOne(params: GetOneParams): Promise<GroupDto | null> {
 		return this.databaseService.group.findUnique({
 			where: {
-				id_roomId: {
-					id,
-					roomId,
-				},
+				id_roomId: params,
 			},
 		}) as Promise<GroupDto | null>;
 	}
 
-	async create(roomId: number, data: CreateGroupDto): Promise<GroupDto> {
+	async create(params: CreateParams): Promise<GroupDto> {
 		return this.databaseService.group.create({
-			data: {
-				...data,
-				roomId,
-			},
+			data: params,
 		}) as Promise<GroupDto>;
 	}
 
-	async update(
-		id: number,
-		roomId: number,
-		data: UpdateGroupDto
-	): Promise<GroupDto> {
+	async update(params: UpdateParams): Promise<GroupDto> {
+		const { id, roomId, ...data } = params;
+
 		return this.databaseService.group.update({
 			where: {
 				id_roomId: {
@@ -50,13 +47,10 @@ export class GroupRepository {
 		}) as Promise<GroupDto | null>;
 	}
 
-	async remove(id: number, roomId: number): Promise<void> {
+	async remove(params: RemoveParams): Promise<void> {
 		await this.databaseService.group.delete({
 			where: {
-				id_roomId: {
-					id,
-					roomId,
-				},
+				id_roomId: params,
 			},
 		});
 	}

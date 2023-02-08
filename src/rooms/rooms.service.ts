@@ -4,21 +4,20 @@ import {
 	NotFoundException
 } from '@nestjs/common';
 import { SecurityUserDto } from '@/users/dto';
-import { normalizePaginationParams } from '@/utils';
+import { normalizePaginationParams } from '@/lib';
 import { RoomDto } from './dto';
 import { RoomRepository, RoomUserRepository } from './repository';
 import { UserRepository } from '@/users/repository';
-import { ServiceParams } from '@/common';
 import {
-	AddUserData,
-	CreateData,
-	GetAllData,
-	GetOneData,
-	GetUsersData,
-	RemoveData,
-	RemoveUserData,
-	RoomExistsUserData,
-	UpdateData
+	AddUserParams,
+	CreateParams,
+	GetAllParams,
+	GetOneParams,
+	GetUsersParams,
+	RemoveParams,
+	RemoveUserParams,
+	RoomExistsUserParams,
+	UpdateParams
 } from './types';
 
 @Injectable()
@@ -29,19 +28,18 @@ export class RoomsService {
 		private readonly usersRepository: UserRepository
 	) {}
 
-	async getAll(params: ServiceParams<GetAllData>): Promise<RoomDto[]> {
-		const { data, } = params;
+	async getAll(params: GetAllParams): Promise<RoomDto[]> {
+		const { userId, } = params;
 		const pagination = normalizePaginationParams({});
 
 		return this.roomsRepository.getAllByUser({
-			filters: data,
-			pagination,
+			...pagination,
+			userId,
 		});
 	}
 
-	async getOne(params: ServiceParams<GetOneData>): Promise<RoomDto> {
-		const { data, } = params;
-		const room = await this.roomsRepository.getOne({ filters: data, });
+	async getOne(params: GetOneParams): Promise<RoomDto> {
+		const room = await this.roomsRepository.getOne(params);
 
 		if (!room) {
 			throw new NotFoundException('Room was not found');
@@ -50,38 +48,18 @@ export class RoomsService {
 		return room;
 	}
 
-	async create(params: ServiceParams<CreateData>): Promise<RoomDto> {
-		const {
-			data: { userId, ...dto },
-		} = params;
-		return this.roomsRepository.create({
-			data: { ...dto, userId, },
-			filters: { userId, },
-		});
+	async create(params: CreateParams): Promise<RoomDto> {
+		return this.roomsRepository.create(params);
 	}
 
-	async update(params: ServiceParams<UpdateData>): Promise<RoomDto> {
-		const {
-			data: { id, userId, ...dto },
-		} = params;
-		return this.roomsRepository.update({
-			data: dto,
-			filters: {
-				userId,
-				id,
-			},
-		});
+	async update(params: UpdateParams): Promise<RoomDto> {
+		return this.roomsRepository.update(params);
 	}
 
-	async getUsers(
-		params: ServiceParams<GetUsersData>
-	): Promise<SecurityUserDto[]> {
-		const {
-			data: { id, },
-		} = params;
-		const users = await this.roomUserRepository.getUsers({
-			filters: { roomId: id, },
-		});
+	async getUsers(params: GetUsersParams): Promise<SecurityUserDto[]> {
+		const { id, } = params;
+
+		const users = await this.roomUserRepository.getUsers({ roomId: id, });
 
 		if (!users) {
 			throw new NotFoundException('Room was not found');
@@ -90,30 +68,25 @@ export class RoomsService {
 		return users;
 	}
 
-	async addUser(params: ServiceParams<AddUserData>): Promise<SecurityUserDto> {
-		const {
-			data: { id, userId, },
-		} = params;
+	async addUser(params: AddUserParams): Promise<SecurityUserDto> {
+		const { id, userId, } = params;
 		const added = await this.roomUserRepository.addUser({
-			data: { roomId: id, userId, },
+			roomId: id,
+			userId,
 		});
 
 		if (!added) {
 			throw new ConflictException('User already exists');
 		}
 
-		return this.usersRepository.getOne(userId);
+		return this.usersRepository.getOne({ id, });
 	}
 
-	async removeUser(params: ServiceParams<RemoveUserData>): Promise<boolean> {
-		const {
-			data: { id, userId, },
-		} = params;
+	async removeUser(params: RemoveUserParams): Promise<boolean> {
+		const { id, userId, } = params;
 		const isSuccess = await this.roomUserRepository.removeUser({
-			data: {
-				roomId: id,
-				userId,
-			},
+			roomId: id,
+			userId,
 		});
 
 		if (!isSuccess) {
@@ -123,19 +96,11 @@ export class RoomsService {
 		return isSuccess;
 	}
 
-	async roomExistsUser(
-		params: ServiceParams<RoomExistsUserData>
-	): Promise<boolean> {
-		const { data, } = params;
-		return this.roomUserRepository.existsUser({
-			filters: data,
-		});
+	async roomExistsUser(params: RoomExistsUserParams): Promise<boolean> {
+		return this.roomUserRepository.existsUser(params);
 	}
 
-	async remove(params: ServiceParams<RemoveData>): Promise<boolean> {
-		const { data, } = params;
-		return this.roomsRepository.remove({
-			filters: data,
-		});
+	async remove(params: RemoveParams): Promise<boolean> {
+		return this.roomsRepository.remove(params);
 	}
 }

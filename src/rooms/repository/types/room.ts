@@ -1,34 +1,25 @@
+import { Pagination } from '@/lib';
 import { CreateRoomDto, UpdateRoomDto } from '../../dto';
 
-export interface GetAllFilters {
+export interface GetAllByUserParams extends Pagination {
 	readonly userId: number;
 }
 
-export interface GetAllByUserFilters {
-	readonly userId: number;
-}
-
-export interface GetOneFilters {
+export interface GetOneParams {
 	readonly id: number;
 	readonly userId: number;
 }
 
-export interface CreateData extends CreateRoomDto {
+export interface CreateParams extends CreateRoomDto {
 	readonly userId: number;
 }
 
-export interface CreateFilters {
-	readonly userId: number;
-}
-
-export interface UpdateData extends UpdateRoomDto {}
-
-export interface UpdateFilters {
+export interface UpdateParams extends UpdateRoomDto {
 	readonly id: number;
 	readonly userId: number;
 }
 
-export interface RemoveFilters {
+export interface RemoveParams {
 	readonly id: number;
 }
 

@@ -4,7 +4,7 @@ import {
 	ExecutionContext,
 	UnauthorizedException
 } from '@nestjs/common';
-import { extractAccessToken } from '@/utils';
+import { extractAccessToken } from '@/lib';
 
 export const AuthToken = createParamDecorator<unknown, ExecutionContext>(
 	(_, context): string => {

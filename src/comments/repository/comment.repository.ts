@@ -1,18 +1,21 @@
 import { Injectable } from '@nestjs/common';
 import { DatabaseService } from '@/database/database.service';
-import { Pagination } from '@/utils';
-import { CommentDto, CreateCommentDto, UpdateCommentDto } from '../dto';
+import { CommentDto } from '../dto';
+import {
+	CreateParams,
+	GetAllParams,
+	getOneParams,
+	RemoveParams,
+	UpdateParams
+} from './types';
 
 @Injectable()
 export class CommentRepository {
 	constructor(private readonly databaseService: DatabaseService) {}
 
-	async getAll(
-		roomId: number,
-		taskId: number,
-		pagination: Pagination
-	): Promise<CommentDto[]> {
-		const { limit, offset, } = pagination;
+	async getAll(params: GetAllParams): Promise<CommentDto[]> {
+		const { limit, offset, roomId, taskId, } = params;
+
 		return this.databaseService.comment.findMany({
 			where: {
 				roomId,
@@ -23,42 +26,21 @@ export class CommentRepository {
 		});
 	}
 
-	async getOne(
-		roomId: number,
-		taskId: number,
-		id: number
-	): Promise<CommentDto | null> {
+	async getOne(params: getOneParams): Promise<CommentDto | null> {
 		return this.databaseService.comment.findFirst({
-			where: {
-				id,
-				taskId,
-				roomId,
-			},
+			where: params,
 		});
 	}
 
-	async create(
-		taskId: number,
-		roomId: number,
-		authorId: number,
-		data: CreateCommentDto
-	): Promise<CommentDto> {
+	async create(params: CreateParams): Promise<CommentDto> {
 		return this.databaseService.comment.create({
-			data: {
-				...data,
-				taskId,
-				roomId,
-				authorId,
-			},
+			data: params,
 		});
 	}
 
-	async update(
-		id: number,
-		taskId: number,
-		roomId: number,
-		data: UpdateCommentDto
-	): Promise<CommentDto> {
+	async update(params: UpdateParams): Promise<CommentDto> {
+		const { id, roomId, taskId, ...data } = params;
+
 		return this.databaseService.comment.update({
 			data,
 			where: {
@@ -71,14 +53,10 @@ export class CommentRepository {
 		});
 	}
 
-	async remove(id: number, taskId: number, roomId: number): Promise<void> {
+	async remove(params: RemoveParams): Promise<void> {
 		await this.databaseService.comment.delete({
 			where: {
-				id_roomId_taskId: {
-					id,
-					roomId,
-					taskId,
-				},
+				id_roomId_taskId: params,
 			},
 		});
 	}

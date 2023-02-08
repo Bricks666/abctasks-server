@@ -1,28 +1,26 @@
 import { Injectable } from '@nestjs/common';
 import { Prisma, user as UserModel } from '@prisma/client';
 import { DatabaseService } from '@/database/database.service';
-import { PaginationQueryDto } from '@/common';
+import { SecurityUserDto } from '../dto';
 import {
-	CreateUserDto,
-	GetUsersQueryDto,
-	SecurityUserDto,
-	UpdateUserDto
-} from '../dto';
+	CreateData,
+	GetAllParams,
+	GetOneByLoginParams,
+	GetOneParams,
+	UpdateParams
+} from './types';
 
 @Injectable()
 export class UserRepository {
 	constructor(private readonly databaseService: DatabaseService) {}
 
-	async getAll(
-		dto: Omit<GetUsersQueryDto, keyof PaginationQueryDto>,
-		limit: number,
-		offset: number
-	): Promise<SecurityUserDto[]> {
+	async getAll(params: GetAllParams): Promise<SecurityUserDto[]> {
+		const { login, limit, offset, } = params;
 		const where: Prisma.userWhereInput = {};
 
-		if (typeof dto.login !== 'undefined') {
+		if (typeof login !== 'undefined') {
 			where.login = {
-				startsWith: dto.login,
+				startsWith: login,
 			};
 		}
 
@@ -38,11 +36,9 @@ export class UserRepository {
 		});
 	}
 
-	async getOne(id: number): Promise<SecurityUserDto | null> {
+	async getOne(params: GetOneParams): Promise<SecurityUserDto | null> {
 		return this.databaseService.user.findFirst({
-			where: {
-				id,
-			},
+			where: params,
 			select: {
 				id: true,
 				login: true,
@@ -51,17 +47,15 @@ export class UserRepository {
 		});
 	}
 
-	async getOneByLogin(login: string): Promise<UserModel | null> {
+	async getOneByLogin(params: GetOneByLoginParams): Promise<UserModel | null> {
 		return this.databaseService.user.findFirst({
-			where: {
-				login,
-			},
+			where: params,
 		});
 	}
 
-	async create(data: CreateUserDto): Promise<SecurityUserDto> {
+	async create(params: CreateData): Promise<SecurityUserDto> {
 		return this.databaseService.user.create({
-			data,
+			data: params,
 			select: {
 				id: true,
 				login: true,
@@ -70,7 +64,9 @@ export class UserRepository {
 		});
 	}
 
-	async update(id: number, data: UpdateUserDto): Promise<SecurityUserDto> {
+	async update(params: UpdateParams): Promise<SecurityUserDto> {
+		const { id, ...data } = params;
+
 		return this.databaseService.user.update({
 			data,
 			where: {

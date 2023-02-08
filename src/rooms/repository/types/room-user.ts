@@ -1,18 +1,18 @@
-export interface GetUsersFilters {
+export interface GetUsersParams {
 	readonly roomId: number;
 }
 
-export interface AddUserData {
+export interface AddUserParams {
 	readonly userId: number;
 	readonly roomId: number;
 }
 
-export interface RemoveUserData {
+export interface RemoveUserParams {
 	readonly userId: number;
 	readonly roomId: number;
 }
 
-export interface ExistsUserFilters {
+export interface ExistsUserParams {
 	readonly roomId: number;
 	readonly userId: number;
 }

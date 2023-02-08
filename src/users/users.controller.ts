@@ -92,6 +92,6 @@ export class UsersController {
 		@Param('id', ParseIntPipe) id: number,
 		@Body() dto: UpdateUserDto
 	): Promise<SecurityUserDto> {
-		return this.usersService.update(id, dto);
+		return this.usersService.update({ id, ...dto, });
 	}
 }

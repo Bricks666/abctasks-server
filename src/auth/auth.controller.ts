@@ -6,10 +6,9 @@ import {
 	Get,
 	HttpStatus,
 	Post,
-	Req,
 	Res
 } from '@nestjs/common';
-import { Request, Response } from 'express';
+import { Response } from 'express';
 import {
 	ApiBody,
 	ApiCookieAuth,
@@ -26,6 +25,7 @@ import {
 	LoginRequestDto,
 	TokensDto
 } from './dto';
+import { Cookie } from '@/common';
 
 @ApiTags('Авторизация')
 @Controller('auth')
@@ -42,15 +42,14 @@ export class AuthController {
 	@ApiCookieAuth()
 	@Get('/')
 	async authentication(
-		@Req() req: Request,
+		@Cookie(COOKIE_NAME) token: string | null,
 		@Res({ passthrough: true, }) res: Response
 	): Promise<AuthenticationResultDto> {
-		const refreshToken = req.cookies[COOKIE_NAME];
-		if (!refreshToken) {
+		if (!token) {
 			throw new ForbiddenException('There is not refresh token');
 		}
 
-		const result = await this.authService.authentication(refreshToken);
+		const result = await this.authService.authentication({ token, });
 
 		res.cookie(COOKIE_NAME, result.tokens.refreshToken, {
 			...BASE_COOKIE_OPTIONS,
@@ -71,8 +70,8 @@ export class AuthController {
 		description: 'Подтверждение успешности регистрации',
 	})
 	@Post('registration')
-	async registration(@Body() dto: CreateUserDto): Promise<SecurityUserDto> {
-		return this.authService.registration(dto);
+	async registration(@Body() body: CreateUserDto): Promise<SecurityUserDto> {
+		return this.authService.registration(body);
 	}
 
 	@ApiOperation({ summary: 'Вход пользователя в аккаунт', })
@@ -85,10 +84,10 @@ export class AuthController {
 	@Post('login')
 	async login(
 		@Res({ passthrough: true, }) res: Response,
-		@Body() dto: LoginRequestDto
+		@Body() body: LoginRequestDto
 	): Promise<AuthenticationResultDto> {
-		const { rememberMe, ...loginDto } = dto;
-		const result = await this.authService.login(loginDto);
+		const { rememberMe, ...dto } = body;
+		const result = await this.authService.login(dto);
 
 		if (rememberMe) {
 			res.cookie(COOKIE_NAME, result.tokens.refreshToken, {
@@ -121,16 +120,14 @@ export class AuthController {
 	@ApiCookieAuth()
 	@Get('refresh')
 	async refresh(
-		@Req() req: Request,
+		@Cookie(COOKIE_NAME) token: string | null,
 		@Res({ passthrough: true, }) res: Response
 	): Promise<TokensDto> {
-		const refreshToken = req.cookies[COOKIE_NAME];
-
-		if (!refreshToken) {
+		if (!token) {
 			throw new ForbiddenException('There is not refresh token');
 		}
 
-		const tokens = await this.authService.refresh(refreshToken);
+		const tokens = await this.authService.refresh({ token, });
 
 		res.cookie(COOKIE_NAME, tokens.refreshToken, {
 			...BASE_COOKIE_OPTIONS,

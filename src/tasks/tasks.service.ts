@@ -1,26 +1,24 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { Prisma } from '@prisma/client';
-import { CreateTaskDto, GetTasksQueryDto, TaskDto, UpdateTaskDto } from './dto';
+import { TaskDto } from './dto';
 import { TaskRepository } from './repository';
+import {
+	CreateParams,
+	GetAllParams,
+	GetOneParams,
+	RemoveParams,
+	UpdateParams
+} from './types';
 
 @Injectable()
 export class TasksService {
 	constructor(private readonly tasksRepository: TaskRepository) {}
 
-	async getAll(roomId: number, filters: GetTasksQueryDto): Promise<TaskDto[]> {
-		const where: Prisma.taskWhereInput = {
-			authorId: filters.authorId,
-			groupId: filters.groupId,
-			createdAt: {
-				gte: filters.after,
-				lte: filters.before,
-			},
-		};
-		return this.tasksRepository.getAll(roomId, where);
+	async getAll(params: GetAllParams): Promise<TaskDto[]> {
+		return this.tasksRepository.getAll(params);
 	}
 
-	async getOne(roomId: number, id: number): Promise<TaskDto> {
-		const task = await this.tasksRepository.getOne(id, roomId);
+	async getOne(params: GetOneParams): Promise<TaskDto> {
+		const task = await this.tasksRepository.getOne(params);
 
 		if (!task) {
 			throw new NotFoundException('Task was not found');
@@ -29,27 +27,19 @@ export class TasksService {
 		return task;
 	}
 
-	async create(
-		roomId: number,
-		authorId: number,
-		dto: CreateTaskDto
-	): Promise<TaskDto> {
-		return this.tasksRepository.create(roomId, authorId, dto);
+	async create(params: CreateParams): Promise<TaskDto> {
+		return this.tasksRepository.create(params);
 	}
 
 	/**
 	 * TODO: Сделать сначала поиск, а потом уже изменение, чтобы ошибка кидалась до изменений
 	 */
-	async update(
-		roomId: number,
-		id: number,
-		dto: UpdateTaskDto
-	): Promise<TaskDto> {
-		return this.tasksRepository.update(id, roomId, dto);
+	async update(params: UpdateParams): Promise<TaskDto> {
+		return this.tasksRepository.update(params);
 	}
 
-	async remove(roomId: number, id: number): Promise<boolean> {
-		await this.tasksRepository.remove(id, roomId);
+	async remove(params: RemoveParams): Promise<boolean> {
+		await this.tasksRepository.remove(params);
 
 		return true;
 	}

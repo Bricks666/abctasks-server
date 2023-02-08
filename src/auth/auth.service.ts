@@ -6,8 +6,15 @@ import {
 } from '@nestjs/common';
 import { compare } from 'bcrypt';
 import { UsersService } from '@/users/users.service';
-import { CreateUserDto, SecurityUserDto } from '@/users/dto';
-import { AuthenticationResultDto, LoginDto, TokensDto } from './dto';
+import { SecurityUserDto } from '@/users/dto';
+import { AuthenticationResultDto, TokensDto } from './dto';
+import {
+	AuthenticationParams,
+	LoginParams,
+	RefreshParams,
+	RegistrationParams,
+	VerifyUserParams
+} from './types';
 
 @Injectable()
 export class AuthService {
@@ -16,11 +23,13 @@ export class AuthService {
 		private readonly jwtService: JwtService
 	) {}
 
-	async authentication(token: string): Promise<AuthenticationResultDto> {
-		const authUser = await this.verifyUser(token);
+	async authentication(
+		params: AuthenticationParams
+	): Promise<AuthenticationResultDto> {
+		const authUser = await this.verifyUser(params);
 		const user = await this.usersService.getOne({ id: authUser.id, });
 
-		const tokens = await this.generateToken(user);
+		const tokens = await this.#generateToken(user);
 
 		return {
 			user,
@@ -28,14 +37,16 @@ export class AuthService {
 		};
 	}
 
-	async registration(dto: CreateUserDto): Promise<SecurityUserDto> {
-		return this.usersService.create(dto);
+	async registration(params: RegistrationParams): Promise<SecurityUserDto> {
+		return this.usersService.create(params);
 	}
 
-	async login(dto: LoginDto): Promise<AuthenticationResultDto> {
-		const user = await this.usersService.getInsecure(dto.login);
+	async login(params: LoginParams): Promise<AuthenticationResultDto> {
+		const { login, password, } = params;
 
-		const isValidPassword = await compare(dto.password, user.password);
+		const user = await this.usersService.getInsecure({ login, });
+
+		const isValidPassword = await compare(password, user.password);
 
 		if (!isValidPassword) {
 			throw new UnauthorizedException('Incorrect password');
@@ -43,16 +54,16 @@ export class AuthService {
 
 		user.password = undefined;
 
-		const tokens = await this.generateToken(user);
+		const tokens = await this.#generateToken(user);
 
 		return { user, tokens, };
 	}
 
-	async refresh(refreshToken: string): Promise<TokensDto> {
+	async refresh(params: RefreshParams): Promise<TokensDto> {
 		try {
-			const authUser = await this.verifyUser(refreshToken);
+			const authUser = await this.verifyUser(params);
 
-			return this.generateToken({
+			return this.#generateToken({
 				id: authUser.id,
 				login: authUser.login,
 				photo: authUser.photo,
@@ -64,7 +75,19 @@ export class AuthService {
 		}
 	}
 
-	private async generateToken(user: SecurityUserDto): Promise<TokensDto> {
+	async verifyUser(params: VerifyUserParams): Promise<SecurityUserDto> {
+		const { token, } = params;
+
+		try {
+			return await this.jwtService.verifyAsync<SecurityUserDto>(token, {
+				secret: process.env.SECRET,
+			});
+		} catch (error) {
+			throw new UnauthorizedException('jwt expired', { cause: error, });
+		}
+	}
+
+	async #generateToken(user: SecurityUserDto): Promise<TokensDto> {
 		const accessToken = this.jwtService.signAsync(user, {
 			secret: process.env.SECRET,
 			expiresIn: '10m',
@@ -78,15 +101,5 @@ export class AuthService {
 			refreshToken: tokens[0],
 			accessToken: tokens[1],
 		};
-	}
-
-	async verifyUser(token: string): Promise<SecurityUserDto> {
-		try {
-			return await this.jwtService.verifyAsync<SecurityUserDto>(token, {
-				secret: process.env.SECRET,
-			});
-		} catch (error) {
-			throw new UnauthorizedException('jwt expired', { cause: error, });
-		}
 	}
 }

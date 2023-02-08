@@ -54,7 +54,7 @@ export class GroupsController {
 	async getAll(
 		@Param('roomId', ParseIntPipe) roomId: number
 	): Promise<GroupDto[]> {
-		return this.groupsService.getAll(roomId);
+		return this.groupsService.getAll({ roomId, });
 	}
 
 	@ApiOperation({
@@ -84,7 +84,7 @@ export class GroupsController {
 		@Param('roomId', ParseIntPipe) roomId: number,
 		@Param('id', ParseIntPipe) id: number
 	): Promise<GroupDto> {
-		return this.groupsService.getOne(roomId, id);
+		return this.groupsService.getOne({ roomId, id, });
 	}
 
 	@ApiOperation({
@@ -109,18 +109,20 @@ export class GroupsController {
 	@Post('/:roomId/create')
 	async create(
 		@Param('roomId', ParseIntPipe) roomId: number,
-		@Body() dto: CreateGroupDto,
-		@AuthToken() token: string
+		@AuthToken() token: string,
+		@Body() body: CreateGroupDto
 	): Promise<GroupDto> {
-		const { id: userId, } = await this.authService.verifyUser(token);
+		const { id: userId, } = await this.authService.verifyUser({ token, });
 
-		const group = await this.groupsService.create(roomId, dto);
+		const group = await this.groupsService.create({ ...body, roomId, });
 
-		await this.activitiesService.create(roomId, {
+		await this.activitiesService.create({
+			roomId,
 			sphereName: 'group',
 			action: 'create',
 			activistId: userId,
 		});
+
 		return group;
 	}
 
@@ -152,14 +154,15 @@ export class GroupsController {
 	async update(
 		@Param('roomId', ParseIntPipe) roomId: number,
 		@Param('id', ParseIntPipe) id: number,
-		@Body() dto: UpdateGroupDto,
-		@AuthToken() token: string
+		@AuthToken() token: string,
+		@Body() body: UpdateGroupDto
 	): Promise<GroupDto> {
-		const { id: userId, } = await this.authService.verifyUser(token);
+		const { id: userId, } = await this.authService.verifyUser({ token, });
 
-		const group = await this.groupsService.update(roomId, id, dto);
+		const group = await this.groupsService.update({ ...body, roomId, id, });
 
-		await this.activitiesService.create(roomId, {
+		await this.activitiesService.create({
+			roomId,
 			sphereName: 'group',
 			action: 'update',
 			activistId: userId,
@@ -194,11 +197,12 @@ export class GroupsController {
 		@Param('id', ParseIntPipe) id: number,
 		@AuthToken() token: string
 	): Promise<boolean> {
-		const { id: userId, } = await this.authService.verifyUser(token);
+		const { id: userId, } = await this.authService.verifyUser({ token, });
 
-		const response = await this.groupsService.remove(roomId, id);
+		const response = await this.groupsService.remove({ roomId, id, });
 
-		await this.activitiesService.create(roomId, {
+		await this.activitiesService.create({
+			roomId,
 			sphereName: 'group',
 			action: 'remove',
 			activistId: userId,

@@ -1,42 +1,42 @@
 import { CreateRoomDto, UpdateRoomDto } from './dto';
 
-export interface GetAllData {
+export interface GetAllParams {
 	readonly userId: number;
 }
 
-export interface GetOneData {
+export interface GetOneParams {
 	readonly id: number;
 	readonly userId: number;
 }
 
-export interface CreateData extends CreateRoomDto {
+export interface CreateParams extends CreateRoomDto {
 	readonly userId: number;
 }
 
-export interface UpdateData extends UpdateRoomDto {
+export interface UpdateParams extends UpdateRoomDto {
 	readonly id: number;
 	readonly userId: number;
 }
 
-export interface GetUsersData {
+export interface GetUsersParams {
 	readonly id: number;
 }
 
-export interface AddUserData {
-	readonly id: number;
-	readonly userId: number;
-}
-
-export interface RemoveUserData {
+export interface AddUserParams {
 	readonly id: number;
 	readonly userId: number;
 }
 
-export interface RoomExistsUserData {
+export interface RemoveUserParams {
+	readonly id: number;
+	readonly userId: number;
+}
+
+export interface RoomExistsUserParams {
 	readonly roomId: number;
 	readonly userId: number;
 }
 
-export interface RemoveData {
+export interface RemoveParams {
 	readonly id: number;
 }

@@ -1,32 +1,25 @@
 import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { DatabaseService } from '@/database/database.service';
-import { ActivityDto, CreateActivityDto, GetActivitiesQueryDto } from '../dto';
-import { Pagination } from '@/utils';
-import { PaginationQueryDto } from '@/common';
+import { ActivityDto } from '../dto';
+import {
+	CreateParams,
+	GetAllByRoomIdParams,
+	GetAllByUserIdParams,
+	GetTotalCountInRoomParams
+} from './types';
+import { prepareWhere } from './lib';
 
 @Injectable()
 export class ActivityRepository {
 	constructor(private readonly databaseService: DatabaseService) {}
 
-	async getAllByRoomId(
-		roomId: number,
-		filters: Omit<GetActivitiesQueryDto, keyof PaginationQueryDto>,
-		pagination: Pagination
-	): Promise<ActivityDto[]> {
-		const { limit, offset, } = pagination;
+	async getAllByRoomId(params: GetAllByRoomIdParams): Promise<ActivityDto[]> {
+		const { limit, offset, roomId, ...filters } = params;
 
 		const where: Prisma.activityWhereInput = {
+			...prepareWhere(filters),
 			roomId,
-			action: filters.action,
-			activistId: filters.activistId,
-			createdAt: {
-				gte: filters.after,
-				lte: filters.before,
-			},
-			sphere: {
-				name: filters.sphereName,
-			},
 		};
 
 		return this.databaseService.activity.findMany({
@@ -48,34 +41,24 @@ export class ActivityRepository {
 	}
 
 	async getTotalCountInRoom(
-		roomId: number,
-		filters: Omit<GetActivitiesQueryDto, keyof PaginationQueryDto>
+		params: GetTotalCountInRoomParams
 	): Promise<number> {
 		/*
     TODO: Исправить дублирование кода, может вынести куда нибудь
     */
+		const { roomId, ...filters } = params;
+
 		const where: Prisma.activityWhereInput = {
+			...prepareWhere(filters),
 			roomId,
-			action: filters.action,
-			activistId: filters.activistId,
-			createdAt: {
-				gte: filters.after,
-				lte: filters.before,
-			},
-			sphere: {
-				name: filters.sphereName,
-			},
 		};
 		return this.databaseService.activity.count({
 			where,
 		});
 	}
 
-	async getAllByUserId(
-		userId: number,
-		pagination: Pagination
-	): Promise<ActivityDto[]> {
-		const { limit, offset, } = pagination;
+	async getAllByUserId(params: GetAllByUserIdParams): Promise<ActivityDto[]> {
+		const { limit, offset, userId, } = params;
 		return this.databaseService.activity.findMany({
 			where: {
 				activistId: userId,
@@ -93,19 +76,18 @@ export class ActivityRepository {
 		});
 	}
 
-	async create(roomId: number, dto: CreateActivityDto): Promise<ActivityDto> {
+	async create(params: CreateParams): Promise<ActivityDto> {
+		const { sphereName, ...data } = params;
 		return this.databaseService.activity.create({
 			data: {
-				action: dto.action,
-				activistId: dto.activistId,
-				roomId,
+				...data,
 				sphere: {
 					connectOrCreate: {
 						create: {
-							name: dto.sphereName,
+							name: sphereName,
 						},
 						where: {
-							name: dto.sphereName,
+							name: sphereName,
 						},
 					},
 				},

@@ -1,37 +1,8 @@
-import {
-	IsDateString,
-	IsEnum,
-	IsNumber,
-	IsOptional,
-	IsString
-} from 'class-validator';
-import { Transform } from 'class-transformer';
+import { IntersectionType } from '@nestjs/swagger';
 import { PaginationQueryDto } from '@/common';
-import { ActivityAction } from './activity.dto';
+import { ActivitiesFiltersDto } from './activities-filters.dto';
 
-export class GetActivitiesQueryDto extends PaginationQueryDto {
-	@IsNumber()
-	@Transform((a) => Number(a.value))
-	@IsOptional()
-	declare activistId?: number;
-
-	@IsString()
-	@IsOptional()
-	declare sphereName?: string;
-
-	@IsEnum({
-		create: 'create',
-		update: 'update',
-		remove: 'remove',
-	})
-	@IsOptional()
-	declare action?: ActivityAction;
-
-	@IsDateString()
-	@IsOptional()
-	declare before?: string;
-
-	@IsDateString()
-	@IsOptional()
-	declare after?: string;
-}
+export class GetActivitiesQueryDto extends IntersectionType(
+	PaginationQueryDto,
+	ActivitiesFiltersDto
+) {}

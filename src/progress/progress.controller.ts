@@ -32,6 +32,6 @@ export class ProgressController {
 	async getAll(
 		@Param('roomId', ParseIntPipe) roomId: number
 	): Promise<ProgressDto[]> {
-		return this.progressService.getAll(roomId);
+		return this.progressService.getAll({ roomId, });
 	}
 }

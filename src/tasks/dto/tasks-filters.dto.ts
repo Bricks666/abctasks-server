@@ -1,7 +1,7 @@
 import { Transform } from 'class-transformer';
 import { IsDateString, IsNumber, IsOptional } from 'class-validator';
 
-export class GetTasksQueryDto {
+export class TasksFiltersDto {
 	@IsNumber()
 	@IsOptional()
 	@Transform((property) => Number(property.value))

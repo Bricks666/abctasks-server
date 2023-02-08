@@ -1,23 +1,19 @@
 import { Injectable } from '@nestjs/common';
 import { DatabaseService } from '@/database/database.service';
 import { SecurityUserDto } from '@/users/dto';
-import { RepositoryParams, RepositoryParamsWithData } from '@/common';
 import {
-	AddUserData,
-	ExistsUserFilters,
-	GetUsersFilters,
-	RemoveUserData
+	AddUserParams,
+	ExistsUserParams,
+	GetUsersParams,
+	RemoveUserParams
 } from './types/room-user';
 
 @Injectable()
 export class RoomUserRepository {
 	constructor(private readonly databaseService: DatabaseService) {}
 
-	async getUsers(
-		params: RepositoryParams<GetUsersFilters>
-	): Promise<SecurityUserDto[]> {
-		const { filters, } = params;
-		const { roomId, } = filters;
+	async getUsers(params: GetUsersParams): Promise<SecurityUserDto[]> {
+		const { roomId, } = params;
 
 		const pairs = await this.databaseService.room_user.findMany({
 			where: {
@@ -38,17 +34,9 @@ export class RoomUserRepository {
 		return pairs.map((pair) => pair.user);
 	}
 
-	async addUser(
-		params: RepositoryParamsWithData<AddUserData, never>
-	): Promise<boolean> {
-		const { data, } = params;
-		const { roomId, userId, } = data;
-
+	async addUser(params: AddUserParams): Promise<boolean> {
 		const pair = await this.databaseService.room_user.findFirst({
-			where: {
-				roomId,
-				userId,
-			},
+			where: params,
 		});
 
 		if (pair.removed) {
@@ -57,10 +45,7 @@ export class RoomUserRepository {
 					removed: false,
 				},
 				where: {
-					roomId_userId: {
-						roomId,
-						userId,
-					},
+					roomId_userId: params,
 				},
 			});
 
@@ -72,26 +57,15 @@ export class RoomUserRepository {
 		}
 
 		await this.databaseService.room_user.create({
-			data: {
-				roomId,
-				userId,
-			},
+			data: params,
 		});
 
 		return true;
 	}
 
-	async removeUser(
-		params: RepositoryParamsWithData<RemoveUserData, never>
-	): Promise<boolean> {
-		const { data, } = params;
-		const { roomId, userId, } = data;
-
+	async removeUser(params: RemoveUserParams): Promise<boolean> {
 		const pair = await this.databaseService.room_user.findFirst({
-			where: {
-				roomId,
-				userId,
-			},
+			where: params,
 		});
 
 		if (!pair || pair.removed) {
@@ -105,10 +79,7 @@ export class RoomUserRepository {
 				},
 
 				where: {
-					roomId_userId: {
-						roomId,
-						userId,
-					},
+					roomId_userId: params,
 				},
 			});
 
@@ -116,20 +87,14 @@ export class RoomUserRepository {
 		}
 
 		await this.databaseService.room_user.create({
-			data: {
-				roomId,
-				userId,
-			},
+			data: params,
 		});
 
 		return true;
 	}
 
-	async existsUser(
-		params: RepositoryParams<ExistsUserFilters>
-	): Promise<boolean> {
-		const { filters, } = params;
-		const { roomId, userId, } = filters;
+	async existsUser(params: ExistsUserParams): Promise<boolean> {
+		const { roomId, userId, } = params;
 
 		return this.databaseService.room_user
 			.count({

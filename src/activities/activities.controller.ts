@@ -14,6 +14,9 @@ export class ActivitiesController {
 		@Param('roomId', ParseIntPipe) roomId: number,
 		@Query() query: GetActivitiesQueryDto
 	): Promise<ItemsResponse<ActivityDto>> {
-		return this.activitiesService.getAllByRoomId(roomId, query);
+		return this.activitiesService.getAllByRoomId({
+			...query,
+			roomId,
+		});
 	}
 }

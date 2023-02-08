@@ -64,9 +64,9 @@ export class CommentsController {
 	async getAll(
 		@Param('taskId', ParseIntPipe) taskId: number,
 		@Param('roomId', ParseIntPipe) roomId: number,
-		@Query() dto: PaginationQueryDto
+		@Query() query: PaginationQueryDto
 	): Promise<CommentDto[]> {
-		return this.commentsService.getAll(roomId, taskId, dto);
+		return this.commentsService.getAll({ roomId, taskId, ...query, });
 	}
 
 	@ApiOperation({
@@ -103,7 +103,7 @@ export class CommentsController {
 		@Param('taskId', ParseIntPipe) taskId: number,
 		@Param('roomId', ParseIntPipe) roomId: number
 	): Promise<CommentDto> {
-		return this.commentsService.getOne(id, taskId, roomId);
+		return this.commentsService.getOne({ id, taskId, roomId, });
 	}
 
 	@ApiOperation({
@@ -135,16 +135,17 @@ export class CommentsController {
 		@Param('taskId', ParseIntPipe) taskId: number,
 		@Param('roomId', ParseIntPipe) roomId: number,
 		@AuthToken() token: string,
-		@Body() createCommentDto: CreateCommentDto
+		@Body() body: CreateCommentDto
 	): Promise<CommentDto> {
-		const { id: authorId, } = await this.authService.verifyUser(token);
-		const comment = await this.commentsService.create(
+		const { id: authorId, } = await this.authService.verifyUser({ token, });
+		const comment = await this.commentsService.create({
 			roomId,
 			taskId,
 			authorId,
-			createCommentDto
-		);
-		await this.activitiesService.create(roomId, {
+			...body,
+		});
+		await this.activitiesService.create({
+			roomId,
 			action: 'create',
 			activistId: authorId,
 			sphereName: 'comment',
@@ -192,11 +193,17 @@ export class CommentsController {
 		@Param('taskId', ParseIntPipe) taskId: number,
 		@Param('roomId', ParseIntPipe) roomId: number,
 		@AuthToken() token: string,
-		@Body() dto: UpdateCommentDto
+		@Body() body: UpdateCommentDto
 	): Promise<CommentDto> {
-		const { id: authorId, } = await this.authService.verifyUser(token);
-		const comment = await this.commentsService.update(id, taskId, roomId, dto);
-		await this.activitiesService.create(roomId, {
+		const { id: authorId, } = await this.authService.verifyUser({ token, });
+		const comment = await this.commentsService.update({
+			id,
+			taskId,
+			roomId,
+			...body,
+		});
+		await this.activitiesService.create({
+			roomId,
 			action: 'update',
 			activistId: authorId,
 			sphereName: 'comment',
@@ -241,9 +248,10 @@ export class CommentsController {
 		@Param('roomId', ParseIntPipe) roomId: number,
 		@AuthToken() token: string
 	): Promise<boolean> {
-		const { id: authorId, } = await this.authService.verifyUser(token);
-		const comment = await this.commentsService.remove(id, taskId, roomId);
-		await this.activitiesService.create(roomId, {
+		const { id: authorId, } = await this.authService.verifyUser({ token, });
+		const comment = await this.commentsService.remove({ id, taskId, roomId, });
+		await this.activitiesService.create({
+			roomId,
 			action: 'update',
 			activistId: authorId,
 			sphereName: 'comment',

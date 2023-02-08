@@ -7,7 +7,7 @@ import {
 } from '@nestjs/common';
 import { RoomsService } from '@/rooms/rooms.service';
 import { AuthService } from '@/auth/auth.service';
-import { extractAccessToken } from '@/utils';
+import { extractAccessToken } from '@/lib';
 
 @Injectable()
 export class InRoomGuard implements CanActivate {
@@ -24,13 +24,14 @@ export class InRoomGuard implements CanActivate {
 		}
 
 		const [, token] = extractAccessToken(req);
-		const { id: userId, } = await this.authService.verifyUser(token);
-		const roomExistsUser = await this.roomsService.roomExistsUser(
-			Number(roomId || id),
-			userId
-		);
+		const { id: userId, } = await this.authService.verifyUser({ token, });
+		const roomExistsUser = await this.roomsService.roomExistsUser({
+			roomId: Number(roomId || id),
+			userId,
+		});
+
 		if (!roomExistsUser) {
-			throw new ForbiddenException('You dont have access');
+			throw new ForbiddenException("You don't have access");
 		}
 		return true;
 	}

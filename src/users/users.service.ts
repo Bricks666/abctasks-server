@@ -4,29 +4,30 @@ import {
 	NotFoundException
 } from '@nestjs/common';
 import { hash } from 'bcrypt';
-import { normalizePaginationParams } from '@/utils';
-import {
-	GetUsersQueryDto,
-	CreateUserDto,
-	GetUserDto,
-	UpdateUserDto,
-	SecurityUserDto,
-	UserDto
-} from './dto';
+import { normalizePaginationParams } from '@/lib';
+import { SecurityUserDto, UserDto } from './dto';
 import { UserRepository } from './repository';
+import {
+	CreateParams,
+	GetAllParams,
+	GetInsecureParams,
+	GetOneParams,
+	UpdateParas
+} from './types';
 
 @Injectable()
 export class UsersService {
 	constructor(private readonly usersRepository: UserRepository) {}
 
-	async getAll(dto: GetUsersQueryDto): Promise<SecurityUserDto[]> {
-		const { limit, offset, } = normalizePaginationParams(dto);
+	async getAll(params: GetAllParams): Promise<SecurityUserDto[]> {
+		const { page, count, ...rest } = params;
+		const { limit, offset, } = normalizePaginationParams({ page, count, });
 
-		return this.usersRepository.getAll(dto, limit, offset);
+		return this.usersRepository.getAll({ ...rest, limit, offset, });
 	}
 
-	async getOne(dto: GetUserDto): Promise<SecurityUserDto> {
-		const user = await this.usersRepository.getOne(dto.id);
+	async getOne(params: GetOneParams): Promise<SecurityUserDto> {
+		const user = await this.usersRepository.getOne(params);
 
 		if (!user) {
 			throw new NotFoundException('User was not found');
@@ -35,19 +36,20 @@ export class UsersService {
 		return user;
 	}
 
-	async create(dto: CreateUserDto): Promise<SecurityUserDto> {
+	async create(params: CreateParams): Promise<SecurityUserDto> {
+		const { password, ...rest } = params;
 		try {
 			return await this.usersRepository.create({
-				...dto,
-				password: await hash(dto.password, Number(process.env.ROUND_COUNT)),
+				...rest,
+				password: await hash(password, Number(process.env.ROUND_COUNT)),
 			});
 		} catch (error) {
 			throw new ConflictException('User already exists', { cause: error, });
 		}
 	}
 
-	async getInsecure(login: string): Promise<UserDto> {
-		const user = await this.usersRepository.getOneByLogin(login);
+	async getInsecure(params: GetInsecureParams): Promise<UserDto> {
+		const user = await this.usersRepository.getOneByLogin(params);
 
 		if (!user) {
 			throw new NotFoundException('User was not found');
@@ -56,7 +58,9 @@ export class UsersService {
 		return user;
 	}
 
-	async update(id: number, dto: UpdateUserDto): Promise<SecurityUserDto> {
-		return this.usersRepository.update(id, dto);
+	async update(params: UpdateParas): Promise<SecurityUserDto> {
+		const { id, ...rest } = params;
+
+		return this.usersRepository.update({ id, ...rest, });
 	}
 }
