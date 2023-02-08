@@ -1,7 +1,11 @@
+import { SortQueryDto } from '@/common';
 import { Pagination } from '@/lib';
 import { ActivitiesFiltersDto, CreateActivityDto } from '../dto';
 
-export interface GetAllByRoomIdParams extends Pagination, ActivitiesFiltersDto {
+export interface GetAllByRoomIdParams
+	extends Pagination,
+		ActivitiesFiltersDto,
+		SortQueryDto {
 	readonly roomId: number;
 }
 

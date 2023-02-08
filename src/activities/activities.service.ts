@@ -2,8 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { normalizePaginationParams } from '@/lib';
 import { ActivityDto } from './dto';
 import { ActivityRepository } from './repository';
-import { ItemsResponse } from '@/types';
 import { CreateParams, GetAllByRoomIdParams } from './types';
+import { PaginationResponseDto } from '@/common';
 
 @Injectable()
 export class ActivitiesService {
@@ -11,7 +11,7 @@ export class ActivitiesService {
 
 	async getAllByRoomId(
 		params: GetAllByRoomIdParams
-	): Promise<ItemsResponse<ActivityDto>> {
+	): Promise<PaginationResponseDto<ActivityDto>> {
 		const { count, page, ...filters } = params;
 		const pagination = normalizePaginationParams({ count, page, });
 		const items = await this.activitiesRepository.getAllByRoomId({

@@ -8,21 +8,21 @@ import {
 	ParseIntPipe,
 	Body,
 	HttpStatus,
-	NotFoundException,
 	CacheInterceptor,
 	UseInterceptors,
 	Query
 } from '@nestjs/common';
 import {
 	ApiOperation,
-	ApiResponse,
 	ApiParam,
 	ApiBody,
 	ApiTags,
-	ApiQuery
+	ApiOkResponse,
+	ApiNotFoundResponse,
+	ApiCreatedResponse
 } from '@nestjs/swagger';
 import { TasksService } from './tasks.service';
-import { CreateTaskDto, TasksFiltersDto, TaskDto, UpdateTaskDto } from './dto';
+import { CreateTaskDto, TaskDto, UpdateTaskDto, GetTasksDto } from './dto';
 import { ActivitiesService } from '@/activities/activities.service';
 import { Auth } from '@/auth/auth.decorator';
 import { InRoom } from '@/rooms/in-room.decorator';
@@ -45,21 +45,17 @@ export class TasksController {
 		type: Number,
 		description: 'Id комнаты',
 	})
-	@ApiResponse({
-		status: HttpStatus.OK,
+	@ApiOkResponse({
 		type: TaskDto,
 		isArray: true,
-	})
-	@ApiQuery({
-		type: TasksFiltersDto,
 	})
 	@UseInterceptors(CacheInterceptor)
 	@Get('/:roomId')
 	async getAll(
 		@Param('roomId', ParseIntPipe) roomId: number,
-		@Query() filters: TasksFiltersDto
+		@Query() query: GetTasksDto
 	): Promise<TaskDto[]> {
-		return this.tasksService.getAll({ roomId, ...filters, });
+		return this.tasksService.getAll({ roomId, ...query, });
 	}
 
 	@ApiOperation({
@@ -75,14 +71,10 @@ export class TasksController {
 		type: Number,
 		description: 'Id задачи',
 	})
-	@ApiResponse({
-		status: HttpStatus.OK,
+	@ApiOkResponse({
 		type: TaskDto,
 	})
-	@ApiResponse({
-		status: HttpStatus.NOT_FOUND,
-		type: NotFoundException,
-	})
+	@ApiNotFoundResponse()
 	@UseInterceptors(CacheInterceptor)
 	@Get('/:roomId/:id')
 	async getOne(
@@ -104,10 +96,9 @@ export class TasksController {
 		type: CreateTaskDto,
 		description: 'Тело новой задачи',
 	})
-	@ApiResponse({
-		status: HttpStatus.OK,
+	@ApiCreatedResponse({
 		type: TaskDto,
-		description: 'Обновленная задача',
+		description: 'Созданная задача',
 	})
 	@Auth()
 	@InRoom()
@@ -152,14 +143,12 @@ export class TasksController {
 		type: UpdateTaskDto,
 		description: 'Новые данные задачи',
 	})
-	@ApiResponse({
+	@ApiOkResponse({
 		status: HttpStatus.OK,
 		type: TaskDto,
 		description: 'Измененная задача',
 	})
-	@ApiResponse({
-		status: HttpStatus.NOT_FOUND,
-		type: NotFoundException,
+	@ApiNotFoundResponse({
 		description: 'Такой задачи не существует',
 	})
 	@Auth()
@@ -198,8 +187,7 @@ export class TasksController {
 		type: Number,
 		description: 'Id задачи',
 	})
-	@ApiResponse({
-		status: HttpStatus.OK,
+	@ApiOkResponse({
 		type: Boolean,
 		description: 'Удались ли удалить задачу',
 	})

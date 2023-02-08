@@ -10,14 +10,15 @@ import {
 	HttpStatus,
 	NotFoundException,
 	CacheInterceptor,
-	UseInterceptors,
-	ForbiddenException
+	UseInterceptors
 } from '@nestjs/common';
 import {
 	ApiBody,
+	ApiCreatedResponse,
+	ApiNotFoundResponse,
+	ApiOkResponse,
 	ApiOperation,
 	ApiParam,
-	ApiResponse,
 	ApiTags
 } from '@nestjs/swagger';
 import { RoomsService } from './rooms.service';
@@ -35,8 +36,7 @@ export class RoomsController {
 	@ApiOperation({
 		summary: 'Возврат всех комнат авторизованного пользователя',
 	})
-	@ApiResponse({
-		status: HttpStatus.OK,
+	@ApiOkResponse({
 		type: RoomDto,
 		isArray: true,
 		description: 'Все комнаты, в которых состоит пользователь',
@@ -56,14 +56,10 @@ export class RoomsController {
 		name: 'id',
 		type: Number,
 	})
-	@ApiResponse({
-		status: HttpStatus.OK,
+	@ApiOkResponse({
 		type: RoomDto,
 	})
-	@ApiResponse({
-		status: HttpStatus.NOT_FOUND,
-		type: NotFoundException,
-	})
+	@ApiNotFoundResponse()
 	@Auth()
 	@UseInterceptors(CacheInterceptor)
 	@Get('/:id')
@@ -78,13 +74,12 @@ export class RoomsController {
 	@ApiOperation({
 		summary: 'Получение всех пользователей комнаты',
 	})
-	@ApiResponse({
-		status: HttpStatus.OK,
+	@ApiOkResponse({
 		type: SecurityUserDto,
 		isArray: true,
 		description: 'Пользователи комнаты',
 	})
-	@ApiResponse({
+	@ApiNotFoundResponse({
 		status: HttpStatus.NOT_FOUND,
 		type: NotFoundException,
 		description: 'Такой комнаты не существует',
@@ -103,13 +98,8 @@ export class RoomsController {
 		description: 'Имя и описание комнаты',
 		type: CreateRoomDto,
 	})
-	@ApiResponse({
-		status: HttpStatus.OK,
+	@ApiCreatedResponse({
 		type: RoomDto,
-	})
-	@ApiResponse({
-		status: HttpStatus.NOT_FOUND,
-		type: NotFoundException,
 	})
 	@Auth()
 	@Post('/create')
@@ -131,15 +121,9 @@ export class RoomsController {
 		description: 'Имя и описание комнаты',
 		type: UpdateRoomDto,
 	})
-	@ApiResponse({
-		status: HttpStatus.OK,
+	@ApiOkResponse({
 		type: RoomDto,
 		description: 'Обновленная комната',
-	})
-	@ApiResponse({
-		status: HttpStatus.NOT_FOUND,
-		type: NotFoundException,
-		description: 'Такой комнаты не существует',
 	})
 	@Auth()
 	@InRoom()
@@ -161,8 +145,7 @@ export class RoomsController {
 		description: 'Id пользователя для добавления',
 		type: RoomUserDto,
 	})
-	@ApiResponse({
-		status: HttpStatus.OK,
+	@ApiOkResponse({
 		type: SecurityUserDto,
 		description: 'Добавленный пользователь',
 	})
@@ -179,8 +162,7 @@ export class RoomsController {
 	@ApiOperation({
 		summary: 'Выход текущего пользователя из комнаты',
 	})
-	@ApiResponse({
-		status: HttpStatus.OK,
+	@ApiOkResponse({
 		type: Boolean,
 		description: 'Удалось ли выйти',
 	})
@@ -198,15 +180,9 @@ export class RoomsController {
 	@ApiOperation({
 		summary: 'Удаление комнаты',
 	})
-	@ApiResponse({
-		status: HttpStatus.OK,
+	@ApiOkResponse({
 		type: Boolean,
 		description: 'Удалось ли выполнить удаление комнаты',
-	})
-	@ApiResponse({
-		status: HttpStatus.FORBIDDEN,
-		type: ForbiddenException,
-		description: 'Пользователь не может совершать действия в данной комнате',
 	})
 	@Auth()
 	@InRoom()

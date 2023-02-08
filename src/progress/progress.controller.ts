@@ -1,11 +1,10 @@
+import { Controller, Get, Param, ParseIntPipe } from '@nestjs/common';
 import {
-	Controller,
-	Get,
-	HttpStatus,
-	Param,
-	ParseIntPipe
-} from '@nestjs/common';
-import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
+	ApiOkResponse,
+	ApiOperation,
+	ApiParam,
+	ApiTags
+} from '@nestjs/swagger';
 import { ProgressDto } from './dto';
 import { ProgressService } from './progress.service';
 
@@ -22,10 +21,9 @@ export class ProgressController {
 		type: Number,
 		description: 'Id комнаты',
 	})
-	@ApiResponse({
+	@ApiOkResponse({
 		type: ProgressDto,
 		isArray: true,
-		status: HttpStatus.OK,
 		description: 'Прогресс в комнате',
 	})
 	@Get('/:roomId')

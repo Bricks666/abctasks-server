@@ -1,6 +1,6 @@
-import { CreateTaskDto, TasksFiltersDto, UpdateTaskDto } from '../dto';
+import { CreateTaskDto, GetTasksDto, UpdateTaskDto } from '../dto';
 
-export interface GetAllParams extends TasksFiltersDto {
+export interface GetAllParams extends GetTasksDto {
 	readonly roomId: number;
 }
 

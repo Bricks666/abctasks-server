@@ -4,7 +4,6 @@ import {
 	Delete,
 	ForbiddenException,
 	Get,
-	HttpStatus,
 	Post,
 	Res
 } from '@nestjs/common';
@@ -12,8 +11,9 @@ import { Response } from 'express';
 import {
 	ApiBody,
 	ApiCookieAuth,
+	ApiCreatedResponse,
+	ApiOkResponse,
 	ApiOperation,
-	ApiResponse,
 	ApiTags
 } from '@nestjs/swagger';
 import { BASE_COOKIE_OPTIONS, COOKIE_NAME, COOKIE_TIME } from '@/const/cookie';
@@ -35,8 +35,7 @@ export class AuthController {
 	@ApiOperation({
 		summary: 'Авторизация по куки',
 	})
-	@ApiResponse({
-		status: HttpStatus.OK,
+	@ApiOkResponse({
 		type: AuthenticationResultDto,
 	})
 	@ApiCookieAuth()
@@ -61,11 +60,9 @@ export class AuthController {
 
 	@ApiOperation({ summary: 'Регистрация нового пользователя', })
 	@ApiBody({
-		type: CreateUserDto,
 		description: 'Данные для регистрации в системе',
 	})
-	@ApiResponse({
-		status: 201,
+	@ApiCreatedResponse({
 		type: SecurityUserDto,
 		description: 'Подтверждение успешности регистрации',
 	})
@@ -76,8 +73,7 @@ export class AuthController {
 
 	@ApiOperation({ summary: 'Вход пользователя в аккаунт', })
 	@ApiBody({ type: LoginDto, description: 'Данные для входа в систему', })
-	@ApiResponse({
-		status: 201,
+	@ApiCreatedResponse({
 		type: AuthenticationResultDto,
 		description: 'Данные пользователя и пара токенов',
 	})
@@ -100,8 +96,7 @@ export class AuthController {
 	}
 
 	@ApiOperation({ summary: 'Выход их аккаунта', })
-	@ApiResponse({
-		status: 200,
+	@ApiOkResponse({
 		type: Boolean,
 		description: 'Подтверждение успешности выхода',
 	})
@@ -112,8 +107,7 @@ export class AuthController {
 	}
 
 	@ApiOperation({ summary: 'Обновление токена доступа', })
-	@ApiResponse({
-		status: 200,
+	@ApiOkResponse({
 		type: TokensDto,
 		description: 'Обновленная пара токенов',
 	})

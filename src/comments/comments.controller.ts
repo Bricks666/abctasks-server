@@ -7,16 +7,15 @@ import {
 	Delete,
 	Put,
 	Query,
-	ParseIntPipe,
-	HttpStatus,
-	NotFoundException
+	ParseIntPipe
 } from '@nestjs/common';
 import {
 	ApiBody,
+	ApiCreatedResponse,
+	ApiNotFoundResponse,
+	ApiOkResponse,
 	ApiOperation,
 	ApiParam,
-	ApiQuery,
-	ApiResponse,
 	ApiTags
 } from '@nestjs/swagger';
 import { PaginationQueryDto, User } from '@/common';
@@ -48,15 +47,10 @@ export class CommentsController {
 		name: 'taskId',
 		description: 'Id задачи',
 	})
-	@ApiQuery({
-		type: PaginationQueryDto,
-		description: 'Параметры пагинации',
-	})
-	@ApiResponse({
+	@ApiOkResponse({
 		type: CommentDto,
 		isArray: true,
 		description: 'Комментарии задачи',
-		status: HttpStatus.OK,
 	})
 	@Get('/:roomId/:taskId')
 	async getAll(
@@ -85,15 +79,12 @@ export class CommentsController {
 		name: 'id',
 		description: 'Id комментария',
 	})
-	@ApiResponse({
+	@ApiOkResponse({
 		type: CommentDto,
 		description: 'Комментарий задачи',
-		status: HttpStatus.OK,
 	})
-	@ApiResponse({
-		type: NotFoundException,
+	@ApiNotFoundResponse({
 		description: 'Комментарий не найден',
-		status: HttpStatus.NOT_FOUND,
 	})
 	@Get('/:roomId/:taskId/:id')
 	async getOne(
@@ -121,10 +112,9 @@ export class CommentsController {
 		type: CreateCommentDto,
 		description: 'Данные для создание комментария',
 	})
-	@ApiResponse({
+	@ApiCreatedResponse({
 		type: CommentDto,
 		description: 'Созданный комментарий',
-		status: HttpStatus.OK,
 	})
 	@Auth()
 	@InRoom()
@@ -173,15 +163,12 @@ export class CommentsController {
 		type: UpdateCommentDto,
 		description: 'Данные для обновления комментария',
 	})
-	@ApiResponse({
+	@ApiOkResponse({
 		type: CommentDto,
 		description: 'Обновленный комментарий',
-		status: HttpStatus.OK,
 	})
-	@ApiResponse({
-		type: NotFoundException,
+	@ApiNotFoundResponse({
 		description: 'Комментарий не найден',
-		status: HttpStatus.NOT_FOUND,
 	})
 	@Auth()
 	@InRoom()
@@ -227,15 +214,12 @@ export class CommentsController {
 		name: 'id',
 		description: 'Id комментария',
 	})
-	@ApiResponse({
+	@ApiOkResponse({
 		type: Boolean,
 		description: 'Удалось ли удалить комментарий',
-		status: HttpStatus.OK,
 	})
-	@ApiResponse({
-		type: NotFoundException,
+	@ApiNotFoundResponse({
 		description: 'Комментарий не найден',
-		status: HttpStatus.NOT_FOUND,
 	})
 	@Auth()
 	@InRoom()

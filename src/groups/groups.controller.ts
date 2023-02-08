@@ -4,8 +4,6 @@ import {
 	Controller,
 	Delete,
 	Get,
-	HttpStatus,
-	NotFoundException,
 	Param,
 	ParseIntPipe,
 	Post,
@@ -14,9 +12,11 @@ import {
 } from '@nestjs/common';
 import {
 	ApiBody,
+	ApiCreatedResponse,
+	ApiNotFoundResponse,
+	ApiOkResponse,
 	ApiOperation,
 	ApiParam,
-	ApiResponse,
 	ApiTags
 } from '@nestjs/swagger';
 import { ActivitiesService } from '@/activities/activities.service';
@@ -43,8 +43,7 @@ export class GroupsController {
 		type: Number,
 		description: 'Id комнаты',
 	})
-	@ApiResponse({
-		status: HttpStatus.OK,
+	@ApiOkResponse({
 		type: GroupDto,
 		isArray: true,
 	})
@@ -69,14 +68,10 @@ export class GroupsController {
 		type: Number,
 		description: 'Id группы',
 	})
-	@ApiResponse({
-		status: HttpStatus.OK,
+	@ApiOkResponse({
 		type: GroupDto,
 	})
-	@ApiResponse({
-		status: HttpStatus.NOT_FOUND,
-		type: NotFoundException,
-	})
+	@ApiNotFoundResponse()
 	@UseInterceptors(CacheInterceptor)
 	@Get('/:roomId/:id')
 	async getOne(
@@ -98,8 +93,7 @@ export class GroupsController {
 		type: CreateGroupDto,
 		description: 'Тело новой группы',
 	})
-	@ApiResponse({
-		status: HttpStatus.OK,
+	@ApiCreatedResponse({
 		type: GroupDto,
 		description: 'Созданная группа',
 	})
@@ -142,8 +136,7 @@ export class GroupsController {
 		type: UpdateGroupDto,
 		description: 'Новые данные группы',
 	})
-	@ApiResponse({
-		status: HttpStatus.OK,
+	@ApiOkResponse({
 		type: GroupDto,
 		description: 'Обновленная группа',
 	})
@@ -183,8 +176,7 @@ export class GroupsController {
 		type: Number,
 		description: 'Id группы',
 	})
-	@ApiResponse({
-		status: HttpStatus.OK,
+	@ApiOkResponse({
 		type: Boolean,
 		description: 'Удалось ли удалить группу',
 	})

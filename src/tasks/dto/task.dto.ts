@@ -1,6 +1,6 @@
 import { task as TaskModel, task_status } from '@prisma/client';
 import {
-	IsDate,
+	IsISO8601,
 	IsEnum,
 	IsNumber,
 	IsOptional,
@@ -82,6 +82,6 @@ export class TaskDto implements TaskModel {
 		description: 'Дата создания задачи',
 		example: '2022-07-07',
 	})
-	@IsDate()
+	@IsISO8601()
 	declare createdAt: Date;
 }

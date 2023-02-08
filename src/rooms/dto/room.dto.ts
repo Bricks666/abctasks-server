@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { room as RoomModel } from '@prisma/client';
-import { IsDateString, IsNumber, IsOptional, IsString } from 'class-validator';
+import { IsISO8601, IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class RoomDto implements RoomModel {
 	@ApiProperty({
@@ -42,10 +42,10 @@ export class RoomDto implements RoomModel {
 	})
 	declare canChange: boolean;
 
-	@IsDateString()
+	@IsISO8601()
 	declare createdAt: Date;
 
-	@IsDateString()
+	@IsISO8601()
 	@IsOptional()
 	declare updatedAt: Date;
 }

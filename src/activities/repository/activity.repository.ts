@@ -15,7 +15,14 @@ export class ActivityRepository {
 	constructor(private readonly databaseService: DatabaseService) {}
 
 	async getAllByRoomId(params: GetAllByRoomIdParams): Promise<ActivityDto[]> {
-		const { limit, offset, roomId, ...filters } = params;
+		const {
+			limit,
+			offset,
+			roomId,
+			by = 'id',
+			type = 'asc',
+			...filters
+		} = params;
 
 		const where: Prisma.activityWhereInput = {
 			...prepareWhere(filters),
@@ -35,7 +42,7 @@ export class ActivityRepository {
 				},
 			},
 			orderBy: {
-				id: 'desc',
+				[by]: type,
 			},
 		});
 	}

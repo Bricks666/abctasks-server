@@ -10,7 +10,7 @@ import { CORS } from './const';
 import { DatabaseService } from './database/database.service';
 
 async function bootstrap() {
-	const { HOST, PORT, } = process.env;
+	const { PORT, } = process.env;
 	const app = await NestFactory.create(AppModule);
 
 	const prismaService = app.get(DatabaseService);
@@ -47,8 +47,8 @@ async function bootstrap() {
 	(BigInt.prototype as any).toJSON = function () {
 		return (this as bigint).toString();
 	};
-	await app.listen(PORT, HOST, () => {
-		console.log(`server start PORT: ${PORT} and HOST: ${HOST}`);
+	await app.listen(PORT, '0.0.0.0', () => {
+		console.log(`server start PORT: ${PORT}`);
 	});
 }
 bootstrap();

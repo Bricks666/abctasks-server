@@ -3,7 +3,6 @@ import {
 	CacheInterceptor,
 	Controller,
 	Get,
-	HttpStatus,
 	Param,
 	ParseIntPipe,
 	Put,
@@ -13,10 +12,10 @@ import {
 import {
 	ApiTags,
 	ApiOperation,
-	ApiResponse,
 	ApiBody,
 	ApiParam,
-	ApiQuery
+	ApiOkResponse,
+	ApiNotFoundResponse
 } from '@nestjs/swagger';
 import { GetUsersQueryDto, SecurityUserDto } from '@/users/dto';
 import { UpdateUserDto } from './dto';
@@ -31,16 +30,10 @@ export class UsersController {
 	@ApiOperation({
 		summary: 'Получение всех пользователей',
 	})
-	@ApiResponse({
+	@ApiOkResponse({
 		isArray: true,
-		status: HttpStatus.OK,
 		type: SecurityUserDto,
 		description: 'Пользователи, зарегистрированные на сайте',
-	})
-	@ApiQuery({
-		type: GetUsersQueryDto,
-		description: 'Параметры фильтрации пользователей',
-		required: false,
 	})
 	@UseInterceptors(CacheInterceptor)
 	@Get('/')
@@ -56,11 +49,11 @@ export class UsersController {
 		type: Number,
 		description: 'Id пользователя',
 	})
-	@ApiResponse({
-		status: HttpStatus.OK,
+	@ApiOkResponse({
 		type: SecurityUserDto,
 		description: 'Пользователь с переданным id',
 	})
+	@ApiNotFoundResponse()
 	@UseInterceptors(CacheInterceptor)
 	@Get('/:id')
 	async getOne(
@@ -81,9 +74,8 @@ export class UsersController {
 		type: Number,
 		description: 'Id пользователя',
 	})
-	@ApiResponse({
+	@ApiOkResponse({
 		type: SecurityUserDto,
-		status: HttpStatus.OK,
 		description: 'Обновленный пользователь',
 	})
 	@Auth()

@@ -15,7 +15,7 @@ export class TaskRepository {
 	constructor(private readonly databaseService: DatabaseService) {}
 
 	async getAll(params: GetAllParams): Promise<TaskDto[]> {
-		const { roomId, ...filters } = params;
+		const { roomId, by, type = 'asc', ...filters } = params;
 
 		const where: Prisma.taskWhereInput = {
 			authorId: filters.authorId,
@@ -26,11 +26,18 @@ export class TaskRepository {
 			},
 		};
 
+		const orderBy: Prisma.taskOrderByWithRelationInput = {};
+
+		if (by) {
+			orderBy[by] = type;
+		}
+
 		const tasks = await this.databaseService.task.findMany({
 			where: {
 				...where,
 				roomId,
 			},
+			orderBy,
 		});
 
 		return tasks;
