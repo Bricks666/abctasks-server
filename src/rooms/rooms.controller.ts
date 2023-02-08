@@ -21,20 +21,16 @@ import {
 	ApiTags
 } from '@nestjs/swagger';
 import { RoomsService } from './rooms.service';
-import { AuthService } from '@/auth/auth.service';
 import { CreateRoomDto, RoomDto, RoomUserDto, UpdateRoomDto } from './dto';
-import { AuthToken } from '@/auth/auth-token.decorator';
 import { Auth } from '@/auth/auth.decorator';
 import { SecurityUserDto } from '@/users/dto';
 import { InRoom } from './in-room.decorator';
+import { User } from '@/common';
 
 @ApiTags('Комнаты')
 @Controller('rooms')
 export class RoomsController {
-	constructor(
-		private readonly roomsService: RoomsService,
-		private readonly authService: AuthService
-	) {}
+	constructor(private readonly roomsService: RoomsService) {}
 
 	@ApiOperation({
 		summary: 'Возврат всех комнат авторизованного пользователя',
@@ -48,8 +44,8 @@ export class RoomsController {
 	@Auth()
 	@UseInterceptors(CacheInterceptor)
 	@Get('/')
-	async getAll(@AuthToken() token: string): Promise<RoomDto[]> {
-		const { id, } = await this.authService.verifyUser({ token, });
+	async getAll(@User() user: SecurityUserDto): Promise<RoomDto[]> {
+		const { id, } = user;
 		return this.roomsService.getAll({ userId: id, });
 	}
 
@@ -73,9 +69,9 @@ export class RoomsController {
 	@Get('/:id')
 	async getOne(
 		@Param('id', ParseIntPipe) id: number,
-		@AuthToken() token: string
+		@User() user: SecurityUserDto
 	): Promise<RoomDto> {
-		const { id: userId, } = await this.authService.verifyUser({ token, });
+		const { id: userId, } = user;
 		return this.roomsService.getOne({ id, userId, });
 	}
 
@@ -118,10 +114,10 @@ export class RoomsController {
 	@Auth()
 	@Post('/create')
 	async create(
-		@AuthToken() token: string,
+		@User() user: SecurityUserDto,
 		@Body() body: CreateRoomDto
 	): Promise<RoomDto> {
-		const { id: userId, } = await this.authService.verifyUser({ token, });
+		const { id: userId, } = user;
 		return this.roomsService.create({
 			...body,
 			userId,
@@ -149,11 +145,11 @@ export class RoomsController {
 	@InRoom()
 	@Put('/:id/update')
 	async update(
-		@AuthToken() token: string,
+		@User() user: SecurityUserDto,
 		@Param('id', ParseIntPipe) id: number,
 		@Body() body: UpdateRoomDto
 	): Promise<RoomDto> {
-		const { id: userId, } = await this.authService.verifyUser({ token, });
+		const { id: userId, } = user;
 
 		return this.roomsService.update({ ...body, id, userId, });
 	}
@@ -193,9 +189,9 @@ export class RoomsController {
 	@Put('/:id/exit')
 	async removeUser(
 		@Param('id', ParseIntPipe) id: number,
-		@AuthToken() token: string
+		@User() user: SecurityUserDto
 	) {
-		const { id: userId, } = await this.authService.verifyUser({ token, });
+		const { id: userId, } = user;
 		return this.roomsService.removeUser({ id, userId, });
 	}
 

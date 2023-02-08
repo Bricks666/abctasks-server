@@ -20,19 +20,18 @@ import {
 	ApiTags
 } from '@nestjs/swagger';
 import { ActivitiesService } from '@/activities/activities.service';
-import { AuthService } from '@/auth/auth.service';
 import { InRoom } from '@/rooms/in-room.decorator';
-import { AuthToken } from '@/auth/auth-token.decorator';
 import { Auth } from '@/auth/auth.decorator';
 import { GroupsService } from './groups.service';
 import { CreateGroupDto, GroupDto, UpdateGroupDto } from './dto';
+import { User } from '@/common';
+import { SecurityUserDto } from '@/users/dto';
 
 @ApiTags('Группы')
 @Controller('groups')
 export class GroupsController {
 	constructor(
 		private readonly groupsService: GroupsService,
-		private readonly authService: AuthService,
 		private readonly activitiesService: ActivitiesService
 	) {}
 
@@ -109,10 +108,10 @@ export class GroupsController {
 	@Post('/:roomId/create')
 	async create(
 		@Param('roomId', ParseIntPipe) roomId: number,
-		@AuthToken() token: string,
+		@User() user: SecurityUserDto,
 		@Body() body: CreateGroupDto
 	): Promise<GroupDto> {
-		const { id: userId, } = await this.authService.verifyUser({ token, });
+		const { id: userId, } = user;
 
 		const group = await this.groupsService.create({ ...body, roomId, });
 
@@ -154,10 +153,10 @@ export class GroupsController {
 	async update(
 		@Param('roomId', ParseIntPipe) roomId: number,
 		@Param('id', ParseIntPipe) id: number,
-		@AuthToken() token: string,
+		@User() user: SecurityUserDto,
 		@Body() body: UpdateGroupDto
 	): Promise<GroupDto> {
-		const { id: userId, } = await this.authService.verifyUser({ token, });
+		const { id: userId, } = user;
 
 		const group = await this.groupsService.update({ ...body, roomId, id, });
 
@@ -195,9 +194,9 @@ export class GroupsController {
 	async remove(
 		@Param('roomId', ParseIntPipe) roomId: number,
 		@Param('id', ParseIntPipe) id: number,
-		@AuthToken() token: string
+		@User() user: SecurityUserDto
 	): Promise<boolean> {
-		const { id: userId, } = await this.authService.verifyUser({ token, });
+		const { id: userId, } = user;
 
 		const response = await this.groupsService.remove({ roomId, id, });
 

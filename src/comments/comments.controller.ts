@@ -19,21 +19,19 @@ import {
 	ApiResponse,
 	ApiTags
 } from '@nestjs/swagger';
-import { PaginationQueryDto } from '@/common';
+import { PaginationQueryDto, User } from '@/common';
 import { Auth } from '@/auth/auth.decorator';
 import { InRoom } from '@/rooms/in-room.decorator';
 import { CommentsService } from './comments.service';
 import { CommentDto, CreateCommentDto, UpdateCommentDto } from './dto';
-import { AuthToken } from '@/auth/auth-token.decorator';
-import { AuthService } from '@/auth/auth.service';
 import { ActivitiesService } from '@/activities/activities.service';
+import { SecurityUserDto } from '@/users/dto';
 
 @ApiTags('Комментарии')
 @Controller('comments')
 export class CommentsController {
 	constructor(
 		private readonly commentsService: CommentsService,
-		private readonly authService: AuthService,
 		private readonly activitiesService: ActivitiesService
 	) {}
 
@@ -134,10 +132,10 @@ export class CommentsController {
 	async create(
 		@Param('taskId', ParseIntPipe) taskId: number,
 		@Param('roomId', ParseIntPipe) roomId: number,
-		@AuthToken() token: string,
+		@User() user: SecurityUserDto,
 		@Body() body: CreateCommentDto
 	): Promise<CommentDto> {
-		const { id: authorId, } = await this.authService.verifyUser({ token, });
+		const { id: authorId, } = user;
 		const comment = await this.commentsService.create({
 			roomId,
 			taskId,
@@ -192,10 +190,10 @@ export class CommentsController {
 		@Param('id', ParseIntPipe) id: number,
 		@Param('taskId', ParseIntPipe) taskId: number,
 		@Param('roomId', ParseIntPipe) roomId: number,
-		@AuthToken() token: string,
+		@User() user: SecurityUserDto,
 		@Body() body: UpdateCommentDto
 	): Promise<CommentDto> {
-		const { id: authorId, } = await this.authService.verifyUser({ token, });
+		const { id: authorId, } = user;
 		const comment = await this.commentsService.update({
 			id,
 			taskId,
@@ -246,9 +244,9 @@ export class CommentsController {
 		@Param('id', ParseIntPipe) id: number,
 		@Param('taskId', ParseIntPipe) taskId: number,
 		@Param('roomId', ParseIntPipe) roomId: number,
-		@AuthToken() token: string
+		@User() user: SecurityUserDto
 	): Promise<boolean> {
-		const { id: authorId, } = await this.authService.verifyUser({ token, });
+		const { id: authorId, } = user;
 		const comment = await this.commentsService.remove({ id, taskId, roomId, });
 		await this.activitiesService.create({
 			roomId,

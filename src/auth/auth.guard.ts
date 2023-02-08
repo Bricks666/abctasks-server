@@ -5,6 +5,7 @@ import {
 	UnauthorizedException
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { Request } from 'express';
 import { SecurityUserDto } from '@/users/dto';
 import { extractAccessToken } from '@/lib';
 
@@ -13,7 +14,8 @@ export class AuthGuard implements CanActivate {
 	constructor(private readonly jwtService: JwtService) {}
 
 	async canActivate(context: ExecutionContext) {
-		const tokenPair = extractAccessToken(context.switchToHttp().getRequest());
+		const req: Request = context.switchToHttp().getRequest();
+		const tokenPair = extractAccessToken(req);
 
 		if (!tokenPair) {
 			throw new UnauthorizedException();
@@ -32,6 +34,12 @@ export class AuthGuard implements CanActivate {
 			throw new UnauthorizedException();
 		}
 
-		return !!user;
+		if (user) {
+			(req as any).user = user;
+
+			return true;
+		}
+
+		return false;
 	}
 }

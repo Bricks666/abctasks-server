@@ -22,19 +22,18 @@ import {
 	ApiQuery
 } from '@nestjs/swagger';
 import { TasksService } from './tasks.service';
-import { AuthToken } from '@/auth/auth-token.decorator';
 import { CreateTaskDto, TasksFiltersDto, TaskDto, UpdateTaskDto } from './dto';
-import { AuthService } from '@/auth/auth.service';
 import { ActivitiesService } from '@/activities/activities.service';
 import { Auth } from '@/auth/auth.decorator';
 import { InRoom } from '@/rooms/in-room.decorator';
+import { User } from '@/common';
+import { SecurityUserDto } from '@/users/dto';
 
 @ApiTags('Задачи')
 @Controller('tasks')
 export class TasksController {
 	constructor(
 		private readonly tasksService: TasksService,
-		private readonly authService: AuthService,
 		private readonly activitiesService: ActivitiesService
 	) {}
 
@@ -115,10 +114,10 @@ export class TasksController {
 	@Post('/:roomId/create')
 	async create(
 		@Param('roomId', ParseIntPipe) roomId: number,
-		@AuthToken() token: string,
+		@User() user: SecurityUserDto,
 		@Body() body: CreateTaskDto
 	): Promise<TaskDto> {
-		const { id: authorId, } = await this.authService.verifyUser({ token, });
+		const { id: authorId, } = user;
 
 		const task = await this.tasksService.create({
 			roomId,
@@ -169,10 +168,10 @@ export class TasksController {
 	async update(
 		@Param('roomId', ParseIntPipe) roomId: number,
 		@Param('id', ParseIntPipe) id: number,
-		@AuthToken() token: string,
+		@User() user: SecurityUserDto,
 		@Body() body: UpdateTaskDto
 	): Promise<TaskDto> {
-		const { id: userId, } = await this.authService.verifyUser({ token, });
+		const { id: userId, } = user;
 
 		const task = await this.tasksService.update({ roomId, id, ...body, });
 
@@ -210,9 +209,9 @@ export class TasksController {
 	async remove(
 		@Param('roomId', ParseIntPipe) roomId: number,
 		@Param('id', ParseIntPipe) id: number,
-		@AuthToken() token: string
+		@User() user: SecurityUserDto
 	): Promise<boolean> {
-		const { id: userId, } = await this.authService.verifyUser({ token, });
+		const { id: userId, } = user;
 
 		const response = await this.tasksService.remove({ roomId, id, });
 

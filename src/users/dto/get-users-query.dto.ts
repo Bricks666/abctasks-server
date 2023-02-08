@@ -1,4 +1,4 @@
-import { PartialType, PickType, IntersectionType } from '@nestjs/swagger';
+import { PartialType, PickType, IntersectionType } from '@nestjs/mapped-types';
 import { UserDto } from './user.dto';
 import { PaginationQueryDto } from '@/common';
 
