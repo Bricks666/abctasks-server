@@ -9,6 +9,7 @@ import { AuthModule } from '@/auth/auth.module';
 import { ProgressModule } from './progress/progress.module';
 import { CommentsModule } from './comments/comments.module';
 import { DatabaseModule } from './database/database.module';
+import { RedisModule } from './redis/redis.module';
 
 @Module({
 	imports: [
@@ -18,6 +19,11 @@ import { DatabaseModule } from './database/database.module';
 		}),
 		ConfigModule.forRoot({
 			envFilePath: '.env',
+		}),
+		RedisModule.forRoot({
+			lazyConnect: true,
+			host: process.env.REDIS_HOST,
+			port: Number(process.env.REDIS_PORT),
 		}),
 		AuthModule,
 		UsersModule,

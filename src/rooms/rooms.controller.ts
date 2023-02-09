@@ -21,6 +21,7 @@ import {
 	ApiParam,
 	ApiTags
 } from '@nestjs/swagger';
+import { JwtService } from '@nestjs/jwt';
 import { RoomsService } from './rooms.service';
 import { CreateRoomDto, RoomDto, RoomUserDto, UpdateRoomDto } from './dto';
 import { Auth } from '@/auth/auth.decorator';
@@ -31,7 +32,10 @@ import { User } from '@/common';
 @ApiTags('Комнаты')
 @Controller('rooms')
 export class RoomsController {
-	constructor(private readonly roomsService: RoomsService) {}
+	constructor(
+		private readonly roomsService: RoomsService,
+		private readonly jwtService: JwtService
+	) {}
 
 	@ApiOperation({
 		summary: 'Возврат всех комнат авторизованного пользователя',
@@ -157,6 +161,54 @@ export class RoomsController {
 		@Body() body: RoomUserDto
 	): Promise<SecurityUserDto> {
 		return this.roomsService.addUser({ ...body, id, });
+	}
+
+	@ApiOperation({
+		summary: 'Генерация ссылки для приглашения человека в комнату',
+	})
+	@ApiOkResponse({
+		type: String,
+		description: 'Hash дял добавления',
+	})
+	@Auth()
+	@InRoom()
+	@Get('/:id/link')
+	async generateAddUserLink(
+		@Param('id', ParseIntPipe) id: number
+	): Promise<string> {
+		return this.roomsService.generateAddUserLink({ id, });
+	}
+
+	@ApiOperation({
+		summary: 'Добавление пользователя по ссылке',
+	})
+	@ApiParam({
+		type: String,
+		name: 'hash',
+	})
+	@ApiParam({
+		type: Number,
+		name: 'id',
+	})
+	@ApiOkResponse({
+		type: Boolean,
+	})
+	@Auth()
+	@Put(':id/add-user/:hash')
+	async addUserByLink(
+		@Param('hash') hash: string,
+		@User() user: SecurityUserDto
+	): Promise<boolean> {
+		const room: Pick<RoomDto, 'id'> = await this.jwtService.verifyAsync(hash, {
+			secret: process.env.SECRET,
+		});
+
+		await this.roomsService.addUser({
+			id: room.id,
+			userId: user.id,
+		});
+
+		return true;
 	}
 
 	@ApiOperation({

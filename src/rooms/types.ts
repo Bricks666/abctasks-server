@@ -27,6 +27,10 @@ export interface AddUserParams {
 	readonly userId: number;
 }
 
+export interface GenerateAddUserLink {
+	readonly id: number;
+}
+
 export interface RemoveUserParams {
 	readonly id: number;
 	readonly userId: number;

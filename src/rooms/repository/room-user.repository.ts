@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { room_user } from '@prisma/client';
 import { DatabaseService } from '@/database/database.service';
 import { SecurityUserDto } from '@/users/dto';
 import {
@@ -35,9 +36,18 @@ export class RoomUserRepository {
 	}
 
 	async addUser(params: AddUserParams): Promise<boolean> {
-		const pair = await this.databaseService.room_user.findFirst({
-			where: params,
-		});
+		const pair: room_user | null =
+			await this.databaseService.room_user.findFirst({
+				where: params,
+			});
+
+		if (!pair) {
+			await this.databaseService.room_user.create({
+				data: params,
+			});
+
+			return true;
+		}
 
 		if (pair.removed) {
 			await this.databaseService.room_user.update({
@@ -52,15 +62,7 @@ export class RoomUserRepository {
 			return true;
 		}
 
-		if (!pair.removed) {
-			return false;
-		}
-
-		await this.databaseService.room_user.create({
-			data: params,
-		});
-
-		return true;
+		return false;
 	}
 
 	async removeUser(params: RemoveUserParams): Promise<boolean> {

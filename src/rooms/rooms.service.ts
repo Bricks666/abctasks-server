@@ -3,6 +3,7 @@ import {
 	Injectable,
 	NotFoundException
 } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
 import { SecurityUserDto } from '@/users/dto';
 import { normalizePaginationParams } from '@/lib';
 import { RoomDto } from './dto';
@@ -11,6 +12,7 @@ import { UserRepository } from '@/users/repository';
 import {
 	AddUserParams,
 	CreateParams,
+	GenerateAddUserLink,
 	GetAllParams,
 	GetOneParams,
 	GetUsersParams,
@@ -19,13 +21,17 @@ import {
 	RoomExistsUserParams,
 	UpdateParams
 } from './types';
+import { RedisService } from '@/redis';
+import { getLinkRedisKey } from './config';
 
 @Injectable()
 export class RoomsService {
 	constructor(
 		private readonly roomsRepository: RoomRepository,
 		private readonly roomUserRepository: RoomUserRepository,
-		private readonly usersRepository: UserRepository
+		private readonly usersRepository: UserRepository,
+		private readonly redisService: RedisService,
+		private readonly jwtService: JwtService
 	) {}
 
 	async getAll(params: GetAllParams): Promise<RoomDto[]> {
@@ -82,6 +88,28 @@ export class RoomsService {
 		return this.usersRepository.getOne({ id, });
 	}
 
+	async generateAddUserLink(params: GenerateAddUserLink): Promise<string> {
+		const { id, } = params;
+		const generatedLink: string | null = await this.redisService.get(
+			getLinkRedisKey(id)
+		);
+
+		if (generatedLink) {
+			return generatedLink;
+		}
+
+		const hash = await this.jwtService.signAsync(
+			{ id, },
+			{
+				secret: process.env.SECRET,
+			}
+		);
+
+		await this.redisService.set(getLinkRedisKey(id), hash);
+
+		return hash;
+	}
+
 	async removeUser(params: RemoveUserParams): Promise<boolean> {
 		const { id, userId, } = params;
 		const isSuccess = await this.roomUserRepository.removeUser({
@@ -101,6 +129,7 @@ export class RoomsService {
 	}
 
 	async remove(params: RemoveParams): Promise<boolean> {
+		await this.redisService.del(getLinkRedisKey(params.id));
 		return this.roomsRepository.remove(params);
 	}
 }
