@@ -1,29 +1,31 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Transform } from 'class-transformer';
 import { IsISO8601, IsNumber, IsOptional } from 'class-validator';
+import { NumberTransform } from '@/common';
 
 export class TasksFiltersDto {
 	@ApiProperty({
 		type: Number,
+		isArray: true,
 		required: false,
 		description: 'Id создателя',
-		example: 1,
+		example: [1],
 	})
-	@IsNumber()
+	@IsNumber({}, { each: true, })
 	@IsOptional()
-	@Transform((property) => Number(property.value))
-	declare readonly authorId?: number;
+	@NumberTransform()
+	declare readonly authorId?: number[];
 
 	@ApiProperty({
 		type: Number,
+		isArray: true,
 		required: false,
 		description: 'Id группы',
-		example: 1,
+		example: [1],
 	})
-	@IsNumber()
+	@IsNumber({}, { each: true, })
 	@IsOptional()
-	@Transform((property) => Number(property.value))
-	declare readonly groupId?: number;
+	@NumberTransform()
+	declare readonly groupId?: number[];
 
 	@ApiProperty({
 		type: String,

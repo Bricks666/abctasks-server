@@ -1,19 +1,19 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Transform } from 'class-transformer';
 import { IsNumber, IsOptional, Min } from 'class-validator';
+import { NumberTransform } from './number-transform.decorator';
 
 export class PaginationQueryDto {
 	@ApiProperty({
 		type: Number,
 		description: 'Страница',
 		default: 1,
-		example: 2,
+		example: 1,
 		required: false,
 	})
-	@Transform(({ value, }) => Number(value))
 	@IsOptional()
 	@IsNumber()
 	@Min(1)
+	@NumberTransform()
 	declare page?: number;
 
 	@ApiProperty({
@@ -23,9 +23,9 @@ export class PaginationQueryDto {
 		example: 150,
 		required: false,
 	})
-	@Transform(({ value, }) => Number(value))
 	@IsNumber()
 	@Min(1)
 	@IsOptional()
+	@NumberTransform()
 	declare count?: number;
 }

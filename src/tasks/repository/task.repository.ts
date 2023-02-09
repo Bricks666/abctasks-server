@@ -9,6 +9,7 @@ import {
 	RemoveParams,
 	UpdateParams
 } from './types';
+import { prepareWhere } from './lib';
 
 @Injectable()
 export class TaskRepository {
@@ -17,14 +18,7 @@ export class TaskRepository {
 	async getAll(params: GetAllParams): Promise<TaskDto[]> {
 		const { roomId, by, type = 'asc', ...filters } = params;
 
-		const where: Prisma.taskWhereInput = {
-			authorId: filters.authorId,
-			groupId: filters.groupId,
-			createdAt: {
-				gte: filters.after,
-				lte: filters.before,
-			},
-		};
+		const where: Prisma.taskWhereInput = prepareWhere(filters);
 
 		const orderBy: Prisma.taskOrderByWithRelationInput = {};
 

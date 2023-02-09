@@ -5,14 +5,14 @@ export const prepareWhere = (
 	filters: ActivitiesFiltersDto
 ): Prisma.activityWhereInput => {
 	return {
-		action: filters.action,
-		activistId: filters.activistId,
+		action: { in: filters.action, },
+		activistId: { in: filters.activistId, },
 		createdAt: {
 			gte: filters.after,
 			lte: filters.before,
 		},
 		sphere: {
-			name: filters.sphereName,
+			name: { in: filters.sphereName, },
 		},
 	};
 };
