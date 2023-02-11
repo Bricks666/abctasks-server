@@ -18,9 +18,9 @@ import {
 	ApiNotFoundResponse
 } from '@nestjs/swagger';
 import { GetUsersQueryDto, SecurityUserDto } from '@/users/dto';
+import { Auth } from '@/auth/auth.decorator';
 import { UpdateUserDto } from './dto';
 import { UsersService } from './users.service';
-import { Auth } from '@/auth/auth.decorator';
 
 @ApiTags('Пользователи')
 @Controller('users')

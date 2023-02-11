@@ -22,12 +22,12 @@ import {
 	ApiTags
 } from '@nestjs/swagger';
 import { JwtService } from '@nestjs/jwt';
-import { RoomsService } from './rooms.service';
-import { CreateRoomDto, RoomDto, UpdateRoomDto } from './dto';
 import { Auth } from '@/auth/auth.decorator';
 import { SecurityUserDto } from '@/users/dto';
-import { InRoom, IsOwner } from './lib';
 import { User } from '@/common';
+import { RoomsService } from './rooms.service';
+import { CreateRoomDto, RoomDto, UpdateRoomDto } from './dto';
+import { InRoom, IsOwner } from './lib';
 
 @ApiTags('Комнаты')
 @Controller('rooms')

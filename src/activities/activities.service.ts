@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { normalizePaginationParams } from '@/lib';
+import { PaginationResponseDto } from '@/common';
 import { ActivityDto } from './dto';
 import { ActivityRepository } from './repository';
 import { CreateParams, GetAllByRoomIdParams } from './types';
-import { PaginationResponseDto } from '@/common';
 
 @Injectable()
 export class ActivitiesService {

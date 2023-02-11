@@ -18,6 +18,7 @@ import {
 } from '@nestjs/swagger';
 import { BASE_COOKIE_OPTIONS, COOKIE_NAME, COOKIE_TIME } from '@/const/cookie';
 import { CreateUserDto, SecurityUserDto } from '@/users/dto';
+import { Cookie } from '@/common';
 import { AuthService } from './auth.service';
 import {
 	AuthenticationResultDto,
@@ -25,7 +26,6 @@ import {
 	LoginRequestDto,
 	TokensDto
 } from './dto';
-import { Cookie } from '@/common';
 
 @ApiTags('Авторизация')
 @Controller('auth')

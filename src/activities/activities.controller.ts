@@ -1,8 +1,8 @@
 import { Controller, Get, Param, ParseIntPipe, Query } from '@nestjs/common';
 import { ApiExtraModels, ApiTags } from '@nestjs/swagger';
+import { ApiPaginatedResponse, PaginationResponseDto } from '@/common';
 import { ActivitiesService } from './activities.service';
 import { ActivityDto, GetActivitiesQueryDto } from './dto';
-import { ApiPaginatedResponse, PaginationResponseDto } from '@/common';
 
 @ApiTags('Активности')
 @ApiExtraModels(PaginationResponseDto, ActivityDto)

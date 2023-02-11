@@ -22,10 +22,10 @@ import {
 import { ActivitiesService } from '@/activities/activities.service';
 import { InRoom } from '@/rooms';
 import { Auth } from '@/auth/auth.decorator';
-import { GroupsService } from './groups.service';
-import { CreateGroupDto, GroupDto, UpdateGroupDto } from './dto';
 import { User } from '@/common';
 import { SecurityUserDto } from '@/users/dto';
+import { GroupsService } from './groups.service';
+import { CreateGroupDto, GroupDto, UpdateGroupDto } from './dto';
 
 @ApiTags('Группы')
 @Controller('groups')

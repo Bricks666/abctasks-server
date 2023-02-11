@@ -21,10 +21,10 @@ import {
 import { PaginationQueryDto, User } from '@/common';
 import { Auth } from '@/auth/auth.decorator';
 import { InRoom } from '@/rooms';
-import { CommentsService } from './comments.service';
-import { CommentDto, CreateCommentDto, UpdateCommentDto } from './dto';
 import { ActivitiesService } from '@/activities/activities.service';
 import { SecurityUserDto } from '@/users/dto';
+import { CommentsService } from './comments.service';
+import { CommentDto, CreateCommentDto, UpdateCommentDto } from './dto';
 
 @ApiTags('Комментарии')
 @Controller('comments')

@@ -21,13 +21,13 @@ import {
 	ApiNotFoundResponse,
 	ApiCreatedResponse
 } from '@nestjs/swagger';
-import { TasksService } from './tasks.service';
-import { CreateTaskDto, TaskDto, UpdateTaskDto, GetTasksDto } from './dto';
 import { ActivitiesService } from '@/activities/activities.service';
 import { Auth } from '@/auth/auth.decorator';
 import { InRoom } from '@/rooms';
 import { User } from '@/common';
 import { SecurityUserDto } from '@/users/dto';
+import { CreateTaskDto, TaskDto, UpdateTaskDto, GetTasksDto } from './dto';
+import { TasksService } from './tasks.service';
 
 @ApiTags('Задачи')
 @Controller('tasks')
