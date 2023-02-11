@@ -22,12 +22,22 @@ export interface GetUsersParams {
 	readonly id: number;
 }
 
-export interface AddUserParams {
+export interface InviteUserParams {
 	readonly id: number;
 	readonly userId: number;
 }
 
-export interface GenerateAddUserLink {
+export interface ApproveInviteParams {
+	readonly id: number;
+	readonly userId: number;
+}
+
+export interface RejectInviteParams {
+	readonly id: number;
+	readonly userId: number;
+}
+
+export interface GenerateInviteHashParams {
 	readonly id: number;
 }
 
@@ -36,7 +46,12 @@ export interface RemoveUserParams {
 	readonly userId: number;
 }
 
-export interface RoomExistsUserParams {
+export interface IsOwnerParams {
+	readonly roomId: number;
+	readonly userId: number;
+}
+
+export interface IsExistsParams {
 	readonly roomId: number;
 	readonly userId: number;
 }

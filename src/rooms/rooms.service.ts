@@ -6,23 +6,28 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import { SecurityUserDto } from '@/users/dto';
 import { normalizePaginationParams } from '@/lib';
-import { RoomDto } from './dto';
-import { RoomRepository, RoomUserRepository } from './repository';
 import { UserRepository } from '@/users/repository';
+import { RoomDto } from './dto';
 import {
-	AddUserParams,
+	ApproveInviteParams,
 	CreateParams,
-	GenerateAddUserLink,
+	GenerateInviteHashParams,
 	GetAllParams,
 	GetOneParams,
 	GetUsersParams,
+	IsOwnerParams,
 	RemoveParams,
 	RemoveUserParams,
-	RoomExistsUserParams,
-	UpdateParams
+	IsExistsParams,
+	UpdateParams,
+	InviteUserParams,
+	RejectInviteParams
 } from './types';
-import { RedisService } from '@/redis';
-import { getLinkRedisKey } from './config';
+import {
+	RoomRedisRepository,
+	RoomRepository,
+	RoomUserRepository
+} from './repository';
 
 @Injectable()
 export class RoomsService {
@@ -30,7 +35,7 @@ export class RoomsService {
 		private readonly roomsRepository: RoomRepository,
 		private readonly roomUserRepository: RoomUserRepository,
 		private readonly usersRepository: UserRepository,
-		private readonly redisService: RedisService,
+		private readonly roomRedisRepository: RoomRedisRepository,
 		private readonly jwtService: JwtService
 	) {}
 
@@ -62,6 +67,11 @@ export class RoomsService {
 		return this.roomsRepository.update(params);
 	}
 
+	async remove(params: RemoveParams): Promise<boolean> {
+		await this.roomRedisRepository.removeInviteHash({ roomId: params.id, });
+		return this.roomsRepository.remove(params);
+	}
+
 	async getUsers(params: GetUsersParams): Promise<SecurityUserDto[]> {
 		const { id, } = params;
 
@@ -74,28 +84,36 @@ export class RoomsService {
 		return users;
 	}
 
-	async addUser(params: AddUserParams): Promise<SecurityUserDto> {
+	async inviteUser(params: InviteUserParams): Promise<SecurityUserDto> {
 		const { id, userId, } = params;
-		const added = await this.roomUserRepository.addUser({
+		const isExists = await this.isExists({ roomId: id, userId, });
+
+		if (isExists) {
+			throw new ConflictException('User already exists in room');
+		}
+
+		const isInvited = await this.roomUserRepository.isInvited({
 			roomId: id,
 			userId,
 		});
 
-		if (!added) {
-			throw new ConflictException('User already exists');
+		if (isInvited) {
+			throw new ConflictException('User has already been invited into room');
 		}
 
-		return this.usersRepository.getOne({ id, });
+		return this.roomUserRepository.addInvitation({
+			roomId: id,
+			userId,
+		});
 	}
 
-	async generateAddUserLink(params: GenerateAddUserLink): Promise<string> {
+	async generateInviteHash(params: GenerateInviteHashParams): Promise<string> {
 		const { id, } = params;
-		const generatedLink: string | null = await this.redisService.get(
-			getLinkRedisKey(id)
-		);
+		const cachedHash: string | null =
+			await this.roomRedisRepository.getInviteHash({ roomId: id, });
 
-		if (generatedLink) {
-			return generatedLink;
+		if (cachedHash) {
+			return cachedHash;
 		}
 
 		const hash = await this.jwtService.signAsync(
@@ -105,9 +123,29 @@ export class RoomsService {
 			}
 		);
 
-		await this.redisService.set(getLinkRedisKey(id), hash);
+		await this.roomRedisRepository.setInviteHash({ roomId: params.id, hash, });
 
 		return hash;
+	}
+
+	async approveInvite(params: ApproveInviteParams): Promise<SecurityUserDto> {
+		const { id, userId, } = params;
+
+		const added = await this.roomUserRepository.addUser({
+			roomId: id,
+			userId,
+		});
+
+		if (!added) {
+			throw new ConflictException('User already exists');
+		}
+
+		return this.usersRepository.getOne({ id: userId, });
+	}
+
+	async rejectInvite(params: RejectInviteParams): Promise<boolean> {
+		const { id, userId, } = params;
+		return this.roomUserRepository.removeUserHard({ roomId: id, userId, });
 	}
 
 	async removeUser(params: RemoveUserParams): Promise<boolean> {
@@ -124,12 +162,21 @@ export class RoomsService {
 		return isSuccess;
 	}
 
-	async roomExistsUser(params: RoomExistsUserParams): Promise<boolean> {
-		return this.roomUserRepository.existsUser(params);
+	async isOwner(params: IsOwnerParams): Promise<boolean> {
+		const { roomId, userId, } = params;
+		const room = await this.roomsRepository.getOne({
+			id: roomId,
+			userId,
+		});
+
+		if (!room) {
+			throw new NotFoundException('Room was not found');
+		}
+
+		return room?.ownerId === userId;
 	}
 
-	async remove(params: RemoveParams): Promise<boolean> {
-		await this.redisService.del(getLinkRedisKey(params.id));
-		return this.roomsRepository.remove(params);
+	async isExists(params: IsExistsParams): Promise<boolean> {
+		return this.roomUserRepository.existsUser(params);
 	}
 }

@@ -1,2 +1,3 @@
-export * from './room.repository';
-export * from './room-user.repository';
+export * from './room';
+export * from './room-user';
+export * from './room-redis';

@@ -25,7 +25,7 @@ import { TasksService } from './tasks.service';
 import { CreateTaskDto, TaskDto, UpdateTaskDto, GetTasksDto } from './dto';
 import { ActivitiesService } from '@/activities/activities.service';
 import { Auth } from '@/auth/auth.decorator';
-import { InRoom } from '@/rooms/in-room.decorator';
+import { InRoom } from '@/rooms';
 import { User } from '@/common';
 import { SecurityUserDto } from '@/users/dto';
 
@@ -100,8 +100,8 @@ export class TasksController {
 		type: TaskDto,
 		description: 'Созданная задача',
 	})
-	@Auth()
 	@InRoom()
+	@Auth()
 	@Post('/:roomId/create')
 	async create(
 		@Param('roomId', ParseIntPipe) roomId: number,
@@ -151,8 +151,8 @@ export class TasksController {
 	@ApiNotFoundResponse({
 		description: 'Такой задачи не существует',
 	})
-	@Auth()
 	@InRoom()
+	@Auth()
 	@Put('/:roomId/:id/update')
 	async update(
 		@Param('roomId', ParseIntPipe) roomId: number,
@@ -191,8 +191,8 @@ export class TasksController {
 		type: Boolean,
 		description: 'Удались ли удалить задачу',
 	})
-	@Auth()
 	@InRoom()
+	@Auth()
 	@Delete('/:roomId/:id/remove')
 	async remove(
 		@Param('roomId', ParseIntPipe) roomId: number,

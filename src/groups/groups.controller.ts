@@ -20,7 +20,7 @@ import {
 	ApiTags
 } from '@nestjs/swagger';
 import { ActivitiesService } from '@/activities/activities.service';
-import { InRoom } from '@/rooms/in-room.decorator';
+import { InRoom } from '@/rooms';
 import { Auth } from '@/auth/auth.decorator';
 import { GroupsService } from './groups.service';
 import { CreateGroupDto, GroupDto, UpdateGroupDto } from './dto';
@@ -97,8 +97,8 @@ export class GroupsController {
 		type: GroupDto,
 		description: 'Созданная группа',
 	})
-	@Auth()
 	@InRoom()
+	@Auth()
 	@Post('/:roomId/create')
 	async create(
 		@Param('roomId', ParseIntPipe) roomId: number,
@@ -140,8 +140,8 @@ export class GroupsController {
 		type: GroupDto,
 		description: 'Обновленная группа',
 	})
-	@Auth()
 	@InRoom()
+	@Auth()
 	@Put('/:roomId/:id/update')
 	async update(
 		@Param('roomId', ParseIntPipe) roomId: number,
@@ -180,8 +180,8 @@ export class GroupsController {
 		type: Boolean,
 		description: 'Удалось ли удалить группу',
 	})
-	@Auth()
 	@InRoom()
+	@Auth()
 	@Delete('/:roomId/:id/remove')
 	async remove(
 		@Param('roomId', ParseIntPipe) roomId: number,

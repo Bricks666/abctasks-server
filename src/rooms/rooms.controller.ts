@@ -23,10 +23,10 @@ import {
 } from '@nestjs/swagger';
 import { JwtService } from '@nestjs/jwt';
 import { RoomsService } from './rooms.service';
-import { CreateRoomDto, RoomDto, RoomUserDto, UpdateRoomDto } from './dto';
+import { CreateRoomDto, RoomDto, UpdateRoomDto } from './dto';
 import { Auth } from '@/auth/auth.decorator';
 import { SecurityUserDto } from '@/users/dto';
-import { InRoom } from './in-room.decorator';
+import { InRoom, IsOwner } from './lib';
 import { User } from '@/common';
 
 @ApiTags('Комнаты')
@@ -88,7 +88,6 @@ export class RoomsController {
 		type: NotFoundException,
 		description: 'Такой комнаты не существует',
 	})
-	@Auth()
 	@UseInterceptors(CacheInterceptor)
 	@Get('/:id/users')
 	async getUsers(@Param('id', ParseIntPipe) id: number) {
@@ -129,8 +128,8 @@ export class RoomsController {
 		type: RoomDto,
 		description: 'Обновленная комната',
 	})
-	@Auth()
 	@InRoom()
+	@Auth()
 	@Put('/:id/update')
 	async update(
 		@User() user: SecurityUserDto,
@@ -143,24 +142,34 @@ export class RoomsController {
 	}
 
 	@ApiOperation({
-		summary: 'Добавление пользователя в комнату',
+		summary: 'Удаление комнаты',
 	})
-	@ApiBody({
-		description: 'Id пользователя для добавления',
-		type: RoomUserDto,
+	@ApiOkResponse({
+		type: Boolean,
+		description: 'Удалось ли выполнить удаление комнаты',
+	})
+	@InRoom()
+	@Auth()
+	@Delete('/:id/remove')
+	async remove(@Param('id', ParseIntPipe) id: number): Promise<boolean> {
+		return this.roomsService.remove({ id, });
+	}
+
+	@ApiOperation({
+		summary: 'Отсылает пользователю приглашения присоединиться',
 	})
 	@ApiOkResponse({
 		type: SecurityUserDto,
 		description: 'Добавленный пользователь',
 	})
+	@IsOwner()
 	@Auth()
-	@InRoom()
-	@Put('/:id/add-user')
-	async addUser(
+	@Put('/:id/invite/:userId')
+	async invite(
 		@Param('id', ParseIntPipe) id: number,
-		@Body() body: RoomUserDto
+		@Param('userId', ParseIntPipe) userId: number
 	): Promise<SecurityUserDto> {
-		return this.roomsService.addUser({ ...body, id, });
+		return this.roomsService.inviteUser({ userId, id, });
 	}
 
 	@ApiOperation({
@@ -170,13 +179,45 @@ export class RoomsController {
 		type: String,
 		description: 'Hash дял добавления',
 	})
-	@Auth()
 	@InRoom()
-	@Get('/:id/link')
-	async generateAddUserLink(
+	@Auth()
+	@Get('/:id/link-hash')
+	async generateInviteHash(
 		@Param('id', ParseIntPipe) id: number
 	): Promise<string> {
-		return this.roomsService.generateAddUserLink({ id, });
+		return this.roomsService.generateInviteHash({ id, });
+	}
+
+	@ApiOperation({
+		summary: 'Принятие приглашения в комнату',
+	})
+	@ApiOkResponse({
+		type: SecurityUserDto,
+		description: 'Добавленный пользователь',
+	})
+	@Auth()
+	@Put('/:id/invite/approve')
+	async approveInvite(
+		@Param('id', ParseIntPipe) id: number,
+		@User() user: SecurityUserDto
+	): Promise<SecurityUserDto> {
+		return this.roomsService.approveInvite({ id, userId: user.id, });
+	}
+
+	@ApiOperation({
+		summary: 'Отклонение добавления в комнату',
+	})
+	@ApiOkResponse({
+		type: Boolean,
+		description: 'Удалось ли отклонить приглашение',
+	})
+	@Auth()
+	@Put('/:id/invite/reject')
+	async rejectInvite(
+		@Param('id', ParseIntPipe) id: number,
+		@User() user: SecurityUserDto
+	): Promise<boolean> {
+		return this.roomsService.rejectInvite({ id, userId: user.id, });
 	}
 
 	@ApiOperation({
@@ -194,7 +235,7 @@ export class RoomsController {
 		type: Boolean,
 	})
 	@Auth()
-	@Put(':id/add-user/:hash')
+	@Put(':id/invite/:hash')
 	async addUserByLink(
 		@Param('hash') hash: string,
 		@User() user: SecurityUserDto
@@ -203,7 +244,7 @@ export class RoomsController {
 			secret: process.env.SECRET,
 		});
 
-		await this.roomsService.addUser({
+		await this.roomsService.approveInvite({
 			id: room.id,
 			userId: user.id,
 		});
@@ -218,28 +259,33 @@ export class RoomsController {
 		type: Boolean,
 		description: 'Удалось ли выйти',
 	})
-	@Auth()
 	@InRoom()
+	@Auth()
 	@Put('/:id/exit')
-	async removeUser(
+	async exit(
 		@Param('id', ParseIntPipe) id: number,
 		@User() user: SecurityUserDto
-	) {
+	): Promise<boolean> {
 		const { id: userId, } = user;
-		return this.roomsService.removeUser({ id, userId, });
+		await this.roomsService.removeUser({ id, userId, });
+
+		return true;
 	}
 
 	@ApiOperation({
-		summary: 'Удаление комнаты',
+		summary: 'Удаление пользователя из комнаты',
 	})
 	@ApiOkResponse({
 		type: Boolean,
-		description: 'Удалось ли выполнить удаление комнаты',
+		description: 'Удалось ли удалить пользователя',
 	})
+	@IsOwner()
 	@Auth()
-	@InRoom()
-	@Delete('/:id/remove')
-	async remove(@Param('id', ParseIntPipe) id: number): Promise<boolean> {
-		return this.roomsService.remove({ id, });
+	@Put('/:id/remove/:userId')
+	async removeUser(
+		@Param('id', ParseIntPipe) id: number,
+		@Param('userId', ParseIntPipe) userId: number
+	): Promise<boolean> {
+		return this.roomsService.removeUser({ id, userId, });
 	}
 }

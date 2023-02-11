@@ -1,6 +1,6 @@
 import { applyDecorators, UseGuards } from '@nestjs/common';
 import { ApiForbiddenResponse } from '@nestjs/swagger';
-import { InRoomGuard } from '@/rooms/in-room.guard';
+import { InRoomGuard } from './in-room.guard';
 
 export const InRoom = () =>
 	applyDecorators(

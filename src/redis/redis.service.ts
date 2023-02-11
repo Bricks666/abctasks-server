@@ -13,7 +13,6 @@ export class RedisService
 	implements OnModuleInit, OnModuleDestroy
 {
 	constructor(@Inject(MODULE_OPTIONS_TOKEN) options: RedisOptions) {
-		console.log(options);
 		super(options);
 	}
 

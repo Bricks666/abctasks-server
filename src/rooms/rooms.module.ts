@@ -3,13 +3,22 @@ import { RoomsService } from './rooms.service';
 import { RoomsController } from './rooms.controller';
 import { AuthModule } from '@/auth/auth.module';
 import { DatabaseModule } from '@/database/database.module';
-import { RoomRepository, RoomUserRepository } from './repository';
 import { UsersModule } from '@/users/users.module';
+import {
+	RoomRedisRepository,
+	RoomRepository,
+	RoomUserRepository
+} from './repository';
 
 @Module({
 	imports: [AuthModule, DatabaseModule, UsersModule],
-	providers: [RoomsService, RoomRepository, RoomUserRepository],
+	providers: [
+		RoomsService,
+		RoomUserRepository,
+		RoomRepository,
+		RoomRedisRepository
+	],
 	controllers: [RoomsController],
-	exports: [RoomsService, RoomRepository, RoomUserRepository],
+	exports: [RoomsService, RoomUserRepository, RoomRepository],
 })
 export class RoomsModule {}

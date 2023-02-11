@@ -20,7 +20,7 @@ import {
 } from '@nestjs/swagger';
 import { PaginationQueryDto, User } from '@/common';
 import { Auth } from '@/auth/auth.decorator';
-import { InRoom } from '@/rooms/in-room.decorator';
+import { InRoom } from '@/rooms';
 import { CommentsService } from './comments.service';
 import { CommentDto, CreateCommentDto, UpdateCommentDto } from './dto';
 import { ActivitiesService } from '@/activities/activities.service';
@@ -116,8 +116,8 @@ export class CommentsController {
 		type: CommentDto,
 		description: 'Созданный комментарий',
 	})
-	@Auth()
 	@InRoom()
+	@Auth()
 	@Post('/:roomId/:taskId/create')
 	async create(
 		@Param('taskId', ParseIntPipe) taskId: number,
@@ -170,8 +170,8 @@ export class CommentsController {
 	@ApiNotFoundResponse({
 		description: 'Комментарий не найден',
 	})
-	@Auth()
 	@InRoom()
+	@Auth()
 	@Put('/:roomId/:taskId/:id/update')
 	async update(
 		@Param('id', ParseIntPipe) id: number,
@@ -221,8 +221,8 @@ export class CommentsController {
 	@ApiNotFoundResponse({
 		description: 'Комментарий не найден',
 	})
-	@Auth()
 	@InRoom()
+	@Auth()
 	@Delete('/:roomId/:taskId/:id/remove')
 	async remove(
 		@Param('id', ParseIntPipe) id: number,

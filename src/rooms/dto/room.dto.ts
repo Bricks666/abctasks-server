@@ -17,7 +17,7 @@ export class RoomDto implements RoomModel {
 		type: Number,
 	})
 	@IsNumber()
-	declare creatorId: number;
+	declare ownerId: number;
 
 	@ApiProperty({
 		example: 'Room name',

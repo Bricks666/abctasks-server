@@ -1,5 +1,5 @@
 generator client {
-  provider        = "prisma-client-js"
+  provider = "prisma-client-js"
 }
 
 datasource db {
@@ -62,8 +62,9 @@ model group {
 model room_user {
   roomId    Int
   userId    Int
-  canChange Boolean   @default(false)
+  canChange Boolean   @default(false) // Может добавить роль или что нибудь подобное
   removed   Boolean   @default(false)
+  activated Boolean   @default(false)
   room      room      @relation(fields: [roomId], references: [id], onDelete: Cascade, map: "room-user_ibfk_1")
   user      user      @relation(fields: [userId], references: [id], onDelete: Cascade, map: "room-user_ibfk_2")
   task      task[]
@@ -77,12 +78,12 @@ model room_user {
 
 model room {
   id          Int         @id @default(autoincrement())
-  creatorId   Int
+  ownerId     Int         @map("creatorId")
   name        String      @db.VarChar(32)
   description String      @db.VarChar(255)
   createdAt   DateTime?   @default(now())
   updatedAt   DateTime?   @updatedAt
-  creator     user        @relation(fields: [creatorId], references: [id], onDelete: Cascade)
+  owner       user        @relation(fields: [ownerId], references: [id], onDelete: Cascade)
   groups      group[]
   room_user   room_user[]
 }

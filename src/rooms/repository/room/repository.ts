@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { DatabaseService } from '@/database/database.service';
-import { RoomDto } from '../dto';
+import { RoomDto } from '../../dto';
 import {
 	CreateParams,
 	GetAllByUserParams,
@@ -9,10 +9,10 @@ import {
 	RemoveParams,
 	UpdateParams,
 	WithCanChange
-} from './types/room';
+} from './types';
 
 @Injectable()
-export class RoomRepository {
+export class Repository {
 	constructor(private readonly databaseService: DatabaseService) {}
 
 	async getAllByUser(params: GetAllByUserParams): Promise<RoomDto[]> {
@@ -26,6 +26,7 @@ export class RoomRepository {
 					some: {
 						userId,
 						removed: false,
+						activated: true,
 					},
 				},
 			},
@@ -72,10 +73,11 @@ export class RoomRepository {
 		const room = await this.databaseService.room.create({
 			data: {
 				...rest,
-				creatorId: userId,
+				ownerId: userId,
 				room_user: {
 					create: {
 						userId,
+						canChange: true,
 					},
 				},
 			},
