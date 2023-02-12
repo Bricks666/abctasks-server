@@ -6,10 +6,10 @@ import { TasksModule } from '@/tasks';
 import { GroupsModule } from '@/groups';
 import { ActivitiesModule } from '@/activities';
 import { AuthModule } from '@/auth';
-import { ProgressModule } from '@/progress/progress.module';
+import { ProgressModule } from '@/progress';
 import { CommentsModule } from '@/comments';
 import { DatabaseModule } from '@/database';
-import { RedisModule } from '@/redis/redis.module';
+import { RedisModule } from '@/redis';
 
 @Module({
 	imports: [
@@ -25,6 +25,7 @@ import { RedisModule } from '@/redis/redis.module';
 			host: process.env.REDIS_HOST,
 			port: Number(process.env.REDIS_PORT),
 		}),
+		DatabaseModule.forRoot({}),
 		AuthModule,
 		UsersModule,
 		RoomsModule,
@@ -32,8 +33,7 @@ import { RedisModule } from '@/redis/redis.module';
 		GroupsModule,
 		ActivitiesModule,
 		ProgressModule,
-		CommentsModule,
-		DatabaseModule
+		CommentsModule
 	],
 })
 export class AppModule {}

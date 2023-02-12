@@ -6,7 +6,7 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import * as cookieParser from 'cookie-parser';
 import { AppModule } from '@/app.module';
 import { StandardResponseInterceptor } from '@/shared';
-import { CORS } from '@/const';
+import { ORIGIN } from '@/const';
 import { DatabaseService } from '@/database';
 
 async function bootstrap() {
@@ -19,7 +19,7 @@ async function bootstrap() {
 	app.use(cookieParser());
 	app.enableCors({
 		credentials: true,
-		origin: CORS.ORIGIN,
+		origin: ORIGIN,
 	});
 	app.useGlobalPipes(
 		new ValidationPipe({

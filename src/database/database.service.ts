@@ -1,10 +1,18 @@
-import { INestApplication, Injectable, OnModuleInit } from '@nestjs/common';
+import { PrismaClientOptions } from '@prisma/client/runtime';
+import {
+	INestApplication,
+	Inject,
+	Injectable,
+	OnModuleInit
+} from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
+import { MODULE_OPTIONS_TOKEN } from './database.module-definition';
 
 @Injectable()
 export class DatabaseService extends PrismaClient implements OnModuleInit {
-	constructor() {
+	constructor(@Inject(MODULE_OPTIONS_TOKEN) options: PrismaClientOptions) {
 		super({
+			...options,
 			log: [
 				{
 					emit: 'event',

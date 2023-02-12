@@ -1,2 +1,2 @@
-export * as COOKIE from './cookie';
-export * as CORS from './cors';
+export * from './cookie';
+export * from './cors';
