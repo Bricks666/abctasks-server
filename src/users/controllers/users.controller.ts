@@ -3,8 +3,6 @@ import {
 	CacheInterceptor,
 	Controller,
 	Get,
-	Param,
-	ParseIntPipe,
 	Put,
 	Query,
 	UseInterceptors
@@ -19,6 +17,7 @@ import {
 } from '@nestjs/swagger';
 import { GetUsersQueryDto, SecurityUserDto } from '@/users';
 import { Auth } from '@/auth';
+import { IntParam } from '@/shared';
 import { UpdateUserDto } from '../dto';
 import { UsersService } from '../services';
 
@@ -56,9 +55,7 @@ export class UsersController {
 	@ApiNotFoundResponse()
 	@UseInterceptors(CacheInterceptor)
 	@Get('/:id')
-	async getOne(
-		@Param('id', ParseIntPipe) id: number
-	): Promise<SecurityUserDto> {
+	async getOne(@IntParam('id') id: number): Promise<SecurityUserDto> {
 		return this.usersService.getOne({ id, });
 	}
 
@@ -81,7 +78,7 @@ export class UsersController {
 	@Auth()
 	@Put('/:id/update')
 	async updateUser(
-		@Param('id', ParseIntPipe) id: number,
+		@IntParam('id') id: number,
 		@Body() dto: UpdateUserDto
 	): Promise<SecurityUserDto> {
 		return this.usersService.update({ id, ...dto, });

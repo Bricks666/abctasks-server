@@ -3,11 +3,9 @@ import {
 	Get,
 	Post,
 	Body,
-	Param,
 	Delete,
 	Put,
-	Query,
-	ParseIntPipe
+	Query
 } from '@nestjs/common';
 import {
 	ApiBody,
@@ -18,7 +16,7 @@ import {
 	ApiParam,
 	ApiTags
 } from '@nestjs/swagger';
-import { PaginationQueryDto, User } from '@/shared';
+import { IntParam, PaginationQueryDto, User } from '@/shared';
 import { Auth } from '@/auth';
 import { InRoom } from '@/rooms';
 import { ActivitiesService } from '@/activities';
@@ -54,8 +52,8 @@ export class CommentsController {
 	})
 	@Get('/:roomId/:taskId')
 	async getAll(
-		@Param('taskId', ParseIntPipe) taskId: number,
-		@Param('roomId', ParseIntPipe) roomId: number,
+		@IntParam('taskId') taskId: number,
+		@IntParam('roomId') roomId: number,
 		@Query() query: PaginationQueryDto
 	): Promise<CommentDto[]> {
 		return this.commentsService.getAll({ roomId, taskId, ...query, });
@@ -88,9 +86,9 @@ export class CommentsController {
 	})
 	@Get('/:roomId/:taskId/:id')
 	async getOne(
-		@Param('id', ParseIntPipe) id: number,
-		@Param('taskId', ParseIntPipe) taskId: number,
-		@Param('roomId', ParseIntPipe) roomId: number
+		@IntParam('id') id: number,
+		@IntParam('taskId') taskId: number,
+		@IntParam('roomId') roomId: number
 	): Promise<CommentDto> {
 		return this.commentsService.getOne({ id, taskId, roomId, });
 	}
@@ -120,8 +118,8 @@ export class CommentsController {
 	@Auth()
 	@Post('/:roomId/:taskId/create')
 	async create(
-		@Param('taskId', ParseIntPipe) taskId: number,
-		@Param('roomId', ParseIntPipe) roomId: number,
+		@IntParam('taskId') taskId: number,
+		@IntParam('roomId') roomId: number,
 		@User() user: SecurityUserDto,
 		@Body() body: CreateCommentDto
 	): Promise<CommentDto> {
@@ -174,9 +172,9 @@ export class CommentsController {
 	@Auth()
 	@Put('/:roomId/:taskId/:id/update')
 	async update(
-		@Param('id', ParseIntPipe) id: number,
-		@Param('taskId', ParseIntPipe) taskId: number,
-		@Param('roomId', ParseIntPipe) roomId: number,
+		@IntParam('id') id: number,
+		@IntParam('taskId') taskId: number,
+		@IntParam('roomId') roomId: number,
 		@User() user: SecurityUserDto,
 		@Body() body: UpdateCommentDto
 	): Promise<CommentDto> {
@@ -225,9 +223,9 @@ export class CommentsController {
 	@Auth()
 	@Delete('/:roomId/:taskId/:id/remove')
 	async remove(
-		@Param('id', ParseIntPipe) id: number,
-		@Param('taskId', ParseIntPipe) taskId: number,
-		@Param('roomId', ParseIntPipe) roomId: number,
+		@IntParam('id') id: number,
+		@IntParam('taskId') taskId: number,
+		@IntParam('roomId') roomId: number,
 		@User() user: SecurityUserDto
 	): Promise<boolean> {
 		const { id: authorId, } = user;

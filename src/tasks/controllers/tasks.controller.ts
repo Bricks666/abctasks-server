@@ -2,10 +2,8 @@ import {
 	Controller,
 	Delete,
 	Get,
-	Param,
 	Post,
 	Put,
-	ParseIntPipe,
 	Body,
 	HttpStatus,
 	CacheInterceptor,
@@ -24,7 +22,7 @@ import {
 import { ActivitiesService } from '@/activities';
 import { Auth } from '@/auth';
 import { InRoom } from '@/rooms';
-import { User } from '@/shared';
+import { IntParam, User } from '@/shared';
 import { SecurityUserDto } from '@/users';
 import { CreateTaskDto, TaskDto, UpdateTaskDto, GetTasksDto } from '../dto';
 import { TasksService } from '../services';
@@ -52,7 +50,7 @@ export class TasksController {
 	@UseInterceptors(CacheInterceptor)
 	@Get('/:roomId')
 	async getAll(
-		@Param('roomId', ParseIntPipe) roomId: number,
+		@IntParam('roomId') roomId: number,
 		@Query() query: GetTasksDto
 	): Promise<TaskDto[]> {
 		return this.tasksService.getAll({ roomId, ...query, });
@@ -78,8 +76,8 @@ export class TasksController {
 	@UseInterceptors(CacheInterceptor)
 	@Get('/:roomId/:id')
 	async getOne(
-		@Param('roomId', ParseIntPipe) roomId: number,
-		@Param('id', ParseIntPipe) id: number
+		@IntParam('roomId') roomId: number,
+		@IntParam('id') id: number
 	): Promise<TaskDto> {
 		return this.tasksService.getOne({ roomId, id, });
 	}
@@ -104,7 +102,7 @@ export class TasksController {
 	@Auth()
 	@Post('/:roomId/create')
 	async create(
-		@Param('roomId', ParseIntPipe) roomId: number,
+		@IntParam('roomId') roomId: number,
 		@User() user: SecurityUserDto,
 		@Body() body: CreateTaskDto
 	): Promise<TaskDto> {
@@ -155,8 +153,8 @@ export class TasksController {
 	@Auth()
 	@Put('/:roomId/:id/update')
 	async update(
-		@Param('roomId', ParseIntPipe) roomId: number,
-		@Param('id', ParseIntPipe) id: number,
+		@IntParam('roomId') roomId: number,
+		@IntParam('id') id: number,
 		@User() user: SecurityUserDto,
 		@Body() body: UpdateTaskDto
 	): Promise<TaskDto> {
@@ -195,8 +193,8 @@ export class TasksController {
 	@Auth()
 	@Delete('/:roomId/:id/remove')
 	async remove(
-		@Param('roomId', ParseIntPipe) roomId: number,
-		@Param('id', ParseIntPipe) id: number,
+		@IntParam('roomId') roomId: number,
+		@IntParam('id') id: number,
 		@User() user: SecurityUserDto
 	): Promise<boolean> {
 		const { id: userId, } = user;

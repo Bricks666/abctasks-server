@@ -1,10 +1,11 @@
-import { Controller, Get, Param, ParseIntPipe } from '@nestjs/common';
+import { Controller, Get } from '@nestjs/common';
 import {
 	ApiOkResponse,
 	ApiOperation,
 	ApiParam,
 	ApiTags
 } from '@nestjs/swagger';
+import { IntParam } from '@/shared';
 import { ProgressDto } from '../dto';
 import { ProgressService } from '../services';
 
@@ -27,9 +28,7 @@ export class ProgressController {
 		description: 'Прогресс в комнате',
 	})
 	@Get('/:roomId')
-	async getAll(
-		@Param('roomId', ParseIntPipe) roomId: number
-	): Promise<ProgressDto[]> {
+	async getAll(@IntParam('roomId') roomId: number): Promise<ProgressDto[]> {
 		return this.progressService.getAll({ roomId, });
 	}
 }

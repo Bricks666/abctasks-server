@@ -5,3 +5,4 @@ export * from './user.decorator';
 export * from './api-pagination-response.decorator';
 export * from './extract-access-token';
 export * from './normalize-pagination-params';
+export * from './int-param.decorator';

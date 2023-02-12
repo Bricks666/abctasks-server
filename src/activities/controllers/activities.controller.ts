@@ -1,6 +1,10 @@
-import { Controller, Get, Param, ParseIntPipe, Query } from '@nestjs/common';
+import { Controller, Get, Query } from '@nestjs/common';
 import { ApiExtraModels, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { ApiPaginatedResponse, PaginationResponseDto } from '@/shared';
+import {
+	ApiPaginatedResponse,
+	IntParam,
+	PaginationResponseDto
+} from '@/shared';
 import { ActivityDto, GetActivitiesQueryDto } from '../dto';
 import { ActivitiesService } from '../services';
 
@@ -16,7 +20,7 @@ export class ActivitiesController {
 	@ApiPaginatedResponse(ActivityDto)
 	@Get('/:roomId')
 	getAll(
-		@Param('roomId', ParseIntPipe) roomId: number,
+		@IntParam('roomId') roomId: number,
 		@Query() query: GetActivitiesQueryDto
 	): Promise<PaginationResponseDto<ActivityDto>> {
 		return this.activitiesService.getAllByRoomId({

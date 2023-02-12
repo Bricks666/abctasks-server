@@ -1,8 +1,6 @@
 import {
 	Controller,
 	Get,
-	Param,
-	ParseIntPipe,
 	Post,
 	Body,
 	Put,
@@ -21,7 +19,7 @@ import {
 } from '@nestjs/swagger';
 import { Auth } from '@/auth';
 import { SecurityUserDto } from '@/users';
-import { User } from '@/shared';
+import { IntParam, User } from '@/shared';
 import { RoomsService } from '../services';
 import { CreateRoomDto, RoomDto, UpdateRoomDto } from '../dto';
 import { IsOwner } from '../lib';
@@ -62,7 +60,7 @@ export class RoomsController {
 	@UseInterceptors(CacheInterceptor)
 	@Get('/:id')
 	async getOne(
-		@Param('id', ParseIntPipe) id: number,
+		@IntParam('id') id: number,
 		@User() user: SecurityUserDto
 	): Promise<RoomDto> {
 		const { id: userId, } = user;
@@ -108,7 +106,7 @@ export class RoomsController {
 	@Put('/:id/update')
 	async update(
 		@User() user: SecurityUserDto,
-		@Param('id', ParseIntPipe) id: number,
+		@IntParam('id') id: number,
 		@Body() body: UpdateRoomDto
 	): Promise<RoomDto> {
 		const { id: userId, } = user;
@@ -126,7 +124,7 @@ export class RoomsController {
 	@IsOwner()
 	@Auth()
 	@Delete('/:id/remove')
-	async remove(@Param('id', ParseIntPipe) id: number): Promise<boolean> {
+	async remove(@IntParam('id') id: number): Promise<boolean> {
 		return this.roomsService.remove({ id, });
 	}
 }

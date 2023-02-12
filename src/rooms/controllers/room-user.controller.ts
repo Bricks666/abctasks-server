@@ -1,8 +1,6 @@
 import {
 	Controller,
 	Get,
-	Param,
-	ParseIntPipe,
 	Put,
 	Delete,
 	HttpStatus,
@@ -20,7 +18,7 @@ import {
 } from '@nestjs/swagger';
 import { Auth } from '@/auth';
 import { SecurityUserDto } from '@/users';
-import { User } from '@/shared';
+import { IntParam, User } from '@/shared';
 import { RoomUserService } from '../services';
 import { InRoom, IsOwner } from '../lib';
 
@@ -44,9 +42,7 @@ export class RoomUserController {
 	})
 	@UseInterceptors(CacheInterceptor)
 	@Get('')
-	async getUsers(
-		@Param('id', ParseIntPipe) id: number
-	): Promise<SecurityUserDto[]> {
+	async getUsers(@IntParam('id') id: number): Promise<SecurityUserDto[]> {
 		return this.roomUserService.getUsers({ roomId: id, });
 	}
 
@@ -63,7 +59,7 @@ export class RoomUserController {
 	})
 	@Get('invited')
 	async getInvitations(
-		@Param('id', ParseIntPipe) roomId: number
+		@IntParam('id') roomId: number
 	): Promise<SecurityUserDto[]> {
 		return this.roomUserService.getInvitations({ roomId, });
 	}
@@ -79,8 +75,8 @@ export class RoomUserController {
 	@Auth()
 	@Put('/:userId')
 	async invite(
-		@Param('id', ParseIntPipe) id: number,
-		@Param('userId', ParseIntPipe) userId: number
+		@IntParam('id') id: number,
+		@IntParam('userId') userId: number
 	): Promise<SecurityUserDto> {
 		return this.roomUserService.inviteUser({ userId, roomId: id, });
 	}
@@ -95,9 +91,7 @@ export class RoomUserController {
 	@InRoom()
 	@Auth()
 	@Get('/link-hash')
-	async generateInviteHash(
-		@Param('id', ParseIntPipe) id: number
-	): Promise<string> {
+	async generateInviteHash(@IntParam('id') id: number): Promise<string> {
 		return this.roomUserService.generateInviteHash({ roomId: id, });
 	}
 
@@ -111,7 +105,7 @@ export class RoomUserController {
 	@Auth()
 	@Put('/invite/approve')
 	async approveInvite(
-		@Param('id', ParseIntPipe) id: number,
+		@IntParam('id') id: number,
 		@User() user: SecurityUserDto
 	): Promise<SecurityUserDto> {
 		return this.roomUserService.approveInvite({ roomId: id, userId: user.id, });
@@ -127,7 +121,7 @@ export class RoomUserController {
 	@Auth()
 	@Put('/invite/reject')
 	async rejectInvite(
-		@Param('id', ParseIntPipe) id: number,
+		@IntParam('id') id: number,
 		@User() user: SecurityUserDto
 	): Promise<boolean> {
 		return this.roomUserService.rejectInvite({ roomId: id, userId: user.id, });
@@ -154,7 +148,7 @@ export class RoomUserController {
 	@Auth()
 	@Put('/invite/:hash')
 	async addUserByLink(
-		@Param('hash') hash: string,
+		@IntParam('hash') hash: string,
 		@User() user: SecurityUserDto
 	): Promise<SecurityUserDto> {
 		return this.roomUserService.addUserByLink({
@@ -174,7 +168,7 @@ export class RoomUserController {
 	@Auth()
 	@Delete('/exit')
 	async exit(
-		@Param('id', ParseIntPipe) id: number,
+		@IntParam('id') id: number,
 		@User() user: SecurityUserDto
 	): Promise<boolean> {
 		const { id: userId, } = user;
@@ -194,8 +188,8 @@ export class RoomUserController {
 	@Auth()
 	@Delete('/remove/:userId')
 	async removeUser(
-		@Param('id', ParseIntPipe) id: number,
-		@Param('userId', ParseIntPipe) userId: number
+		@IntParam('id') id: number,
+		@IntParam('userId') userId: number
 	): Promise<boolean> {
 		return this.roomUserService.removeUser({ roomId: id, userId, });
 	}
