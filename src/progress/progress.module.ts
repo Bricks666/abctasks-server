@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
-import { DatabaseModule } from '@/database/database.module';
-import { ProgressService } from './progress.service';
-import { ProgressController } from './progress.controller';
-import { ProgressRepository } from './repository';
+import { DatabaseModule } from '@/database';
+import { ProgressService } from './services';
+import { ProgressController } from './controllers';
+import { ProgressRepository } from './repositories';
 
 @Module({
 	imports: [DatabaseModule],

@@ -1,4 +1,4 @@
-import { Pagination } from '@/lib';
+import { Pagination } from '@/shared';
 import { CreateRoomDto, UpdateRoomDto } from '../../dto';
 
 export interface GetAllByUserParams extends Pagination {

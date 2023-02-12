@@ -6,7 +6,7 @@ import {
 	IsString
 } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
-import { NumberTransform } from '@/common';
+import { NumberTransform } from '@/shared';
 import { ActivityAction } from './activity.dto';
 
 export class ActivitiesFiltersDto {

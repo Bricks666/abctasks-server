@@ -1,15 +1,15 @@
 import { CacheModule, Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { UsersModule } from '@/users/users.module';
+import { UsersModule } from '@/users';
 import { RoomsModule } from '@/rooms';
-import { TasksModule } from '@/tasks/tasks.module';
-import { GroupsModule } from '@/groups/groups.module';
-import { ActivitiesModule } from '@/activities/activities.module';
-import { AuthModule } from '@/auth/auth.module';
-import { ProgressModule } from './progress/progress.module';
-import { CommentsModule } from './comments/comments.module';
-import { DatabaseModule } from './database/database.module';
-import { RedisModule } from './redis/redis.module';
+import { TasksModule } from '@/tasks';
+import { GroupsModule } from '@/groups';
+import { ActivitiesModule } from '@/activities';
+import { AuthModule } from '@/auth';
+import { ProgressModule } from '@/progress/progress.module';
+import { CommentsModule } from '@/comments';
+import { DatabaseModule } from '@/database';
+import { RedisModule } from '@/redis/redis.module';
 
 @Module({
 	imports: [

@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { group as GroupModel } from '@prisma/client';
 import { IsHexColor, IsNumber, IsString } from 'class-validator';
-import { HEX } from '@/types/common';
+import { HEX } from '@/shared';
 
 export class GroupDto implements GroupModel {
 	@ApiProperty({

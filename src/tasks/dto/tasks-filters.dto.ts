@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsISO8601, IsNumber, IsOptional } from 'class-validator';
-import { NumberTransform } from '@/common';
+import { NumberTransform } from '@/shared';
 
 export class TasksFiltersDto {
 	@ApiProperty({

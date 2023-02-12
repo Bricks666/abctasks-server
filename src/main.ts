@@ -4,10 +4,10 @@ import * as transformerPackage from 'class-transformer';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import * as cookieParser from 'cookie-parser';
-import { AppModule } from './app.module';
-import { StandardResponseInterceptor } from './common';
-import { CORS } from './const';
-import { DatabaseService } from './database/database.service';
+import { AppModule } from '@/app.module';
+import { StandardResponseInterceptor } from '@/shared';
+import { CORS } from '@/const';
+import { DatabaseService } from '@/database';
 
 async function bootstrap() {
 	const { PORT, } = process.env;

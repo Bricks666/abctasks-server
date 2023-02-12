@@ -19,9 +19,9 @@ import {
 	ApiParam,
 	ApiTags
 } from '@nestjs/swagger';
-import { Auth } from '@/auth/auth.decorator';
-import { SecurityUserDto } from '@/users/dto';
-import { User } from '@/common';
+import { Auth } from '@/auth';
+import { SecurityUserDto } from '@/users';
+import { User } from '@/shared';
 import { RoomsService } from '../services';
 import { CreateRoomDto, RoomDto, UpdateRoomDto } from '../dto';
 import { IsOwner } from '../lib';

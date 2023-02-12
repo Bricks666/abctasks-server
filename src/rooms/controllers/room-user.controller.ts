@@ -18,9 +18,9 @@ import {
 	ApiParam,
 	ApiTags
 } from '@nestjs/swagger';
-import { Auth } from '@/auth/auth.decorator';
-import { SecurityUserDto } from '@/users/dto';
-import { User } from '@/common';
+import { Auth } from '@/auth';
+import { SecurityUserDto } from '@/users';
+import { User } from '@/shared';
 import { RoomUserService } from '../services';
 import { InRoom, IsOwner } from '../lib';
 
@@ -77,7 +77,7 @@ export class RoomUserController {
 	})
 	@IsOwner()
 	@Auth()
-	@Put('/invite/:userId')
+	@Put('/:userId')
 	async invite(
 		@Param('id', ParseIntPipe) id: number,
 		@Param('userId', ParseIntPipe) userId: number

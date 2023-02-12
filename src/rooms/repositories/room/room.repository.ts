@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { DatabaseService } from '@/database/database.service';
+import { DatabaseService } from '@/database';
 import { RoomDto } from '../../dto';
 import {
 	CreateParams,

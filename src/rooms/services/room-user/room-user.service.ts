@@ -4,7 +4,7 @@ import {
 	NotFoundException
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { SecurityUserDto } from '@/users/dto';
+import { SecurityUserDto } from '@/users';
 import { RoomUserRepository, RoomRedisRepository } from '../../repositories';
 import {
 	GetUsersParams,
@@ -91,7 +91,13 @@ export class RoomUserService {
 			}
 		);
 
-		return this.roomUserRepository.addUser({ userId, roomId, });
+		const user = await this.roomUserRepository.addUser({ userId, roomId, });
+
+		if (!user) {
+			throw new ConflictException('User already exists in this room');
+		}
+
+		return user;
 	}
 
 	async approveInvite(params: ApproveInviteParams): Promise<SecurityUserDto> {

@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { DatabaseService } from '@/database/database.service';
-import { SecurityUserDto } from '@/users/dto';
-import { SECURITY_USER_SELECT } from '@/users/config';
+import { DatabaseService } from '@/database';
+import { SecurityUserDto, SECURITY_USER_SELECT } from '@/users';
 import { RoomUserDto } from '../../dto';
 import {
 	ActivateUserParams,

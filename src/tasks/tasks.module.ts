@@ -1,11 +1,11 @@
 import { Module } from '@nestjs/common';
-import { AuthModule } from '@/auth/auth.module';
-import { ActivitiesModule } from '@/activities/activities.module';
+import { AuthModule } from '@/auth';
+import { ActivitiesModule } from '@/activities';
 import { RoomsModule } from '@/rooms';
-import { DatabaseModule } from '@/database/database.module';
-import { TasksController } from './tasks.controller';
-import { TasksService } from './tasks.service';
-import { TaskRepository } from './repository';
+import { DatabaseModule } from '@/database';
+import { TasksController } from './controllers';
+import { TasksService } from './services';
+import { TaskRepository } from './repositories';
 
 @Module({
 	imports: [AuthModule, ActivitiesModule, RoomsModule, DatabaseModule],

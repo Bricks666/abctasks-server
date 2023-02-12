@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { normalizePaginationParams } from '@/lib';
+import { normalizePaginationParams } from '@/shared';
 import { RoomDto } from '../../dto';
 import { RoomRedisRepository, RoomRepository } from '../../repositories';
 import {
