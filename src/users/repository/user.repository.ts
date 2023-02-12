@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { Prisma, user as UserModel } from '@prisma/client';
 import { DatabaseService } from '@/database/database.service';
+import { SECURITY_USER_SELECT } from '../config';
 import { SecurityUserDto } from '../dto';
 import {
 	CreateData,
@@ -28,22 +29,14 @@ export class UserRepository {
 			where,
 			skip: offset,
 			take: limit,
-			select: {
-				id: true,
-				login: true,
-				photo: true,
-			},
+			select: SECURITY_USER_SELECT,
 		});
 	}
 
 	async getOne(params: GetOneParams): Promise<SecurityUserDto | null> {
 		return this.databaseService.user.findFirst({
 			where: params,
-			select: {
-				id: true,
-				login: true,
-				photo: true,
-			},
+			select: SECURITY_USER_SELECT,
 		});
 	}
 
@@ -56,11 +49,7 @@ export class UserRepository {
 	async create(params: CreateData): Promise<SecurityUserDto> {
 		return this.databaseService.user.create({
 			data: params,
-			select: {
-				id: true,
-				login: true,
-				photo: true,
-			},
+			select: SECURITY_USER_SELECT,
 		});
 	}
 
@@ -72,6 +61,7 @@ export class UserRepository {
 			where: {
 				id,
 			},
+			select: SECURITY_USER_SELECT,
 		});
 	}
 }

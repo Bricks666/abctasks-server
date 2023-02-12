@@ -1,8 +1,10 @@
 import { Injectable } from '@nestjs/common';
-import { room_user } from '@prisma/client';
 import { DatabaseService } from '@/database/database.service';
 import { SecurityUserDto } from '@/users/dto';
+import { SECURITY_USER_SELECT } from '@/users/config';
+import { RoomUserDto } from '../../dto';
 import {
+	ActivateUserParams,
 	AddInvitationParams,
 	AddUserParams,
 	ExistsUserParams,
@@ -13,7 +15,7 @@ import {
 } from './types';
 
 @Injectable()
-export class Repository {
+export class RoomUserRepository {
 	constructor(private readonly databaseService: DatabaseService) {}
 
 	async getUsers(params: GetUsersParams): Promise<SecurityUserDto[]> {
@@ -27,11 +29,7 @@ export class Repository {
 			},
 			include: {
 				user: {
-					select: {
-						id: true,
-						login: true,
-						photo: true,
-					},
+					select: SECURITY_USER_SELECT,
 				},
 			},
 		});
@@ -39,18 +37,59 @@ export class Repository {
 		return pairs.map((pair) => pair.user);
 	}
 
+	async getInvitations(
+		params: GetInvitationsParams
+	): Promise<SecurityUserDto[]> {
+		const rows = await this.databaseService.room_user.findMany({
+			where: {
+				...params,
+				activated: false,
+			},
+			include: {
+				user: {
+					select: SECURITY_USER_SELECT,
+				},
+			},
+		});
+
+		return rows.map((row) => row.user);
+	}
+
 	async addInvitation(params: AddInvitationParams): Promise<SecurityUserDto> {
+		const isExited = await this.databaseService.room_user.findFirst({
+			where: {
+				...params,
+				removed: true,
+				activated: true,
+			},
+		});
+
+		if (isExited) {
+			const result = await this.databaseService.room_user.update({
+				data: {
+					activated: false,
+					removed: false,
+				},
+				where: {
+					roomId_userId: params,
+				},
+				include: {
+					user: {
+						select: SECURITY_USER_SELECT,
+					},
+				},
+			});
+
+			return result.user;
+		}
+
 		const result = await this.databaseService.room_user.create({
 			data: {
 				...params,
 			},
 			include: {
 				user: {
-					select: {
-						id: true,
-						login: true,
-						photo: true,
-					},
+					select: SECURITY_USER_SELECT,
 				},
 			},
 		});
@@ -66,75 +105,71 @@ export class Repository {
 			},
 		});
 
-		return user?.activated === false;
+		return Boolean(user);
 	}
 
-	async getInvitations(
-		params: GetInvitationsParams
-	): Promise<SecurityUserDto[]> {
-		const rows = await this.databaseService.room_user.findMany({
+	async activateUser(
+		params: ActivateUserParams
+	): Promise<SecurityUserDto | null> {
+		const result = await this.databaseService.room_user.update({
+			data: {
+				activated: true,
+			},
 			where: {
-				...params,
-				activated: false,
+				roomId_userId: params,
 			},
 			include: {
 				user: {
-					select: {
-						id: true,
-						photo: true,
-						login: true,
-					},
+					select: SECURITY_USER_SELECT,
 				},
 			},
 		});
 
-		return rows.map((row) => row.user);
+		return result.user;
 	}
 
 	/*
   Может стоит как либо декомпозировать
   */
-	async addUser(params: AddUserParams): Promise<boolean> {
-		const pair: room_user | null =
+	async addUser(params: AddUserParams): Promise<SecurityUserDto | null> {
+		const pair: RoomUserDto | null =
 			await this.databaseService.room_user.findFirst({
 				where: params,
 			});
 
 		if (!pair) {
-			await this.databaseService.room_user.create({
+			const result = await this.databaseService.room_user.create({
 				data: { ...params, activated: true, },
+				include: {
+					user: {
+						select: SECURITY_USER_SELECT,
+					},
+				},
 			});
 
-			return true;
+			return result.user;
 		}
 
 		if (pair.removed) {
-			await this.databaseService.room_user.update({
+			const result = await this.databaseService.room_user.update({
 				data: {
 					removed: false,
-				},
-				where: {
-					roomId_userId: params,
-				},
-			});
-
-			return true;
-		}
-
-		if (!pair.activated) {
-			await this.databaseService.room_user.update({
-				data: {
 					activated: true,
 				},
 				where: {
 					roomId_userId: params,
 				},
+				include: {
+					user: {
+						select: SECURITY_USER_SELECT,
+					},
+				},
 			});
 
-			return true;
+			return result.user;
 		}
 
-		return false;
+		return null;
 	}
 
 	async removeUser(params: RemoveUserParams): Promise<boolean> {

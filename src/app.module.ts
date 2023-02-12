@@ -1,7 +1,7 @@
 import { CacheModule, Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { UsersModule } from '@/users/users.module';
-import { RoomsModule } from '@/rooms/rooms.module';
+import { RoomsModule } from '@/rooms';
 import { TasksModule } from '@/tasks/tasks.module';
 import { GroupsModule } from '@/groups/groups.module';
 import { ActivitiesModule } from '@/activities/activities.module';

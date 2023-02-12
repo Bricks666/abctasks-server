@@ -8,7 +8,7 @@ import {
 } from './types';
 
 @Injectable()
-export class Repository {
+export class RoomRedisRepository {
 	constructor(private readonly redisService: RedisService) {}
 
 	async getInviteHash(params: GetInviteHashParams): Promise<string | null> {

@@ -12,7 +12,7 @@ import {
 } from './types';
 
 @Injectable()
-export class Repository {
+export class RoomRepository {
 	constructor(private readonly databaseService: DatabaseService) {}
 
 	async getAllByUser(params: GetAllByUserParams): Promise<RoomDto[]> {

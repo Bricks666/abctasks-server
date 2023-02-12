@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { Request } from 'express';
 import { SecurityUserDto } from '@/users/dto';
-import { RoomsService } from '../../rooms.service';
+import { RoomsService } from '../../services';
 
 @Injectable()
 export class IsRoomOwnerGuard implements CanActivate {
@@ -21,7 +21,7 @@ export class IsRoomOwnerGuard implements CanActivate {
 
 		const { id: userId, } = (req as any).user as SecurityUserDto;
 		const isOwner = await this.roomsService.isOwner({
-			roomId: Number(roomId ?? id),
+			id: Number(roomId ?? id),
 			userId,
 		});
 
