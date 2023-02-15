@@ -10,6 +10,7 @@ import { ProgressModule } from '@/progress';
 import { CommentsModule } from '@/comments';
 import { DatabaseModule } from '@/database';
 import { RedisModule } from '@/redis';
+import { MailModule } from '@/mail';
 
 @Module({
 	imports: [
@@ -33,7 +34,8 @@ import { RedisModule } from '@/redis';
 		GroupsModule,
 		ActivitiesModule,
 		ProgressModule,
-		CommentsModule
+		CommentsModule,
+		MailModule
 	],
 })
 export class AppModule {}

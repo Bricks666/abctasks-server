@@ -5,6 +5,7 @@ import {
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { SecurityUserDto } from '@/users';
+import { MailService } from '@/mail';
 import { RoomUserRepository, RoomRedisRepository } from '../../repositories';
 import {
 	GetUsersParams,
@@ -23,7 +24,8 @@ export class RoomUserService {
 	constructor(
 		private readonly roomUserRepository: RoomUserRepository,
 		private readonly roomRedisRepository: RoomRedisRepository,
-		private readonly jwtService: JwtService
+		private readonly jwtService: JwtService,
+		private readonly mailService: MailService
 	) {}
 
 	async getUsers(params: GetUsersParams): Promise<SecurityUserDto[]> {
@@ -61,7 +63,15 @@ export class RoomUserService {
 			throw new ConflictException('User has already been invited into room');
 		}
 
-		return this.roomUserRepository.addInvitation(params);
+		const user = await this.roomUserRepository.addInvitation(params);
+
+		await this.mailService.sendRoomInviteConfirmation({
+			email: user.email,
+			name: user.username,
+			roomId: params.roomId,
+		});
+
+		return user;
 	}
 
 	async generateInviteHash(params: GenerateInviteHashParams): Promise<string> {

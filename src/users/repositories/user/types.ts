@@ -2,15 +2,15 @@ import { Pagination } from '@/shared';
 import { CreateUserDto, UpdateUserDto } from '../../dto';
 
 export interface GetAllParams extends Pagination {
-	readonly login?: string;
+	readonly username?: string;
 }
 
 export interface GetOneParams {
 	readonly id: number;
 }
 
-export interface GetOneByLoginParams {
-	readonly login: string;
+export interface GetOneByEmailParams {
+	readonly email: string;
 }
 
 export interface CreateData extends CreateUserDto {}

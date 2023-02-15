@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { AuthModule } from '@/auth';
-
+import { MailModule } from '@/mail';
 import { UsersModule } from '@/users';
 import { RoomsController, RoomUserController } from './controllers';
 import { RoomsService, RoomUserService } from './services';
@@ -11,7 +11,7 @@ import {
 } from './repositories';
 
 @Module({
-	imports: [AuthModule, UsersModule],
+	imports: [AuthModule, UsersModule, MailModule],
 	providers: [
 		RoomsService,
 		RoomUserService,

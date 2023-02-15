@@ -109,9 +109,11 @@ model task {
 
 model user {
   id        Int         @id @default(autoincrement())
-  login     String      @unique(map: "login") @db.VarChar(32)
+  email     String      @unique() @db.VarChar(32)
+  username  String      @db.VarChar(32)
   password  String      @db.VarChar(255)
   photo     String?     @db.VarChar(255)
+  activated Boolean?    @default(false)
   room_user room_user[]
   room      room[]
 }

@@ -6,7 +6,7 @@ import { SECURITY_USER_SELECT } from './config';
 import {
 	CreateData,
 	GetAllParams,
-	GetOneByLoginParams,
+	GetOneByEmailParams,
 	GetOneParams,
 	UpdateParams
 } from './types';
@@ -16,12 +16,12 @@ export class UserRepository {
 	constructor(private readonly databaseService: DatabaseService) {}
 
 	async getAll(params: GetAllParams): Promise<SecurityUserDto[]> {
-		const { login, limit, offset, } = params;
+		const { username, limit, offset, } = params;
 		const where: Prisma.userWhereInput = {};
 
-		if (typeof login !== 'undefined') {
-			where.login = {
-				startsWith: login,
+		if (typeof username !== 'undefined') {
+			where.username = {
+				startsWith: username,
 			};
 		}
 
@@ -40,7 +40,7 @@ export class UserRepository {
 		});
 	}
 
-	async getOneByLogin(params: GetOneByLoginParams): Promise<UserModel | null> {
+	async getOneByLogin(params: GetOneByEmailParams): Promise<UserModel | null> {
 		return this.databaseService.user.findFirst({
 			where: params,
 		});

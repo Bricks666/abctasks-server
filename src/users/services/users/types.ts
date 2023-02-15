@@ -12,7 +12,7 @@ export interface GetOneParams extends GetUserDto {}
 export interface CreateParams extends CreateUserDto {}
 
 export interface GetInsecureParams {
-	readonly login: string;
+	readonly email: string;
 }
 
 export interface UpdateParas extends UpdateUserDto {

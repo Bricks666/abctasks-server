@@ -78,6 +78,7 @@ export class RoomRepository {
 					create: {
 						userId,
 						canChange: true,
+						activated: true,
 					},
 				},
 			},

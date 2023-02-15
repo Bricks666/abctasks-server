@@ -41,9 +41,9 @@ export class AuthService {
 	}
 
 	async login(params: LoginParams): Promise<AuthenticationResultDto> {
-		const { login, password, } = params;
+		const { email, password, } = params;
 
-		const user = await this.usersService.getInsecure({ login, });
+		const user = await this.usersService.getInsecure({ email, });
 
 		const isValidPassword = await compare(password, user.password);
 
@@ -64,8 +64,9 @@ export class AuthService {
 
 			return this.#generateToken({
 				id: authUser.id,
-				login: authUser.login,
+				username: authUser.username,
 				photo: authUser.photo,
+				email: authUser.email,
 			});
 		} catch (error) {
 			throw new ForbiddenException('Refresh token is incorrect', {

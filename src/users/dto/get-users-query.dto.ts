@@ -3,6 +3,6 @@ import { PaginationQueryDto } from '@/shared';
 import { UserDto } from './user.dto';
 
 export class GetUsersQueryDto extends IntersectionType(
-	PartialType(PickType(UserDto, ['login'] as const)),
+	PartialType(PickType(UserDto, ['username'] as const)),
 	PaginationQueryDto
 ) {}

@@ -1,6 +1,6 @@
 import { ApiProperty, ApiHideProperty } from '@nestjs/swagger';
 import { user as UserModel } from '@prisma/client';
-import { IsNumber, IsString, IsOptional } from 'class-validator';
+import { IsNumber, IsString, IsOptional, IsEmail } from 'class-validator';
 
 export class UserDto implements UserModel {
 	@ApiProperty({
@@ -13,11 +13,19 @@ export class UserDto implements UserModel {
 
 	@ApiProperty({
 		type: String,
-		description: 'Логин пользователя',
-		example: 'Login',
+		description: 'Имя пользователя, которое будет отображаться',
+		example: 'username',
 	})
 	@IsString()
-	declare login: string;
+	declare username: string;
+
+	@ApiProperty({
+		type: String,
+		description: 'Почта, к которой будет привязан аккаунт',
+		example: 'email@example.com',
+	})
+	@IsEmail()
+	declare email: string;
 
 	@ApiProperty({
 		type: String,
@@ -37,4 +45,6 @@ export class UserDto implements UserModel {
 	@IsString()
 	@IsOptional()
 	declare photo: string | null;
+
+	declare activated: boolean;
 }
