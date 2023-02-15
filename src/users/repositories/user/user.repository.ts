@@ -4,10 +4,12 @@ import { DatabaseService } from '@/database';
 import { SecurityUserDto } from '../../dto';
 import { SECURITY_USER_SELECT } from './config';
 import {
+	ActivateParams,
 	CreateData,
 	GetAllParams,
 	GetOneByEmailParams,
 	GetOneParams,
+	IsActivatedParams,
 	UpdateParams
 } from './types';
 
@@ -44,6 +46,29 @@ export class UserRepository {
 		return this.databaseService.user.findFirst({
 			where: params,
 		});
+	}
+
+	async isActivated(params: IsActivatedParams): Promise<boolean> {
+		const user = await this.databaseService.user.findFirst({
+			where: {
+				...params,
+				activated: true,
+			},
+		});
+
+		return Boolean(user);
+	}
+
+	async activate(params: ActivateParams): Promise<boolean> {
+		const user = await this.databaseService.user.update({
+			where: params,
+			data: {
+				activated: true,
+			},
+			select: SECURITY_USER_SELECT,
+		});
+
+		return Boolean(user);
 	}
 
 	async create(params: CreateData): Promise<SecurityUserDto> {

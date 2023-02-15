@@ -20,9 +20,9 @@ import {
 	ApiCreatedResponse
 } from '@nestjs/swagger';
 import { ActivitiesService } from '@/activities';
-import { Auth } from '@/auth';
+import { Auth, CurrentUser } from '@/auth';
 import { InRoom } from '@/rooms';
-import { IntParam, User } from '@/shared';
+import { IntParam } from '@/shared';
 import { SecurityUserDto } from '@/users';
 import { CreateTaskDto, TaskDto, UpdateTaskDto, GetTasksDto } from '../dto';
 import { TasksService } from '../services';
@@ -103,7 +103,7 @@ export class TasksController {
 	@Post('/:roomId/create')
 	async create(
 		@IntParam('roomId') roomId: number,
-		@User() user: SecurityUserDto,
+		@CurrentUser() user: SecurityUserDto,
 		@Body() body: CreateTaskDto
 	): Promise<TaskDto> {
 		const { id: authorId, } = user;
@@ -155,7 +155,7 @@ export class TasksController {
 	async update(
 		@IntParam('roomId') roomId: number,
 		@IntParam('id') id: number,
-		@User() user: SecurityUserDto,
+		@CurrentUser() user: SecurityUserDto,
 		@Body() body: UpdateTaskDto
 	): Promise<TaskDto> {
 		const { id: userId, } = user;
@@ -195,7 +195,7 @@ export class TasksController {
 	async remove(
 		@IntParam('roomId') roomId: number,
 		@IntParam('id') id: number,
-		@User() user: SecurityUserDto
+		@CurrentUser() user: SecurityUserDto
 	): Promise<boolean> {
 		const { id: userId, } = user;
 

@@ -16,8 +16,8 @@ import {
 	ApiParam,
 	ApiTags
 } from '@nestjs/swagger';
-import { IntParam, PaginationQueryDto, User } from '@/shared';
-import { Auth } from '@/auth';
+import { IntParam, PaginationQueryDto } from '@/shared';
+import { Auth, CurrentUser } from '@/auth';
 import { InRoom } from '@/rooms';
 import { ActivitiesService } from '@/activities';
 import { SecurityUserDto } from '@/users';
@@ -120,7 +120,7 @@ export class CommentsController {
 	async create(
 		@IntParam('taskId') taskId: number,
 		@IntParam('roomId') roomId: number,
-		@User() user: SecurityUserDto,
+		@CurrentUser() user: SecurityUserDto,
 		@Body() body: CreateCommentDto
 	): Promise<CommentDto> {
 		const { id: authorId, } = user;
@@ -175,7 +175,7 @@ export class CommentsController {
 		@IntParam('id') id: number,
 		@IntParam('taskId') taskId: number,
 		@IntParam('roomId') roomId: number,
-		@User() user: SecurityUserDto,
+		@CurrentUser() user: SecurityUserDto,
 		@Body() body: UpdateCommentDto
 	): Promise<CommentDto> {
 		const { id: authorId, } = user;
@@ -226,7 +226,7 @@ export class CommentsController {
 		@IntParam('id') id: number,
 		@IntParam('taskId') taskId: number,
 		@IntParam('roomId') roomId: number,
-		@User() user: SecurityUserDto
+		@CurrentUser() user: SecurityUserDto
 	): Promise<boolean> {
 		const { id: authorId, } = user;
 		const comment = await this.commentsService.remove({ id, taskId, roomId, });

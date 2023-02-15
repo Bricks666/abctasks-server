@@ -11,6 +11,14 @@ export interface GetOneParams extends GetUserDto {}
 
 export interface CreateParams extends CreateUserDto {}
 
+export interface IsActivatedParams {
+	readonly id: number;
+}
+
+export interface ActivateParams {
+	readonly id: number;
+}
+
 export interface GetInsecureParams {
 	readonly email: string;
 }

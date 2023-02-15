@@ -8,10 +8,12 @@ import { normalizePaginationParams } from '@/shared';
 import { SecurityUserDto, UserDto } from '../../dto';
 import { UserRepository } from '../../repositories';
 import {
+	ActivateParams,
 	CreateParams,
 	GetAllParams,
 	GetInsecureParams,
 	GetOneParams,
+	IsActivatedParams,
 	UpdateParas
 } from './types';
 
@@ -46,6 +48,20 @@ export class UsersService {
 		} catch (error) {
 			throw new ConflictException('User already exists', { cause: error, });
 		}
+	}
+
+	async isActivated(params: IsActivatedParams): Promise<boolean> {
+		return this.usersRepository.isActivated(params);
+	}
+
+	async activate(params: ActivateParams): Promise<boolean> {
+		const isActivate = await this.usersRepository.activate(params);
+
+		if (!isActivate) {
+			throw new NotFoundException('User was not found');
+		}
+
+		return isActivate;
 	}
 
 	async getInsecure(params: GetInsecureParams): Promise<UserDto> {

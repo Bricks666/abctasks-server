@@ -19,8 +19,8 @@ import {
 } from '@nestjs/swagger';
 import { ActivitiesService } from '@/activities';
 import { InRoom } from '@/rooms';
-import { Auth } from '@/auth';
-import { IntParam, User } from '@/shared';
+import { Auth, CurrentUser } from '@/auth';
+import { IntParam } from '@/shared';
 import { SecurityUserDto } from '@/users';
 import { GroupsService } from '../services';
 import { CreateGroupDto, GroupDto, UpdateGroupDto } from '../dto';
@@ -98,7 +98,7 @@ export class GroupsController {
 	@Post('/:roomId/create')
 	async create(
 		@IntParam('roomId') roomId: number,
-		@User() user: SecurityUserDto,
+		@CurrentUser() user: SecurityUserDto,
 		@Body() body: CreateGroupDto
 	): Promise<GroupDto> {
 		const { id: userId, } = user;
@@ -142,7 +142,7 @@ export class GroupsController {
 	async update(
 		@IntParam('roomId') roomId: number,
 		@IntParam('id') id: number,
-		@User() user: SecurityUserDto,
+		@CurrentUser() user: SecurityUserDto,
 		@Body() body: UpdateGroupDto
 	): Promise<GroupDto> {
 		const { id: userId, } = user;
@@ -182,7 +182,7 @@ export class GroupsController {
 	async remove(
 		@IntParam('roomId') roomId: number,
 		@IntParam('id') id: number,
-		@User() user: SecurityUserDto
+		@CurrentUser() user: SecurityUserDto
 	): Promise<boolean> {
 		const { id: userId, } = user;
 

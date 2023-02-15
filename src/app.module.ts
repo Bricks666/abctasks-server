@@ -1,3 +1,4 @@
+import { APP_GUARD } from '@nestjs/core';
 import { CacheModule, Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { UsersModule } from '@/users';
@@ -5,7 +6,7 @@ import { RoomsModule } from '@/rooms';
 import { TasksModule } from '@/tasks';
 import { GroupsModule } from '@/groups';
 import { ActivitiesModule } from '@/activities';
-import { AuthModule } from '@/auth';
+import { AuthGuard, AuthModule, IsActivatedGuard } from '@/auth';
 import { ProgressModule } from '@/progress';
 import { CommentsModule } from '@/comments';
 import { DatabaseModule } from '@/database';
@@ -36,6 +37,16 @@ import { MailModule } from '@/mail';
 		ProgressModule,
 		CommentsModule,
 		MailModule
+	],
+	providers: [
+		{
+			provide: APP_GUARD,
+			useClass: AuthGuard,
+		},
+		{
+			provide: APP_GUARD,
+			useClass: IsActivatedGuard,
+		}
 	],
 })
 export class AppModule {}

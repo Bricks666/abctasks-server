@@ -28,6 +28,7 @@ async function bootstrap() {
 			forbidUnknownValues: false,
 		})
 	);
+
 	app.useGlobalInterceptors(new StandardResponseInterceptor());
 	app.setGlobalPrefix('api');
 
@@ -37,7 +38,10 @@ async function bootstrap() {
 		.setVersion('1.0.0')
 		.addCookieAuth(process.env.COOKIE_NAME)
 		.addBearerAuth()
+		.addServer('http://localhost:5000')
+		.addTag('api')
 		.build();
+
 	const document = SwaggerModule.createDocument(app, config);
 	SwaggerModule.setup('docs', app, document);
 
@@ -47,6 +51,7 @@ async function bootstrap() {
 	(BigInt.prototype as any).toJSON = function () {
 		return (this as bigint).toString();
 	};
+
 	await app.listen(PORT, '0.0.0.0', () => {
 		console.log(`server start PORT: ${PORT}`);
 	});

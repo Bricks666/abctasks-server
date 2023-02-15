@@ -1,13 +1,16 @@
 import { JwtService } from '@nestjs/jwt';
 import {
+	ConflictException,
 	ForbiddenException,
 	Injectable,
 	UnauthorizedException
 } from '@nestjs/common';
 import { compare } from 'bcrypt';
 import { UsersService, SecurityUserDto } from '@/users';
+import { MailService } from '@/mail';
 import { AuthenticationResultDto, TokensDto } from '../../dto';
 import {
+	ActivateParams,
 	AuthenticationParams,
 	LoginParams,
 	RefreshParams,
@@ -19,7 +22,8 @@ import {
 export class AuthService {
 	constructor(
 		private readonly usersService: UsersService,
-		private readonly jwtService: JwtService
+		private readonly jwtService: JwtService,
+		private readonly mailService: MailService
 	) {}
 
 	async authentication(
@@ -28,7 +32,7 @@ export class AuthService {
 		const authUser = await this.verifyUser(params);
 		const user = await this.usersService.getOne({ id: authUser.id, });
 
-		const tokens = await this.#generateToken(user);
+		const tokens = await this.#generateTokens(user);
 
 		return {
 			user,
@@ -37,7 +41,31 @@ export class AuthService {
 	}
 
 	async registration(params: RegistrationParams): Promise<SecurityUserDto> {
-		return this.usersService.create(params);
+		const user = await this.usersService.create(params);
+
+		const tokens = await this.#generateTokens(user);
+
+		await this.mailService.sendEmailConfirmation({
+			name: user.username,
+			email: user.email,
+			token: tokens.refreshToken,
+		});
+
+		return user;
+	}
+
+	async activate(params: ActivateParams): Promise<boolean> {
+		const user = await this.verifyUser(params);
+
+		const isActivated = await this.usersService.isActivated({ id: user.id, });
+
+		if (isActivated) {
+			throw new ConflictException(
+				'User with the same email is already registered'
+			);
+		}
+
+		return this.usersService.activate({ id: user.id, });
 	}
 
 	async login(params: LoginParams): Promise<AuthenticationResultDto> {
@@ -53,7 +81,7 @@ export class AuthService {
 
 		user.password = undefined;
 
-		const tokens = await this.#generateToken(user);
+		const tokens = await this.#generateTokens(user);
 
 		return { user, tokens, };
 	}
@@ -62,7 +90,7 @@ export class AuthService {
 		try {
 			const authUser = await this.verifyUser(params);
 
-			return this.#generateToken({
+			return this.#generateTokens({
 				id: authUser.id,
 				username: authUser.username,
 				photo: authUser.photo,
@@ -87,7 +115,7 @@ export class AuthService {
 		}
 	}
 
-	async #generateToken(user: SecurityUserDto): Promise<TokensDto> {
+	async #generateTokens(user: SecurityUserDto): Promise<TokensDto> {
 		const accessToken = this.jwtService.signAsync(user, {
 			secret: process.env.SECRET,
 			expiresIn: '10m',

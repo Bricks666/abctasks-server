@@ -16,9 +16,9 @@ import {
 	ApiParam,
 	ApiTags
 } from '@nestjs/swagger';
-import { Auth } from '@/auth';
+import { Auth, CurrentUser } from '@/auth';
 import { SecurityUserDto } from '@/users';
-import { IntParam, User } from '@/shared';
+import { IntParam } from '@/shared';
 import { RoomUserService } from '../services';
 import { InRoom, IsOwner } from '../lib';
 
@@ -106,7 +106,7 @@ export class RoomUserController {
 	@Put('/invite/approve')
 	async approveInvite(
 		@IntParam('id') id: number,
-		@User() user: SecurityUserDto
+		@CurrentUser() user: SecurityUserDto
 	): Promise<SecurityUserDto> {
 		return this.roomUserService.approveInvite({ roomId: id, userId: user.id, });
 	}
@@ -122,7 +122,7 @@ export class RoomUserController {
 	@Put('/invite/reject')
 	async rejectInvite(
 		@IntParam('id') id: number,
-		@User() user: SecurityUserDto
+		@CurrentUser() user: SecurityUserDto
 	): Promise<boolean> {
 		return this.roomUserService.rejectInvite({ roomId: id, userId: user.id, });
 	}
@@ -149,7 +149,7 @@ export class RoomUserController {
 	@Put('/invite/:hash')
 	async addUserByLink(
 		@IntParam('hash') hash: string,
-		@User() user: SecurityUserDto
+		@CurrentUser() user: SecurityUserDto
 	): Promise<SecurityUserDto> {
 		return this.roomUserService.addUserByLink({
 			hash,
@@ -169,7 +169,7 @@ export class RoomUserController {
 	@Delete('/exit')
 	async exit(
 		@IntParam('id') id: number,
-		@User() user: SecurityUserDto
+		@CurrentUser() user: SecurityUserDto
 	): Promise<boolean> {
 		const { id: userId, } = user;
 		await this.roomUserService.removeUser({ roomId: id, userId, });

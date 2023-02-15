@@ -18,3 +18,10 @@ export interface CreateData extends CreateUserDto {}
 export interface UpdateParams extends UpdateUserDto {
 	readonly id: number;
 }
+export interface IsActivatedParams {
+	readonly id: number;
+}
+
+export interface ActivateParams {
+	readonly id: number;
+}

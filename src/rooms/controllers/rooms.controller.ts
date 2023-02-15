@@ -17,9 +17,9 @@ import {
 	ApiParam,
 	ApiTags
 } from '@nestjs/swagger';
-import { Auth } from '@/auth';
+import { Auth, CurrentUser } from '@/auth';
 import { SecurityUserDto } from '@/users';
-import { IntParam, User } from '@/shared';
+import { IntParam } from '@/shared';
 import { RoomsService } from '../services';
 import { CreateRoomDto, RoomDto, UpdateRoomDto } from '../dto';
 import { IsOwner } from '../lib';
@@ -40,7 +40,7 @@ export class RoomsController {
 	@Auth()
 	@UseInterceptors(CacheInterceptor)
 	@Get('/')
-	async getAll(@User() user: SecurityUserDto): Promise<RoomDto[]> {
+	async getAll(@CurrentUser() user: SecurityUserDto): Promise<RoomDto[]> {
 		const { id, } = user;
 		return this.roomsService.getAll({ userId: id, });
 	}
@@ -61,7 +61,7 @@ export class RoomsController {
 	@Get('/:id')
 	async getOne(
 		@IntParam('id') id: number,
-		@User() user: SecurityUserDto
+		@CurrentUser() user: SecurityUserDto
 	): Promise<RoomDto> {
 		const { id: userId, } = user;
 		return this.roomsService.getOne({ id, userId, });
@@ -80,7 +80,7 @@ export class RoomsController {
 	@Auth()
 	@Post('/create')
 	async create(
-		@User() user: SecurityUserDto,
+		@CurrentUser() user: SecurityUserDto,
 		@Body() body: CreateRoomDto
 	): Promise<RoomDto> {
 		const { id: userId, } = user;
@@ -105,7 +105,7 @@ export class RoomsController {
 	@Auth()
 	@Put('/:id/update')
 	async update(
-		@User() user: SecurityUserDto,
+		@CurrentUser() user: SecurityUserDto,
 		@IntParam('id') id: number,
 		@Body() body: UpdateRoomDto
 	): Promise<RoomDto> {

@@ -5,16 +5,21 @@ import {
 	ForbiddenException,
 	Get,
 	Post,
+	Put,
+	Query,
 	Res
 } from '@nestjs/common';
 import { Response } from 'express';
 import {
 	ApiBody,
+	ApiConflictResponse,
 	ApiCookieAuth,
 	ApiCreatedResponse,
+	ApiNotFoundResponse,
 	ApiOkResponse,
 	ApiOperation,
-	ApiTags
+	ApiTags,
+	ApiUnauthorizedResponse
 } from '@nestjs/swagger';
 import { BASE_COOKIE_OPTIONS, COOKIE_NAME, COOKIE_TIME } from '@/const';
 import { CreateUserDto, SecurityUserDto } from '@/users';
@@ -26,6 +31,7 @@ import {
 	LoginRequestDto,
 	TokensDto
 } from '../dto';
+import { DisableIsActivatedCheck, NoAuthCheck } from '../lib';
 
 @ApiTags('Авторизация')
 @Controller('auth')
@@ -39,6 +45,7 @@ export class AuthController {
 		type: AuthenticationResultDto,
 	})
 	@ApiCookieAuth()
+	@NoAuthCheck()
 	@Get('/')
 	async authentication(
 		@Cookie(COOKIE_NAME) token: string | null,
@@ -66,9 +73,33 @@ export class AuthController {
 		type: SecurityUserDto,
 		description: 'Подтверждение успешности регистрации',
 	})
+	@DisableIsActivatedCheck()
+	@NoAuthCheck()
 	@Post('registration')
 	async registration(@Body() body: CreateUserDto): Promise<SecurityUserDto> {
 		return this.authService.registration(body);
+	}
+
+	@ApiOperation({
+		summary: 'Подтверждение регистрации',
+	})
+	@ApiOkResponse({
+		type: Boolean,
+		description: 'Удалось ли подтвердить почту',
+	})
+	@ApiUnauthorizedResponse({
+		description: 'Токен не действителен',
+	})
+	@ApiConflictResponse({
+		description: 'Пользователь с такой почтой уже существует',
+	})
+	@ApiNotFoundResponse({
+		description: 'Пользователь не найден',
+	})
+	@DisableIsActivatedCheck()
+	@Put('registration/activate')
+	async activate(@Query('token') token: string): Promise<boolean> {
+		return this.authService.activate({ token, });
 	}
 
 	@ApiOperation({ summary: 'Вход пользователя в аккаунт', })
@@ -77,6 +108,7 @@ export class AuthController {
 		type: AuthenticationResultDto,
 		description: 'Данные пользователя и пара токенов',
 	})
+	@NoAuthCheck()
 	@Post('login')
 	async login(
 		@Res({ passthrough: true, }) res: Response,
@@ -112,6 +144,7 @@ export class AuthController {
 		description: 'Обновленная пара токенов',
 	})
 	@ApiCookieAuth()
+	@NoAuthCheck()
 	@Get('refresh')
 	async refresh(
 		@Cookie(COOKIE_NAME) token: string | null,

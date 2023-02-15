@@ -6,25 +6,40 @@ import {
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
+import { Reflector } from '@nestjs/core';
 import { SecurityUserDto } from '@/users';
 import { extractAccessToken } from '@/shared';
+import { NO_AUTH_CHECK_FLAG } from './config';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
-	constructor(private readonly jwtService: JwtService) {}
+	constructor(
+		private readonly jwtService: JwtService,
+		private readonly reflector: Reflector
+	) {}
 
 	async canActivate(context: ExecutionContext) {
-		const req: Request = context.switchToHttp().getRequest();
-		const tokenPair = extractAccessToken(req);
+		const noCheck = this.reflector.get(
+			NO_AUTH_CHECK_FLAG,
+			context.getHandler()
+		);
 
+		if (noCheck) {
+			return true;
+		}
+
+		const req: Request = context.switchToHttp().getRequest();
+
+		const tokenPair = extractAccessToken(req);
 		if (!tokenPair) {
 			throw new UnauthorizedException();
 		}
-		const [bearer, token] = tokenPair;
 
+		const [bearer, token] = tokenPair;
 		if (bearer !== 'Bearer') {
 			throw new UnauthorizedException();
 		}
+
 		let user: SecurityUserDto;
 		try {
 			user = await this.jwtService.verifyAsync<SecurityUserDto>(token, {

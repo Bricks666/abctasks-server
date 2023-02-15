@@ -7,6 +7,10 @@ export interface AuthenticationParams {
 
 export interface RegistrationParams extends CreateUserDto {}
 
+export interface ActivateParams {
+	readonly token: string;
+}
+
 export interface LoginParams extends LoginDto {}
 
 export interface RefreshParams {
