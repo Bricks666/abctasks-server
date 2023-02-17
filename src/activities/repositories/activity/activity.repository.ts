@@ -24,7 +24,7 @@ export class ActivityRepository {
 			...filters
 		} = params;
 
-		const where: Prisma.activityWhereInput = {
+		const where: Prisma.ActivityWhereInput = {
 			...prepareWhere(filters),
 			roomId,
 		};
@@ -55,7 +55,7 @@ export class ActivityRepository {
     */
 		const { roomId, ...filters } = params;
 
-		const where: Prisma.activityWhereInput = {
+		const where: Prisma.ActivityWhereInput = {
 			...prepareWhere(filters),
 			roomId,
 		};
@@ -84,21 +84,8 @@ export class ActivityRepository {
 	}
 
 	async create(params: CreateParams): Promise<ActivityDto> {
-		const { sphereName, ...data } = params;
 		return this.databaseService.activity.create({
-			data: {
-				...data,
-				sphere: {
-					connectOrCreate: {
-						create: {
-							name: sphereName,
-						},
-						where: {
-							name: sphereName,
-						},
-					},
-				},
-			},
+			data: params,
 			include: {
 				sphere: {
 					select: {

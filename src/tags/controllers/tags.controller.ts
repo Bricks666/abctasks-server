@@ -17,24 +17,28 @@ import {
 	ApiParam,
 	ApiTags
 } from '@nestjs/swagger';
-import { ActivitiesService } from '@/activities';
+import {
+	ActivitiesService,
+	ActivityActionCodes,
+	ActivitySphereCodes
+} from '@/activities';
 import { InRoom } from '@/rooms';
 import { Auth, CurrentUser } from '@/auth';
 import { IntParam } from '@/shared';
 import { SecurityUserDto } from '@/users';
-import { GroupsService } from '../services';
-import { CreateGroupDto, GroupDto, UpdateGroupDto } from '../dto';
+import { TagsService } from '../services';
+import { CreateTagDto, TagDto, UpdateTagDto } from '../dto';
 
-@ApiTags('Группы')
-@Controller('groups')
-export class GroupsController {
+@ApiTags('Тэги')
+@Controller('tags')
+export class TagsController {
 	constructor(
-		private readonly groupsService: GroupsService,
+		private readonly tagsService: TagsService,
 		private readonly activitiesService: ActivitiesService
 	) {}
 
 	@ApiOperation({
-		summary: 'Получение всех групп в комнате',
+		summary: 'Получение всех тэгов в комнате',
 	})
 	@ApiParam({
 		name: 'roomId',
@@ -42,17 +46,17 @@ export class GroupsController {
 		description: 'Id комнаты',
 	})
 	@ApiOkResponse({
-		type: GroupDto,
+		type: TagDto,
 		isArray: true,
 	})
 	@UseInterceptors(CacheInterceptor)
 	@Get('/:roomId')
-	async getAll(@IntParam('roomId') roomId: number): Promise<GroupDto[]> {
-		return this.groupsService.getAll({ roomId, });
+	async getAll(@IntParam('roomId') roomId: number): Promise<TagDto[]> {
+		return this.tagsService.getAll({ roomId, });
 	}
 
 	@ApiOperation({
-		summary: 'Получение группы из комнате',
+		summary: 'Получение тэга из комнате',
 	})
 	@ApiParam({
 		name: 'roomId',
@@ -62,10 +66,10 @@ export class GroupsController {
 	@ApiParam({
 		name: 'id',
 		type: Number,
-		description: 'Id группы',
+		description: 'Id тэга',
 	})
 	@ApiOkResponse({
-		type: GroupDto,
+		type: TagDto,
 	})
 	@ApiNotFoundResponse()
 	@UseInterceptors(CacheInterceptor)
@@ -73,12 +77,12 @@ export class GroupsController {
 	async getOne(
 		@IntParam('roomId') roomId: number,
 		@IntParam('id') id: number
-	): Promise<GroupDto> {
-		return this.groupsService.getOne({ roomId, id, });
+	): Promise<TagDto> {
+		return this.tagsService.getOne({ roomId, id, });
 	}
 
 	@ApiOperation({
-		summary: 'Создание новой группы',
+		summary: 'Создание новой тэга',
 	})
 	@ApiParam({
 		name: 'roomId',
@@ -86,12 +90,12 @@ export class GroupsController {
 		description: 'Id комнаты',
 	})
 	@ApiBody({
-		type: CreateGroupDto,
-		description: 'Тело новой группы',
+		type: CreateTagDto,
+		description: 'Данные тэга',
 	})
 	@ApiCreatedResponse({
-		type: GroupDto,
-		description: 'Созданная группа',
+		type: TagDto,
+		description: 'Созданная тэга',
 	})
 	@InRoom()
 	@Auth()
@@ -99,24 +103,24 @@ export class GroupsController {
 	async create(
 		@IntParam('roomId') roomId: number,
 		@CurrentUser() user: SecurityUserDto,
-		@Body() body: CreateGroupDto
-	): Promise<GroupDto> {
+		@Body() body: CreateTagDto
+	): Promise<TagDto> {
 		const { id: userId, } = user;
 
-		const group = await this.groupsService.create({ ...body, roomId, });
+		const tag = await this.tagsService.create({ ...body, roomId, });
 
 		await this.activitiesService.create({
 			roomId,
-			sphereName: 'group',
-			action: 'create',
 			activistId: userId,
+			sphereId: ActivitySphereCodes.TAG,
+			actionId: ActivityActionCodes.CREATE,
 		});
 
-		return group;
+		return tag;
 	}
 
 	@ApiOperation({
-		summary: 'Изменение группы',
+		summary: 'Изменение тэга',
 	})
 	@ApiParam({
 		name: 'roomId',
@@ -126,15 +130,15 @@ export class GroupsController {
 	@ApiParam({
 		name: 'id',
 		type: Number,
-		description: 'Id группы',
+		description: 'Id тэга',
 	})
 	@ApiBody({
-		type: UpdateGroupDto,
-		description: 'Новые данные группы',
+		type: UpdateTagDto,
+		description: 'Новые данные тэга',
 	})
 	@ApiOkResponse({
-		type: GroupDto,
-		description: 'Обновленная группа',
+		type: TagDto,
+		description: 'Обновленная тэга',
 	})
 	@InRoom()
 	@Auth()
@@ -143,24 +147,24 @@ export class GroupsController {
 		@IntParam('roomId') roomId: number,
 		@IntParam('id') id: number,
 		@CurrentUser() user: SecurityUserDto,
-		@Body() body: UpdateGroupDto
-	): Promise<GroupDto> {
+		@Body() body: UpdateTagDto
+	): Promise<TagDto> {
 		const { id: userId, } = user;
 
-		const group = await this.groupsService.update({ ...body, roomId, id, });
+		const tag = await this.tagsService.update({ ...body, roomId, id, });
 
 		await this.activitiesService.create({
 			roomId,
-			sphereName: 'group',
-			action: 'update',
 			activistId: userId,
+			sphereId: ActivitySphereCodes.TAG,
+			actionId: ActivityActionCodes.UPDATE,
 		});
 
-		return group;
+		return tag;
 	}
 
 	@ApiOperation({
-		summary: 'Удаление группы',
+		summary: 'Удаление тэга',
 	})
 	@ApiParam({
 		name: 'roomId',
@@ -170,11 +174,11 @@ export class GroupsController {
 	@ApiParam({
 		name: 'id',
 		type: Number,
-		description: 'Id группы',
+		description: 'Id тэга',
 	})
 	@ApiOkResponse({
 		type: Boolean,
-		description: 'Удалось ли удалить группу',
+		description: 'Удалось ли удалить тэг',
 	})
 	@InRoom()
 	@Auth()
@@ -186,13 +190,13 @@ export class GroupsController {
 	): Promise<boolean> {
 		const { id: userId, } = user;
 
-		const response = await this.groupsService.remove({ roomId, id, });
+		const response = await this.tagsService.remove({ roomId, id, });
 
 		await this.activitiesService.create({
 			roomId,
-			sphereName: 'group',
-			action: 'remove',
 			activistId: userId,
+			sphereId: ActivitySphereCodes.TAG,
+			actionId: ActivityActionCodes.REMOVE,
 		});
 
 		return response;

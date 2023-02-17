@@ -19,7 +19,11 @@ import {
 import { IntParam, PaginationQueryDto } from '@/shared';
 import { Auth, CurrentUser } from '@/auth';
 import { InRoom } from '@/rooms';
-import { ActivitiesService } from '@/activities';
+import {
+	ActivitiesService,
+	ActivityActionCodes,
+	ActivitySphereCodes
+} from '@/activities';
 import { SecurityUserDto } from '@/users';
 import { CommentDto, CreateCommentDto, UpdateCommentDto } from '../dto';
 import { CommentsService } from '../services';
@@ -132,9 +136,9 @@ export class CommentsController {
 		});
 		await this.activitiesService.create({
 			roomId,
-			action: 'create',
 			activistId: authorId,
-			sphereName: 'comment',
+			sphereId: ActivitySphereCodes.COMMENT,
+			actionId: ActivityActionCodes.CREATE,
 		});
 		return comment;
 	}
@@ -187,9 +191,9 @@ export class CommentsController {
 		});
 		await this.activitiesService.create({
 			roomId,
-			action: 'update',
 			activistId: authorId,
-			sphereName: 'comment',
+			sphereId: ActivitySphereCodes.COMMENT,
+			actionId: ActivityActionCodes.UPDATE,
 		});
 		return comment;
 	}
@@ -232,9 +236,9 @@ export class CommentsController {
 		const comment = await this.commentsService.remove({ id, taskId, roomId, });
 		await this.activitiesService.create({
 			roomId,
-			action: 'update',
 			activistId: authorId,
-			sphereName: 'comment',
+			sphereId: ActivitySphereCodes.COMMENT,
+			actionId: ActivityActionCodes.REMOVE,
 		});
 		return comment;
 	}

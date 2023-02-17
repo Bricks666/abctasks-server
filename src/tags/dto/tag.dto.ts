@@ -1,11 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { group as GroupModel } from '@prisma/client';
+import { Tag as TagModel } from '@prisma/client';
 import { IsHexColor, IsNumber, IsString } from 'class-validator';
 import { HEX } from '@/shared';
 
-export class GroupDto implements GroupModel {
+export class TagDto implements TagModel {
 	@ApiProperty({
-		description: 'Id группы',
+		description: 'Id тэга',
 		example: 1,
 		type: Number,
 	})
@@ -21,7 +21,7 @@ export class GroupDto implements GroupModel {
 	declare roomId: number;
 
 	@ApiProperty({
-		description: 'Id группы',
+		description: 'Название тэга',
 		example: 'Name',
 		type: String,
 	})
@@ -29,7 +29,7 @@ export class GroupDto implements GroupModel {
 	declare name: string;
 
 	@ApiProperty({
-		description: 'Основной цвет группы',
+		description: 'Основной цвет тэга',
 		example: '#ffffff',
 		type: String,
 	})
@@ -37,7 +37,7 @@ export class GroupDto implements GroupModel {
 	declare mainColor: HEX;
 
 	@ApiProperty({
-		description: 'Вторичный цвет группы',
+		description: 'Вторичный цвет тэга',
 		example: '#ffffff',
 		type: String,
 	})

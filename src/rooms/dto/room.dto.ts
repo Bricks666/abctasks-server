@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { room as RoomModel } from '@prisma/client';
+import { Room as RoomModel } from '@prisma/client';
 import { IsISO8601, IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class RoomDto implements RoomModel {

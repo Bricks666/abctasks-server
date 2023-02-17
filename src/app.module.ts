@@ -4,7 +4,7 @@ import { ConfigModule } from '@nestjs/config';
 import { UsersModule } from '@/users';
 import { RoomsModule } from '@/rooms';
 import { TasksModule } from '@/tasks';
-import { GroupsModule } from '@/groups';
+import { TagsModule } from '@/tags';
 import { ActivitiesModule } from '@/activities';
 import { AuthGuard, AuthModule, IsActivatedGuard } from '@/auth';
 import { ProgressModule } from '@/progress';
@@ -32,7 +32,7 @@ import { MailModule } from '@/mail';
 		UsersModule,
 		RoomsModule,
 		TasksModule,
-		GroupsModule,
+		TagsModule,
 		ActivitiesModule,
 		ProgressModule,
 		CommentsModule,

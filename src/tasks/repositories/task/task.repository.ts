@@ -18,9 +18,9 @@ export class TaskRepository {
 	async getAll(params: GetAllParams): Promise<TaskDto[]> {
 		const { roomId, by, type = 'asc', ...filters } = params;
 
-		const where: Prisma.taskWhereInput = prepareWhere(filters);
+		const where: Prisma.TaskWhereInput = prepareWhere(filters);
 
-		const orderBy: Prisma.taskOrderByWithRelationInput = {};
+		const orderBy: Prisma.TaskOrderByWithRelationInput = {};
 
 		if (by) {
 			orderBy[by] = type;

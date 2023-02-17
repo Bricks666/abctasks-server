@@ -3,10 +3,10 @@ import { TasksFiltersDto } from '../../dto';
 
 export const prepareWhere = (
 	filters: TasksFiltersDto
-): Prisma.taskWhereInput => {
+): Prisma.TaskWhereInput => {
 	return {
-		groupId: {
-			in: filters.groupId,
+		tagIds: {
+			hasSome: filters.tagIds,
 		},
 		authorId: {
 			in: filters.authorId,

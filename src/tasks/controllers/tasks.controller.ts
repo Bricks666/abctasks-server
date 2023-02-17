@@ -19,7 +19,11 @@ import {
 	ApiNotFoundResponse,
 	ApiCreatedResponse
 } from '@nestjs/swagger';
-import { ActivitiesService } from '@/activities';
+import {
+	ActivitiesService,
+	ActivitySphereCodes,
+	ActivityActionCodes
+} from '@/activities';
 import { Auth, CurrentUser } from '@/auth';
 import { InRoom } from '@/rooms';
 import { IntParam } from '@/shared';
@@ -117,8 +121,8 @@ export class TasksController {
 		await this.activitiesService.create({
 			roomId,
 			activistId: authorId,
-			sphereName: 'task',
-			action: 'create',
+			sphereId: ActivitySphereCodes.TASK,
+			actionId: ActivityActionCodes.CREATE,
 		});
 
 		return task;
@@ -165,8 +169,8 @@ export class TasksController {
 		await this.activitiesService.create({
 			roomId,
 			activistId: userId,
-			sphereName: 'task',
-			action: 'update',
+			sphereId: ActivitySphereCodes.TASK,
+			actionId: ActivityActionCodes.UPDATE,
 		});
 
 		return task;
@@ -204,8 +208,8 @@ export class TasksController {
 		await this.activitiesService.create({
 			roomId,
 			activistId: userId,
-			sphereName: 'task',
-			action: 'remove',
+			sphereId: ActivitySphereCodes.TASK,
+			actionId: ActivityActionCodes.REMOVE,
 		});
 
 		return response;

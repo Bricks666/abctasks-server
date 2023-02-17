@@ -1,13 +1,6 @@
-import {
-	IsEnum,
-	IsISO8601,
-	IsNumber,
-	IsOptional,
-	IsString
-} from 'class-validator';
+import { IsISO8601, IsNumber, IsOptional } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { NumberTransform } from '@/shared';
-import { ActivityAction } from './activity.dto';
 
 export class ActivitiesFiltersDto {
 	@ApiProperty({
@@ -23,37 +16,26 @@ export class ActivitiesFiltersDto {
 	declare activistId?: number[];
 
 	@ApiProperty({
-		type: String,
+		type: Number,
 		isArray: true,
 		required: false,
-		description: 'Название сферы деятельности',
-		example: ['comment'],
+		description: 'Id сферы деятельности',
+		example: [1],
 	})
-	@IsString({ each: true, })
+	@IsNumber({}, { each: true, })
 	@IsOptional()
-	declare sphereName?: string[];
+	declare sphereIds?: number[];
 
 	@ApiProperty({
-		enum: {
-			create: 'create',
-			update: 'update',
-			remove: 'remove',
-		},
+		type: Number,
 		isArray: true,
 		required: false,
-		description: 'Произошедшее действие',
-		example: ['create'],
+		description: 'Id Произошедшего действия',
+		example: [1],
 	})
-	@IsEnum(
-		{
-			create: 'create',
-			update: 'update',
-			remove: 'remove',
-		},
-		{ each: true, }
-	)
+	@IsNumber({}, { each: true, })
 	@IsOptional()
-	declare action?: ActivityAction[];
+	declare actionIds?: number[];
 
 	@ApiProperty({
 		type: String,

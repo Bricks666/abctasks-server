@@ -3,16 +3,16 @@ import { ActivitiesFiltersDto } from '../../dto';
 
 export const prepareWhere = (
 	filters: ActivitiesFiltersDto
-): Prisma.activityWhereInput => {
+): Prisma.ActivityWhereInput => {
 	return {
-		action: { in: filters.action, },
+		actionId: { in: filters.actionIds, },
 		activistId: { in: filters.activistId, },
 		createdAt: {
 			gte: filters.after,
 			lte: filters.before,
 		},
-		sphere: {
-			name: { in: filters.sphereName, },
+		sphereId: {
+			in: filters.sphereIds,
 		},
 	};
 };

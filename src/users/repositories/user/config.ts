@@ -5,4 +5,4 @@ export const SECURITY_USER_SELECT = {
 	username: true,
 	email: true,
 	photo: true,
-} satisfies Prisma.userSelect;
+} satisfies Prisma.UserSelect;

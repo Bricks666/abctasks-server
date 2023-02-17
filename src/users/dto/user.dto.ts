@@ -1,5 +1,5 @@
 import { ApiProperty, ApiHideProperty } from '@nestjs/swagger';
-import { user as UserModel } from '@prisma/client';
+import { User as UserModel } from '@prisma/client';
 import { IsNumber, IsString, IsOptional, IsEmail } from 'class-validator';
 
 export class UserDto implements UserModel {

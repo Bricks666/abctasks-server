@@ -1,4 +1,4 @@
 export * from './repositories';
 export * from './dto';
 export * from './services';
-export * from './groups.module';
+export * from './tags.module';

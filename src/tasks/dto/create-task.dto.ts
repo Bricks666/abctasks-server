@@ -4,6 +4,6 @@ import { TaskDto } from './task.dto';
 export class CreateTaskDto extends PickType(TaskDto, [
 	'title',
 	'description',
-	'groupId',
+	'tagIds',
 	'status'
 ]) {}

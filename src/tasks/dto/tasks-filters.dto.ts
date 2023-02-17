@@ -25,7 +25,7 @@ export class TasksFiltersDto {
 	@IsNumber({}, { each: true, })
 	@IsOptional()
 	@NumberTransform()
-	declare readonly groupId?: number[];
+	declare readonly tagIds?: number[];
 
 	@ApiProperty({
 		type: String,

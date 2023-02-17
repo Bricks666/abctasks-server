@@ -49,7 +49,7 @@ async function bootstrap() {
 	 * Для преобразования BigInt в JSON
 	 */
 	(BigInt.prototype as any).toJSON = function () {
-		return (this as bigint).toString();
+		return Number(this);
 	};
 
 	await app.listen(PORT, '0.0.0.0', () => {

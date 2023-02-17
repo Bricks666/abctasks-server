@@ -1,19 +1,19 @@
-import { CreateGroupDto, UpdateGroupDto } from '../../dto';
+import { CreateTagDto, UpdateTagDto } from '../../dto';
 
 export interface GetAllParams {
 	readonly roomId: number;
 }
 
 export interface GetOneParams {
+	readonly roomId: number;
 	readonly id: number;
+}
+
+export interface CreateParams extends CreateTagDto {
 	readonly roomId: number;
 }
 
-export interface CreateParams extends CreateGroupDto {
-	readonly roomId: number;
-}
-
-export interface UpdateParams extends UpdateGroupDto {
+export interface UpdateParams extends UpdateTagDto {
 	readonly id: number;
 	readonly roomId: number;
 }

@@ -1,4 +1,4 @@
-import { room_user as RoomUserModel } from '@prisma/client';
+import { RoomUser as RoomUserModel } from '@prisma/client';
 
 export class RoomUserDto implements RoomUserModel {
 	declare roomId: number;

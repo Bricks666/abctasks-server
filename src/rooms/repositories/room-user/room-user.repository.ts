@@ -20,7 +20,7 @@ export class RoomUserRepository {
 	async getUsers(params: GetUsersParams): Promise<SecurityUserDto[]> {
 		const { roomId, } = params;
 
-		const pairs = await this.databaseService.room_user.findMany({
+		const pairs = await this.databaseService.roomUser.findMany({
 			where: {
 				roomId,
 				removed: false,
@@ -39,7 +39,7 @@ export class RoomUserRepository {
 	async getInvitations(
 		params: GetInvitationsParams
 	): Promise<SecurityUserDto[]> {
-		const rows = await this.databaseService.room_user.findMany({
+		const rows = await this.databaseService.roomUser.findMany({
 			where: {
 				...params,
 				activated: false,
@@ -55,7 +55,7 @@ export class RoomUserRepository {
 	}
 
 	async addInvitation(params: AddInvitationParams): Promise<SecurityUserDto> {
-		const isExited = await this.databaseService.room_user.findFirst({
+		const isExited = await this.databaseService.roomUser.findFirst({
 			where: {
 				...params,
 				removed: true,
@@ -64,7 +64,7 @@ export class RoomUserRepository {
 		});
 
 		if (isExited) {
-			const result = await this.databaseService.room_user.update({
+			const result = await this.databaseService.roomUser.update({
 				data: {
 					activated: false,
 					removed: false,
@@ -82,7 +82,7 @@ export class RoomUserRepository {
 			return result.user;
 		}
 
-		const result = await this.databaseService.room_user.create({
+		const result = await this.databaseService.roomUser.create({
 			data: {
 				...params,
 			},
@@ -97,7 +97,7 @@ export class RoomUserRepository {
 	}
 
 	async isInvited(params: IsInvitedParams): Promise<boolean> {
-		const user = await this.databaseService.room_user.findFirst({
+		const user = await this.databaseService.roomUser.findFirst({
 			where: {
 				...params,
 				activated: false,
@@ -110,7 +110,7 @@ export class RoomUserRepository {
 	async activateUser(
 		params: ActivateUserParams
 	): Promise<SecurityUserDto | null> {
-		const result = await this.databaseService.room_user.update({
+		const result = await this.databaseService.roomUser.update({
 			data: {
 				activated: true,
 			},
@@ -132,12 +132,12 @@ export class RoomUserRepository {
   */
 	async addUser(params: AddUserParams): Promise<SecurityUserDto | null> {
 		const pair: RoomUserDto | null =
-			await this.databaseService.room_user.findFirst({
+			await this.databaseService.roomUser.findFirst({
 				where: params,
 			});
 
 		if (!pair) {
-			const result = await this.databaseService.room_user.create({
+			const result = await this.databaseService.roomUser.create({
 				data: { ...params, activated: true, },
 				include: {
 					user: {
@@ -150,7 +150,7 @@ export class RoomUserRepository {
 		}
 
 		if (pair.removed) {
-			const result = await this.databaseService.room_user.update({
+			const result = await this.databaseService.roomUser.update({
 				data: {
 					removed: false,
 					activated: true,
@@ -172,7 +172,7 @@ export class RoomUserRepository {
 	}
 
 	async removeUser(params: RemoveUserParams): Promise<boolean> {
-		const pair = await this.databaseService.room_user.findFirst({
+		const pair = await this.databaseService.roomUser.findFirst({
 			where: { ...params, activated: true, },
 		});
 
@@ -180,7 +180,7 @@ export class RoomUserRepository {
 			return false;
 		}
 
-		await this.databaseService.room_user.update({
+		await this.databaseService.roomUser.update({
 			data: {
 				removed: true,
 			},
@@ -194,7 +194,7 @@ export class RoomUserRepository {
 	}
 
 	async removeUserHard(params: RemoveUserParams): Promise<boolean> {
-		const { count, } = await this.databaseService.room_user.deleteMany({
+		const { count, } = await this.databaseService.roomUser.deleteMany({
 			where: params,
 		});
 
@@ -204,7 +204,7 @@ export class RoomUserRepository {
 	async existsUser(params: ExistsUserParams): Promise<boolean> {
 		const { roomId, userId, } = params;
 
-		const pair = await this.databaseService.room_user.findFirst({
+		const pair = await this.databaseService.roomUser.findFirst({
 			where: {
 				userId,
 				roomId,

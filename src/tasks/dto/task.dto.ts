@@ -1,4 +1,4 @@
-import { task as TaskModel, task_status } from '@prisma/client';
+import { Task as TaskModel, TaskStatus } from '@prisma/client';
 import {
 	IsISO8601,
 	IsEnum,
@@ -8,8 +8,6 @@ import {
 	MaxLength
 } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
-
-export type TaskStatus = task_status;
 
 export class TaskDto implements TaskModel {
 	@ApiProperty({
@@ -30,11 +28,12 @@ export class TaskDto implements TaskModel {
 
 	@ApiProperty({
 		type: Number,
-		description: 'Id группы',
-		example: 1,
+		isArray: true,
+		description: 'Id тэгов',
+		example: [1],
 	})
-	@IsNumber()
-	declare groupId: number;
+	@IsNumber({}, { each: true, })
+	declare tagIds: number[];
 
 	@ApiProperty({
 		type: Number,
@@ -84,4 +83,12 @@ export class TaskDto implements TaskModel {
 	})
 	@IsISO8601()
 	declare createdAt: Date;
+
+	@ApiProperty({
+		type: String,
+		description: 'Дата обновления',
+		example: '2022-07-07',
+	})
+	@IsISO8601()
+	declare updatedAt: Date;
 }

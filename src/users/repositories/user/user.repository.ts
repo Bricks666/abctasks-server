@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Prisma, user as UserModel } from '@prisma/client';
+import { Prisma, User as UserModel } from '@prisma/client';
 import { DatabaseService } from '@/database';
 import { SecurityUserDto } from '../../dto';
 import { SECURITY_USER_SELECT } from './config';
@@ -19,7 +19,7 @@ export class UserRepository {
 
 	async getAll(params: GetAllParams): Promise<SecurityUserDto[]> {
 		const { username, limit, offset, } = params;
-		const where: Prisma.userWhereInput = {};
+		const where: Prisma.UserWhereInput = {};
 
 		if (typeof username !== 'undefined') {
 			where.username = {
