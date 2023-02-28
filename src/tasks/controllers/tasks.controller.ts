@@ -121,8 +121,8 @@ export class TasksController {
 		await this.activitiesService.create({
 			roomId,
 			activistId: authorId,
-			sphereId: ActivitySphereCodes.TASK,
-			actionId: ActivityActionCodes.CREATE,
+			sphereName: ActivitySphereCodes.TASK,
+			actionName: ActivityActionCodes.CREATE,
 		});
 
 		return task;
@@ -169,8 +169,8 @@ export class TasksController {
 		await this.activitiesService.create({
 			roomId,
 			activistId: userId,
-			sphereId: ActivitySphereCodes.TASK,
-			actionId: ActivityActionCodes.UPDATE,
+			sphereName: ActivitySphereCodes.TASK,
+			actionName: ActivityActionCodes.UPDATE,
 		});
 
 		return task;
@@ -208,8 +208,8 @@ export class TasksController {
 		await this.activitiesService.create({
 			roomId,
 			activistId: userId,
-			sphereId: ActivitySphereCodes.TASK,
-			actionId: ActivityActionCodes.REMOVE,
+			sphereName: ActivitySphereCodes.TASK,
+			actionName: ActivityActionCodes.REMOVE,
 		});
 
 		return response;

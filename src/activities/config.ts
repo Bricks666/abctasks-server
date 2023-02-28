@@ -1,11 +1,11 @@
 export enum ActivityActionCodes {
-	CREATE = 1,
-	UPDATE = 2,
-	REMOVE = 3,
+	CREATE = 'create',
+	UPDATE = 'update',
+	REMOVE = 'remove',
 }
 
 export enum ActivitySphereCodes {
-	TASK = 1,
-	TAG = 2,
-	COMMENT = 3,
+	TASK = 'task',
+	TAG = 'tag',
+	COMMENT = 'comment',
 }

@@ -17,6 +17,7 @@ export const ApiPaginatedResponse = <TModel extends Type<any>>(
 								items: { $ref: getSchemaPath(model), },
 							},
 						},
+						type: 'object',
 					}
 				],
 			},

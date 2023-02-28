@@ -1,14 +1,37 @@
 import { Module } from '@nestjs/common';
 import { AuthModule } from '@/auth';
 
-import { ActivitiesController } from './controllers';
-import { ActivitiesService } from './services';
-import { ActivityRepository } from './repositories';
+import {
+	ActivitiesController,
+	ActivityActionsController,
+	ActivitySpheresController
+} from './controllers';
+import {
+	ActivitiesService,
+	ActivityActionsService,
+	ActivitySpheresService
+} from './services';
+import {
+	ActivityActionRepository,
+	ActivityRepository,
+	ActivitySphereRepository
+} from './repositories';
 
 @Module({
 	imports: [AuthModule],
-	controllers: [ActivitiesController],
-	providers: [ActivitiesService, ActivityRepository],
+	controllers: [
+		ActivitiesController,
+		ActivityActionsController,
+		ActivitySpheresController
+	],
+	providers: [
+		ActivitiesService,
+		ActivityRepository,
+		ActivitySphereRepository,
+		ActivityActionRepository,
+		ActivitySpheresService,
+		ActivityActionsService
+	],
 	exports: [ActivitiesService, ActivityRepository],
 })
 export class ActivitiesModule {}

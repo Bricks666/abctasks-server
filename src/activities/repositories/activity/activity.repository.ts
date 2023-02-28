@@ -84,13 +84,28 @@ export class ActivityRepository {
 	}
 
 	async create(params: CreateParams): Promise<ActivityDto> {
+		const { actionName, sphereName, ...data } = params;
 		return this.databaseService.activity.create({
-			data: params,
-			include: {
+			data: {
+				...data,
+				action: {
+					connectOrCreate: {
+						where: {
+							name: actionName,
+						},
+						create: {
+							name: actionName,
+						},
+					},
+				},
 				sphere: {
-					select: {
-						id: true,
-						name: true,
+					connectOrCreate: {
+						create: {
+							name: sphereName,
+						},
+						where: {
+							name: sphereName,
+						},
 					},
 				},
 			},

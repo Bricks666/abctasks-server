@@ -112,8 +112,8 @@ export class TagsController {
 		await this.activitiesService.create({
 			roomId,
 			activistId: userId,
-			sphereId: ActivitySphereCodes.TAG,
-			actionId: ActivityActionCodes.CREATE,
+			sphereName: ActivitySphereCodes.TAG,
+			actionName: ActivityActionCodes.CREATE,
 		});
 
 		return tag;
@@ -156,8 +156,8 @@ export class TagsController {
 		await this.activitiesService.create({
 			roomId,
 			activistId: userId,
-			sphereId: ActivitySphereCodes.TAG,
-			actionId: ActivityActionCodes.UPDATE,
+			sphereName: ActivitySphereCodes.TAG,
+			actionName: ActivityActionCodes.UPDATE,
 		});
 
 		return tag;
@@ -195,8 +195,8 @@ export class TagsController {
 		await this.activitiesService.create({
 			roomId,
 			activistId: userId,
-			sphereId: ActivitySphereCodes.TAG,
-			actionId: ActivityActionCodes.REMOVE,
+			sphereName: ActivitySphereCodes.TAG,
+			actionName: ActivityActionCodes.REMOVE,
 		});
 
 		return response;

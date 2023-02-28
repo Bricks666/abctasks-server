@@ -137,8 +137,8 @@ export class CommentsController {
 		await this.activitiesService.create({
 			roomId,
 			activistId: authorId,
-			sphereId: ActivitySphereCodes.COMMENT,
-			actionId: ActivityActionCodes.CREATE,
+			sphereName: ActivitySphereCodes.COMMENT,
+			actionName: ActivityActionCodes.CREATE,
 		});
 		return comment;
 	}
@@ -192,8 +192,8 @@ export class CommentsController {
 		await this.activitiesService.create({
 			roomId,
 			activistId: authorId,
-			sphereId: ActivitySphereCodes.COMMENT,
-			actionId: ActivityActionCodes.UPDATE,
+			sphereName: ActivitySphereCodes.COMMENT,
+			actionName: ActivityActionCodes.UPDATE,
 		});
 		return comment;
 	}
@@ -237,8 +237,8 @@ export class CommentsController {
 		await this.activitiesService.create({
 			roomId,
 			activistId: authorId,
-			sphereId: ActivitySphereCodes.COMMENT,
-			actionId: ActivityActionCodes.REMOVE,
+			sphereName: ActivitySphereCodes.COMMENT,
+			actionName: ActivityActionCodes.REMOVE,
 		});
 		return comment;
 	}

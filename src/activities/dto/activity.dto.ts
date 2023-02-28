@@ -1,7 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Activity as ActivityModel } from '@prisma/client';
 import { IsNumber } from 'class-validator';
-import { ActivitySphereDto } from './activity-sphere.dto';
 
 export class ActivityDto implements ActivityModel {
 	@ApiProperty({
@@ -43,8 +42,6 @@ export class ActivityDto implements ActivityModel {
 	})
 	@IsNumber()
 	declare activistId: number;
-
-	declare sphere: ActivitySphereDto;
 
 	declare createdAt: Date;
 }

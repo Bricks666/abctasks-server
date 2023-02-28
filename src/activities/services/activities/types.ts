@@ -1,9 +1,12 @@
-import { CreateActivityDto, GetActivitiesQueryDto } from '../../dto';
+import { GetActivitiesQueryDto } from '../../dto';
 
 export interface GetAllByRoomIdParams extends GetActivitiesQueryDto {
 	readonly roomId: number;
 }
 
-export interface CreateParams extends CreateActivityDto {
+export interface CreateParams {
 	readonly roomId: number;
+	readonly activistId: number;
+	readonly sphereName: string;
+	readonly actionName: string;
 }

@@ -1,5 +1,5 @@
 import { SortQueryDto, Pagination } from '@/shared';
-import { ActivitiesFiltersDto, CreateActivityDto } from '../../dto';
+import { ActivitiesFiltersDto } from '../../dto';
 
 export interface GetAllByRoomIdParams
 	extends Pagination,
@@ -16,6 +16,9 @@ export interface GetAllByUserIdParams extends Pagination {
 	readonly userId: number;
 }
 
-export interface CreateParams extends CreateActivityDto {
+export interface CreateParams {
 	readonly roomId: number;
+	readonly activistId: number;
+	readonly sphereName: string;
+	readonly actionName: string;
 }
