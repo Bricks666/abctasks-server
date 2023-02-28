@@ -1,6 +1,8 @@
 import { APP_GUARD } from '@nestjs/core';
-import { CacheModule, Module } from '@nestjs/common';
+import { CacheModule, CacheStore, Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { RedisClientOptions } from 'redis';
+import { redisStore } from 'cache-manager-redis-store';
 import { UsersModule } from '@/users';
 import { RoomsModule } from '@/rooms';
 import { TasksModule } from '@/tasks';
@@ -10,22 +12,18 @@ import { AuthGuard, AuthModule, IsActivatedGuard } from '@/auth';
 import { ProgressModule } from '@/progress';
 import { CommentsModule } from '@/comments';
 import { DatabaseModule } from '@/database';
-import { RedisModule } from '@/redis';
 import { MailModule } from '@/mail';
 
 @Module({
 	imports: [
-		CacheModule.register({
+		CacheModule.register<RedisClientOptions>({
+			store: redisStore as unknown as CacheStore,
 			isGlobal: true,
 			max: 50,
+			url: process.env.REDIS_URL,
 		}),
 		ConfigModule.forRoot({
 			envFilePath: '.env',
-		}),
-		RedisModule.forRoot({
-			lazyConnect: true,
-			host: process.env.REDIS_HOST,
-			port: Number(process.env.REDIS_PORT),
 		}),
 		DatabaseModule.forRoot({}),
 		AuthModule,

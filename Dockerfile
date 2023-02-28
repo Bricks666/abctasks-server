@@ -1,4 +1,4 @@
-FROM node:18-alpine as builder
+FROM node:alpine as builder
 WORKDIR /app
 COPY package.json /app/package.json
 RUN apk --no-cache add --virtual builds-deps build-base python3
@@ -8,12 +8,14 @@ RUN npx prisma generate
 COPY . /app
 RUN npm run build
 
-FROM node:18-alpine
+FROM node:alpine
 WORKDIR /app
-COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/package*.json ./
-COPY --from=builder /app/dist ./
+RUN npm i prisma
+RUN npm i --omit=dev --ignore-scripts
 COPY --from=builder /app/prisma ./prisma
+RUN npx prisma generate
+COPY --from=builder /app/dist ./
 EXPOSE 5000
 USER node
 CMD ["npm", "run", "start:prod"]

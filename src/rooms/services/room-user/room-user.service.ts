@@ -6,7 +6,7 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import { SecurityUserDto } from '@/users';
 import { MailService } from '@/mail';
-import { RoomUserRepository, RoomRedisRepository } from '../../repositories';
+import { RoomUserRepository } from '../../repositories';
 import {
 	GetUsersParams,
 	InviteUserParams,
@@ -23,7 +23,6 @@ import {
 export class RoomUserService {
 	constructor(
 		private readonly roomUserRepository: RoomUserRepository,
-		private readonly roomRedisRepository: RoomRedisRepository,
 		private readonly jwtService: JwtService,
 		private readonly mailService: MailService
 	) {}
@@ -75,20 +74,9 @@ export class RoomUserService {
 	}
 
 	async generateInviteHash(params: GenerateInviteHashParams): Promise<string> {
-		const cachedHash: string | null =
-			await this.roomRedisRepository.getInviteHash(params);
-
-		if (cachedHash) {
-			return cachedHash;
-		}
-
-		const hash = await this.jwtService.signAsync(params, {
+		return this.jwtService.signAsync(params, {
 			secret: process.env.SECRET,
 		});
-
-		await this.roomRedisRepository.setInviteHash({ ...params, hash, });
-
-		return hash;
 	}
 
 	async addUserByLink(params: AddUserParams): Promise<SecurityUserDto> {

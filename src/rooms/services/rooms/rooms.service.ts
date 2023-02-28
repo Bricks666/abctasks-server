@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { normalizePaginationParams } from '@/shared';
 import { RoomDto } from '../../dto';
-import { RoomRedisRepository, RoomRepository } from '../../repositories';
+import { RoomRepository } from '../../repositories';
 import {
 	CreateParams,
 	GetAllParams,
@@ -13,10 +13,7 @@ import {
 
 @Injectable()
 export class RoomsService {
-	constructor(
-		private readonly roomsRepository: RoomRepository,
-		private readonly roomRedisRepository: RoomRedisRepository
-	) {}
+	constructor(private readonly roomsRepository: RoomRepository) {}
 
 	async getAll(params: GetAllParams): Promise<RoomDto[]> {
 		const { userId, } = params;
@@ -57,7 +54,6 @@ export class RoomsService {
 	}
 
 	async remove(params: RemoveParams): Promise<boolean> {
-		await this.roomRedisRepository.removeInviteHash({ roomId: params.id, });
 		return this.roomsRepository.remove(params);
 	}
 }
