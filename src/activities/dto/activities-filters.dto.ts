@@ -13,7 +13,7 @@ export class ActivitiesFiltersDto {
 	@IsNumber()
 	@IsOptional()
 	@NumberTransform()
-	declare activistId?: number[];
+	declare activistIds?: number[];
 
 	@ApiProperty({
 		type: Number,

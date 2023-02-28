@@ -6,7 +6,7 @@ export const prepareWhere = (
 ): Prisma.ActivityWhereInput => {
 	return {
 		actionId: { in: filters.actionIds, },
-		activistId: { in: filters.activistId, },
+		activistId: { in: filters.activistIds, },
 		createdAt: {
 			gte: filters.after,
 			lte: filters.before,

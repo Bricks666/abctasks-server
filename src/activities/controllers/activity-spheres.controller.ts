@@ -17,7 +17,7 @@ export class ActivityActionsController {
 		type: ActivityActionDto,
 		isArray: true,
 	})
-	@Get('')
+	@Get('/all')
 	getAll(): Promise<ActivityActionDto[]> {
 		return this.activityActionsService.getAll();
 	}

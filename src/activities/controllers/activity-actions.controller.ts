@@ -17,7 +17,7 @@ export class ActivitySpheresController {
 		type: ActivitySphereDto,
 		isArray: true,
 	})
-	@Get('')
+	@Get('/all')
 	getAll(): Promise<ActivitySphereDto[]> {
 		return this.activitySpheresService.getAll();
 	}
