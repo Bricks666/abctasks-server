@@ -8,14 +8,15 @@ import { MailService } from './services';
 	imports: [
 		MailerModule.forRoot({
 			transport: {
-				host: 'smtp.sendgrid.net',
+				host: process.env.EMAIL_HOST,
+				port: Number(process.env.EMAIL_PORT),
 				auth: {
-					user: 'apikey',
-					pass: process.env.SEND_GRID_PASS,
+					user: process.env.EMAIL_USER,
+					pass: process.env.EMAIL_PASS,
 				},
 			},
 			defaults: {
-				from: process.env.SEND_GRID_FROM,
+				from: process.env.EMAIL_FROM,
 			},
 			template: {
 				adapter: new HandlebarsAdapter(),

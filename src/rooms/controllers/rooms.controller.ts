@@ -17,7 +17,7 @@ import {
 	ApiParam,
 	ApiTags
 } from '@nestjs/swagger';
-import { Auth, CurrentUser } from '@/auth';
+import { Auth, CurrentUser, DisableAuthCheck } from '@/auth';
 import { SecurityUserDto } from '@/users';
 import { IntParam } from '@/shared';
 import { RoomsService } from '../services';
@@ -57,6 +57,7 @@ export class RoomsController {
 	})
 	@ApiNotFoundResponse()
 	@Auth()
+	@DisableAuthCheck()
 	@UseInterceptors(CacheInterceptor)
 	@Get('/:id')
 	async getOne(

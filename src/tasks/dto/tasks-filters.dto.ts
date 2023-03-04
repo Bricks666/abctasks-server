@@ -13,7 +13,7 @@ export class TasksFiltersDto {
 	@IsNumber({}, { each: true, })
 	@IsOptional()
 	@NumberTransform()
-	declare readonly authorId?: number[];
+	declare readonly authorIds?: number[];
 
 	@ApiProperty({
 		type: Number,

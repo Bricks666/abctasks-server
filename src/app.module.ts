@@ -20,6 +20,7 @@ import { MailModule } from '@/mail';
 			store: redisStore as unknown as CacheStore,
 			isGlobal: true,
 			max: 50,
+			ttl: 10,
 			url: process.env.REDIS_URL,
 		}),
 		ConfigModule.forRoot({

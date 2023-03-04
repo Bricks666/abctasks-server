@@ -9,7 +9,7 @@ import { Request } from 'express';
 import { Reflector } from '@nestjs/core';
 import { SecurityUserDto } from '@/users';
 import { extractAccessToken } from '@/shared';
-import { NO_AUTH_CHECK_FLAG } from './config';
+import { DISABLE_AUTH_CHECK_FLAG } from './config';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -20,24 +20,26 @@ export class AuthGuard implements CanActivate {
 
 	async canActivate(context: ExecutionContext) {
 		const noCheck = this.reflector.get(
-			NO_AUTH_CHECK_FLAG,
+			DISABLE_AUTH_CHECK_FLAG,
 			context.getHandler()
 		);
-
-		if (noCheck) {
-			return true;
-		}
 
 		const req: Request = context.switchToHttp().getRequest();
 
 		const tokenPair = extractAccessToken(req);
 		if (!tokenPair) {
-			throw new UnauthorizedException();
+			if (noCheck) {
+				return true;
+			}
+			throw new UnauthorizedException('there is not token');
 		}
 
 		const [bearer, token] = tokenPair;
 		if (bearer !== 'Bearer') {
-			throw new UnauthorizedException();
+			if (noCheck) {
+				return true;
+			}
+			throw new UnauthorizedException('It is not bearer token');
 		}
 
 		let user: SecurityUserDto;
@@ -46,7 +48,10 @@ export class AuthGuard implements CanActivate {
 				secret: process.env.SECRET,
 			});
 		} catch {
-			throw new UnauthorizedException();
+			if (noCheck) {
+				return true;
+			}
+			throw new UnauthorizedException('invalid decoding');
 		}
 
 		if (user) {

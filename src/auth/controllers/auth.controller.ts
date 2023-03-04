@@ -31,7 +31,7 @@ import {
 	LoginRequestDto,
 	TokensDto
 } from '../dto';
-import { DisableIsActivatedCheck, NoAuthCheck } from '../lib';
+import { DisableAuthCheck } from '../lib';
 
 @ApiTags('Авторизация')
 @Controller('auth')
@@ -45,7 +45,7 @@ export class AuthController {
 		type: AuthenticationResultDto,
 	})
 	@ApiCookieAuth()
-	@NoAuthCheck()
+	@DisableAuthCheck()
 	@Get('/')
 	async authentication(
 		@Cookie(COOKIE_NAME) token: string | null,
@@ -73,8 +73,7 @@ export class AuthController {
 		type: SecurityUserDto,
 		description: 'Подтверждение успешности регистрации',
 	})
-	@DisableIsActivatedCheck()
-	@NoAuthCheck()
+	@DisableAuthCheck()
 	@Post('registration')
 	async registration(@Body() body: CreateUserDto): Promise<SecurityUserDto> {
 		return this.authService.registration(body);
@@ -96,7 +95,7 @@ export class AuthController {
 	@ApiNotFoundResponse({
 		description: 'Пользователь не найден',
 	})
-	@DisableIsActivatedCheck()
+	@DisableAuthCheck()
 	@Put('registration/activate')
 	async activate(@Query('token') token: string): Promise<boolean> {
 		return this.authService.activate({ token, });
@@ -108,7 +107,7 @@ export class AuthController {
 		type: AuthenticationResultDto,
 		description: 'Данные пользователя и пара токенов',
 	})
-	@NoAuthCheck()
+	@DisableAuthCheck()
 	@Post('login')
 	async login(
 		@Res({ passthrough: true, }) res: Response,
@@ -144,7 +143,7 @@ export class AuthController {
 		description: 'Обновленная пара токенов',
 	})
 	@ApiCookieAuth()
-	@NoAuthCheck()
+	@DisableAuthCheck()
 	@Get('refresh')
 	async refresh(
 		@Cookie(COOKIE_NAME) token: string | null,

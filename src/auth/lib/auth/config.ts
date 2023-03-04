@@ -1,1 +1,1 @@
-export const NO_AUTH_CHECK_FLAG = 'no-auth-check';
+export const DISABLE_AUTH_CHECK_FLAG = 'disable-auth-check';

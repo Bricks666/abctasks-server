@@ -23,7 +23,7 @@ import {
 	ActivitySphereCodes
 } from '@/activities';
 import { InRoom } from '@/rooms';
-import { Auth, CurrentUser } from '@/auth';
+import { Auth, CurrentUser, DisableAuthCheck } from '@/auth';
 import { IntParam } from '@/shared';
 import { SecurityUserDto } from '@/users';
 import { TagsService } from '../services';
@@ -49,6 +49,7 @@ export class TagsController {
 		type: TagDto,
 		isArray: true,
 	})
+	@DisableAuthCheck()
 	@UseInterceptors(CacheInterceptor)
 	@Get('/:roomId')
 	async getAll(@IntParam('roomId') roomId: number): Promise<TagDto[]> {
@@ -72,6 +73,7 @@ export class TagsController {
 		type: TagDto,
 	})
 	@ApiNotFoundResponse()
+	@DisableAuthCheck()
 	@UseInterceptors(CacheInterceptor)
 	@Get('/:roomId/:id')
 	async getOne(
@@ -189,7 +191,6 @@ export class TagsController {
 		@CurrentUser() user: SecurityUserDto
 	): Promise<boolean> {
 		const { id: userId, } = user;
-
 		const response = await this.tagsService.remove({ roomId, id, });
 
 		await this.activitiesService.create({

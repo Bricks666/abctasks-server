@@ -24,7 +24,7 @@ import {
 	ActivitySphereCodes,
 	ActivityActionCodes
 } from '@/activities';
-import { Auth, CurrentUser } from '@/auth';
+import { Auth, CurrentUser, DisableAuthCheck } from '@/auth';
 import { InRoom } from '@/rooms';
 import { IntParam } from '@/shared';
 import { SecurityUserDto } from '@/users';
@@ -51,6 +51,7 @@ export class TasksController {
 		type: TaskDto,
 		isArray: true,
 	})
+	@DisableAuthCheck()
 	@UseInterceptors(CacheInterceptor)
 	@Get('/:roomId')
 	async getAll(
@@ -77,6 +78,7 @@ export class TasksController {
 		type: TaskDto,
 	})
 	@ApiNotFoundResponse()
+	@DisableAuthCheck()
 	@UseInterceptors(CacheInterceptor)
 	@Get('/:roomId/:id')
 	async getOne(

@@ -16,13 +16,13 @@ import {
 	ApiParam,
 	ApiTags
 } from '@nestjs/swagger';
-import { Auth, CurrentUser } from '@/auth';
+import { Auth, CurrentUser, DisableAuthCheck } from '@/auth';
 import { SecurityUserDto } from '@/users';
 import { IntParam } from '@/shared';
 import { RoomUserService } from '../services';
 import { InRoom, IsOwner } from '../lib';
 
-@ApiTags('Комнаты')
+@ApiTags('Пользователи комнаты')
 @Controller('rooms/:id/members')
 export class RoomUserController {
 	constructor(private readonly roomUserService: RoomUserService) {}
@@ -40,6 +40,7 @@ export class RoomUserController {
 		type: NotFoundException,
 		description: 'Такой комнаты не существует',
 	})
+	@DisableAuthCheck()
 	@UseInterceptors(CacheInterceptor)
 	@Get('')
 	async getUsers(@IntParam('id') id: number): Promise<SecurityUserDto[]> {
@@ -57,6 +58,7 @@ export class RoomUserController {
 	@ApiNotFoundResponse({
 		description: 'Такой комнаты не существует',
 	})
+	@DisableAuthCheck()
 	@Get('invited')
 	async getInvitations(
 		@IntParam('id') roomId: number

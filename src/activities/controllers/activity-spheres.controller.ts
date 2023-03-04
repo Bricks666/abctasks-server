@@ -1,24 +1,26 @@
 import { Controller, Get } from '@nestjs/common';
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { ActivityActionDto } from '../dto';
-import { ActivityActionsService } from '../services';
+import { DisableAuthCheck } from '@/auth';
+import { ActivitySphereDto } from '../dto';
+import { ActivitySpheresService } from '../services';
 
-@ApiTags('События активностей')
-@Controller('activities/types')
-export class ActivityActionsController {
+@ApiTags('Сферы активностей')
+@Controller('activities/spheres')
+export class ActivitySpheresController {
 	constructor(
-		private readonly activityActionsService: ActivityActionsService
+		private readonly activitySpheresService: ActivitySpheresService
 	) {}
 
 	@ApiOperation({
-		summary: 'Все события активностей',
+		summary: 'Все сферы активностей',
 	})
 	@ApiOkResponse({
-		type: ActivityActionDto,
+		type: ActivitySphereDto,
 		isArray: true,
 	})
+	@DisableAuthCheck()
 	@Get('/all')
-	getAll(): Promise<ActivityActionDto[]> {
-		return this.activityActionsService.getAll();
+	getAll(): Promise<ActivitySphereDto[]> {
+		return this.activitySpheresService.getAll();
 	}
 }

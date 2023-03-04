@@ -7,6 +7,7 @@ import {
 import { Reflector } from '@nestjs/core';
 import { Request } from 'express';
 import { SecurityUserDto, UsersService } from '@/users';
+import { DISABLE_AUTH_CHECK_FLAG } from '../auth';
 import { DISABLE_IS_ACTIVATED_FLAG } from './config';
 
 @Injectable()
@@ -17,10 +18,15 @@ export class IsActivatedGuard implements CanActivate {
 	) {}
 
 	async canActivate(context: ExecutionContext): Promise<boolean> {
-		const disable = this.reflector.get<boolean | undefined>(
-			DISABLE_IS_ACTIVATED_FLAG,
-			context.getHandler()
-		);
+		const disable =
+			this.reflector.get<boolean | undefined>(
+				DISABLE_IS_ACTIVATED_FLAG,
+				context.getHandler()
+			) ||
+			this.reflector.get<boolean | undefined>(
+				DISABLE_AUTH_CHECK_FLAG,
+				context.getHandler()
+			);
 
 		if (disable) {
 			return true;

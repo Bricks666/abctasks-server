@@ -4,16 +4,24 @@ import { TasksFiltersDto } from '../../dto';
 export const prepareWhere = (
 	filters: TasksFiltersDto
 ): Prisma.TaskWhereInput => {
-	return {
-		tagIds: {
+	const where: Prisma.TaskWhereInput = {};
+
+	if (filters.tagIds) {
+		where.tagIds = {
 			hasSome: filters.tagIds,
-		},
-		authorId: {
-			in: filters.authorId,
-		},
-		createdAt: {
+		};
+	}
+	if (filters.authorIds) {
+		where.authorId = {
+			in: filters.authorIds,
+		};
+	}
+	if (filters.after || filters.before) {
+		where.createdAt = {
 			gte: filters.after,
 			lte: filters.before,
-		},
-	};
+		};
+	}
+
+	return where;
 };
