@@ -23,6 +23,7 @@ import { IntParam } from '@/shared';
 import { RoomsService } from '../services';
 import { CreateRoomDto, RoomDto, UpdateRoomDto } from '../dto';
 import { IsOwner } from '../lib';
+import { WithRights } from '../types';
 
 @ApiTags('Комнаты')
 @Controller('rooms')
@@ -40,7 +41,9 @@ export class RoomsController {
 	@Auth()
 	@UseInterceptors(CacheInterceptor)
 	@Get('/')
-	async getAll(@CurrentUser() user: SecurityUserDto): Promise<RoomDto[]> {
+	async getAll(
+		@CurrentUser() user: SecurityUserDto
+	): Promise<WithRights<RoomDto>[]> {
 		const { id, } = user;
 		return this.roomsService.getAll({ userId: id, });
 	}
@@ -63,7 +66,7 @@ export class RoomsController {
 	async getOne(
 		@IntParam('id') id: number,
 		@CurrentUser() user: SecurityUserDto
-	): Promise<RoomDto> {
+	): Promise<WithRights<RoomDto>> {
 		const { id: userId, } = user;
 		return this.roomsService.getOne({ id, userId, });
 	}
@@ -83,7 +86,7 @@ export class RoomsController {
 	async create(
 		@CurrentUser() user: SecurityUserDto,
 		@Body() body: CreateRoomDto
-	): Promise<RoomDto> {
+	): Promise<WithRights<RoomDto>> {
 		const { id: userId, } = user;
 		return this.roomsService.create({
 			...body,
@@ -109,7 +112,7 @@ export class RoomsController {
 		@CurrentUser() user: SecurityUserDto,
 		@IntParam('id') id: number,
 		@Body() body: UpdateRoomDto
-	): Promise<RoomDto> {
+	): Promise<WithRights<RoomDto>> {
 		const { id: userId, } = user;
 
 		return this.roomsService.update({ ...body, id, userId, });

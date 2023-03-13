@@ -19,7 +19,11 @@ export class InRoomGuard implements CanActivate {
 			throw new Error('Incorrect using of InRoomGuard');
 		}
 
-		const { id: userId, } = (req as any).user as SecurityUserDto;
+		const user = (req as any).user as SecurityUserDto;
+		if (!user) {
+			return false;
+		}
+		const { id: userId, } = user;
 		const roomExistsUser = await this.roomUserService.isExists({
 			roomId: Number(roomId || id),
 			userId,

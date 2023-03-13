@@ -35,13 +35,6 @@ export class RoomDto implements RoomModel {
 	@IsString()
 	declare description: string;
 
-	@ApiProperty({
-		example: true,
-		description: 'Может ли пользователь изменять состояние комнаты',
-		type: Boolean,
-	})
-	declare canChange: boolean;
-
 	@IsISO8601()
 	declare createdAt: Date;
 

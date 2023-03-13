@@ -21,7 +21,6 @@ model User {
 model RoomUser {
   roomId    Int
   userId    Int
-  canChange Boolean   @default(false) // Может добавить роль или что нибудь подобное
   removed   Boolean   @default(false)
   activated Boolean   @default(false)
   room      Room      @relation(fields: [roomId], references: [id], onDelete: Cascade, map: "room-user_ibfk_1")
@@ -53,6 +52,7 @@ model Comment {
   taskId    Int
   content   String    @db.VarChar(255)
   createdAt DateTime? @default(now())
+  updatedAt DateTime  @updatedAt
   task      Task      @relation(fields: [taskId, roomId], references: [id, roomId])
   author    RoomUser  @relation(fields: [roomId, authorId], references: [roomId, userId])
 

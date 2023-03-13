@@ -46,13 +46,21 @@ export class TaskRepository {
 	}
 
 	async create(params: CreateParams): Promise<TaskDto> {
+		const { tagIds, ...rest } = params;
 		return this.databaseService.task.create({
-			data: params,
+			data: {
+				...rest,
+				task_tag: {
+					createMany: {
+						data: tagIds.map((tagId) => ({ tagId, })),
+					},
+				},
+			},
 		});
 	}
 
 	async update(params: UpdateParams): Promise<TaskDto> {
-		const { id, roomId, ...data } = params;
+		const { id, roomId, tagIds, ...data } = params;
 
 		return this.databaseService.task.update({
 			where: {
@@ -61,7 +69,15 @@ export class TaskRepository {
 					roomId,
 				},
 			},
-			data,
+			data: {
+				...data,
+				task_tag: {
+					createMany: {
+						skipDuplicates: true,
+						data: tagIds ? tagIds.map((tagId) => ({ tagId, })) : [],
+					},
+				},
+			},
 		});
 	}
 

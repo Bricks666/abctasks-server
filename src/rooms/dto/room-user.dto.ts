@@ -7,7 +7,5 @@ export class RoomUserDto implements RoomUserModel {
 
 	declare activated: boolean;
 
-	declare canChange: boolean;
-
 	declare removed: boolean;
 }

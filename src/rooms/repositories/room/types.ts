@@ -7,7 +7,6 @@ export interface GetAllByUserParams extends Pagination {
 
 export interface GetOneParams {
 	readonly id: number;
-	readonly userId: number;
 }
 
 export interface CreateParams extends CreateRoomDto {
@@ -16,18 +15,8 @@ export interface CreateParams extends CreateRoomDto {
 
 export interface UpdateParams extends UpdateRoomDto {
 	readonly id: number;
-	readonly userId: number;
 }
 
 export interface RemoveParams {
 	readonly id: number;
 }
-
-export interface HasCanChange {
-	readonly room_user: {
-		canChange: boolean;
-	}[];
-}
-
-export type WithCanChange<T extends HasCanChange> = Omit<T, 'room_user'> &
-	T['room_user'][0];

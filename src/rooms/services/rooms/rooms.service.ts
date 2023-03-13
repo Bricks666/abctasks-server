@@ -1,4 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { WithRights } from '@/rooms/types';
 import { normalizePaginationParams } from '@/shared';
 import { RoomDto } from '../../dto';
 import { RoomRepository } from '../../repositories';
@@ -15,32 +16,41 @@ import {
 export class RoomsService {
 	constructor(private readonly roomsRepository: RoomRepository) {}
 
-	async getAll(params: GetAllParams): Promise<RoomDto[]> {
+	async getAll(params: GetAllParams): Promise<WithRights<RoomDto>[]> {
 		const { userId, } = params;
 		const pagination = normalizePaginationParams({});
 
-		return this.roomsRepository.getAllByUser({
+		const rooms = await this.roomsRepository.getAllByUser({
 			...pagination,
 			userId,
 		});
+
+		return rooms.map((room) => ({
+			...room,
+			canChange: room.ownerId === userId,
+		}));
 	}
 
-	async getOne(params: GetOneParams): Promise<RoomDto> {
+	async getOne(params: GetOneParams): Promise<WithRights<RoomDto>> {
 		const room = await this.roomsRepository.getOne(params);
 
 		if (!room) {
 			throw new NotFoundException('Room was not found');
 		}
 
-		return room;
+		return { ...room, canChange: room.ownerId === params.userId, };
 	}
 
-	async create(params: CreateParams): Promise<RoomDto> {
-		return this.roomsRepository.create(params);
+	async create(params: CreateParams): Promise<WithRights<RoomDto>> {
+		const room = await this.roomsRepository.create(params);
+
+		return { ...room, canChange: room.ownerId === params.userId, };
 	}
 
-	async update(params: UpdateParams): Promise<RoomDto> {
-		return this.roomsRepository.update(params);
+	async update(params: UpdateParams): Promise<WithRights<RoomDto>> {
+		const room = await this.roomsRepository.update(params);
+
+		return { ...room, canChange: room.ownerId === params.userId, };
 	}
 
 	async isOwner(params: IsOwnerParams): Promise<boolean> {
