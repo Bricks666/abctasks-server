@@ -45,4 +45,6 @@ export class CommentDto implements CommentModel {
 	declare content: string;
 
 	declare createdAt: Date;
+
+	declare updatedAt: Date;
 }

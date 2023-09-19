@@ -4,10 +4,12 @@ services:
     build: .
     ports:
       - 5000:5000
+    env_file:
+      - .env
     environment:
       ROUND_COUNT: 4
       SECRET: 123
-      DATABASE_URL: postgres://root:Root123@db:5432/Todo
+      DATABASE_URL: postgres://${DATABASE_USER}:${DATABASE_PASSWORD}@db:5432/${DATABASE_NAME}
       PORT: 5000
       REDIS_URL: redis://cache:6379/0
       EMAIL_HOST: smtp.sendgrid.net
@@ -18,25 +20,26 @@ services:
     depends_on:
       - db
       - redis
-    restart:
-      on-failure
+    restart: always
     container_name: api
   db:
     image: postgres:alpine
-    restart: always
     ports:
-      - 5432:5432
+      - 5433:5432
+    restart: always
     volumes:
       - db-data:/var/lib/postgresql/data
+    env_file:
+      - .env
     environment:
-      POSTGRES_DB: Todo
-      POSTGRES_USER: root
-      POSTGRES_PASSWORD: Root123
+      POSTGRES_DB: ${DATABASE_NAME}
+      POSTGRES_USER: ${DATABASE_USER}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
     container_name: db
   redis:
     image: redis:alpine
-    ports:
-      - 6379:6379
+    env_file:
+      - .env
     volumes:
       - redis-data:/data
     restart:
