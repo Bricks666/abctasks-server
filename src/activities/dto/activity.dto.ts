@@ -1,8 +1,13 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Activity as ActivityModel } from '@prisma/client';
-import { IsNumber } from 'class-validator';
+import { IsNumber, IsObject } from 'class-validator';
+import { SecurityUserDto } from '@/users';
+import { ActivitySphereDto } from './activity-sphere.dto';
+import { ActivityActionDto } from './activity-action.dto';
 
-export class ActivityDto implements ActivityModel {
+export class ActivityDto
+implements Omit<ActivityModel, 'sphereId' | 'activistId' | 'actionId'>
+{
 	@ApiProperty({
 		description: 'Id активности',
 		example: 1,
@@ -21,27 +26,24 @@ export class ActivityDto implements ActivityModel {
 
 	@ApiProperty({
 		description: 'Направление активности',
-		example: 1,
-		type: Number,
+		type: ActivitySphereDto,
 	})
-	@IsNumber()
-	declare sphereId: number;
+	@IsObject()
+	declare sphere: ActivitySphereDto;
 
 	@ApiProperty({
-		type: Number,
+		type: ActivityActionDto,
 		description: 'Тип активности',
-		example: 1,
 	})
-	@IsNumber()
-	declare actionId: number;
+	@IsObject()
+	declare action: ActivityActionDto;
 
 	@ApiProperty({
-		description: 'Id создателя активности',
-		example: 1,
-		type: Number,
+		description: 'Who made activity',
+		type: SecurityUserDto,
 	})
-	@IsNumber()
-	declare activistId: number;
+	@IsObject()
+	declare activist: SecurityUserDto;
 
 	declare createdAt: Date;
 }

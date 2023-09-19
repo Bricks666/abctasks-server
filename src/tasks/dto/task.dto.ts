@@ -5,11 +5,14 @@ import {
 	IsNumber,
 	IsOptional,
 	IsString,
-	MaxLength
+	MaxLength,
+	IsObject
 } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
+import { TagDto } from '@/tags';
+import { SecurityUserDto } from '@/users';
 
-export class TaskDto implements TaskModel {
+export class TaskDto implements Omit<TaskModel, 'tagIds' | 'authorId'> {
 	@ApiProperty({
 		type: Number,
 		description: 'Id задачи',
@@ -27,21 +30,23 @@ export class TaskDto implements TaskModel {
 	declare roomId: number;
 
 	@ApiProperty({
-		type: Number,
+		type: TagDto,
 		isArray: true,
-		description: 'Id тэгов',
-		example: [1],
+		description: 'Tags',
 	})
-	@IsNumber({}, { each: true, })
-	declare tagIds: number[];
+	@IsObject({
+		each: true,
+	})
+	declare tags: TagDto[];
+
+	declare authorId: number;
 
 	@ApiProperty({
-		type: Number,
-		description: 'Id автора',
-		example: 1,
+		type: SecurityUserDto,
+		description: 'Автор',
 	})
-	@IsNumber()
-	declare authorId: number;
+	@IsObject()
+	declare author: number;
 
 	@ApiProperty({
 		type: String,

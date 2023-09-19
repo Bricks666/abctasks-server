@@ -1,8 +1,9 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Comment as CommentModel } from '@prisma/client';
-import { IsNumber, IsString, MinLength } from 'class-validator';
+import { IsNumber, IsObject, IsString, MinLength } from 'class-validator';
+import { SecurityUserDto } from '@/users';
 
-export class CommentDto implements CommentModel {
+export class CommentDto implements Omit<CommentModel, 'authorId'> {
 	@ApiProperty({
 		type: Number,
 		description: 'Id комментария',
@@ -12,12 +13,11 @@ export class CommentDto implements CommentModel {
 	declare id: number;
 
 	@ApiProperty({
-		type: Number,
-		description: 'Id создателя комментария',
-		example: 1,
+		type: SecurityUserDto,
+		description: 'Comment creator',
 	})
-	@IsNumber()
-	declare authorId: number;
+	@IsObject()
+	declare author: SecurityUserDto;
 
 	@ApiProperty({
 		type: Number,

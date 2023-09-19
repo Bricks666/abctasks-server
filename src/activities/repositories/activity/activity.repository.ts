@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { DatabaseService } from '@/database';
+import { SECURITY_USER_SELECT } from '@/users';
 import { ActivityDto } from '../../dto';
 import {
 	CreateParams,
@@ -9,6 +10,21 @@ import {
 	GetTotalCountInRoomParams
 } from './types';
 import { prepareWhere } from './lib';
+
+const select = {
+	id: true,
+	roomId: true,
+	room_user: {
+		select: {
+			user: {
+				select: SECURITY_USER_SELECT,
+			},
+		},
+	},
+	sphere: true,
+	action: true,
+	createdAt: true,
+} satisfies Prisma.ActivitySelect;
 
 @Injectable()
 export class ActivityRepository {
@@ -29,22 +45,17 @@ export class ActivityRepository {
 			roomId,
 		};
 
-		return this.databaseService.activity.findMany({
+		const activities = await this.databaseService.activity.findMany({
 			where,
+			select,
 			take: limit,
 			skip: offset,
-			include: {
-				sphere: {
-					select: {
-						id: true,
-						name: true,
-					},
-				},
-			},
 			orderBy: {
 				[by]: type,
 			},
 		});
+
+		return activities.map(ActivityRepository.map);
 	}
 
 	async getTotalCountInRoom(
@@ -66,7 +77,7 @@ export class ActivityRepository {
 
 	async getAllByUserId(params: GetAllByUserIdParams): Promise<ActivityDto[]> {
 		const { limit, offset, userId, } = params;
-		return this.databaseService.activity.findMany({
+		const activities = await this.databaseService.activity.findMany({
 			where: {
 				activistId: userId,
 			},
@@ -81,11 +92,13 @@ export class ActivityRepository {
 				},
 			},
 		});
+
+		return activities.map(ActivityRepository.map);
 	}
 
 	async create(params: CreateParams): Promise<ActivityDto> {
 		const { actionName, sphereName, ...data } = params;
-		return this.databaseService.activity.create({
+		const activity = await this.databaseService.activity.create({
 			data: {
 				...data,
 				action: {
@@ -108,7 +121,19 @@ export class ActivityRepository {
 						},
 					},
 				},
-			},
+			} as any,
+			select,
 		});
+
+		return ActivityRepository.map(activity);
+	}
+
+	private static map(activity: any): ActivityDto {
+		const { room_user, ...rest } = activity;
+
+		return {
+			...rest,
+			activist: room_user.user,
+		};
 	}
 }

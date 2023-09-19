@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { DatabaseService } from '@/database';
+import { SECURITY_USER_SELECT } from '@/users';
 import { TaskDto } from '../../dto';
 import {
 	CreateParams,
@@ -10,6 +11,26 @@ import {
 	UpdateParams
 } from './types';
 import { prepareWhere } from './lib';
+
+const select = {
+	id: true,
+	roomId: true,
+	title: true,
+	description: true,
+	status: true,
+	task_tag: {
+		select: {
+			tag: true,
+		},
+	},
+	author: {
+		select: {
+			user: { select: SECURITY_USER_SELECT, },
+		},
+	},
+	updatedAt: true,
+	createdAt: true,
+} satisfies Prisma.TaskSelect;
 
 @Injectable()
 export class TaskRepository {
@@ -32,22 +53,26 @@ export class TaskRepository {
 				roomId,
 			},
 			orderBy,
+			select,
 		});
 
-		return tasks;
+		return tasks.map(TaskRepository.map);
 	}
 
 	async getOne(params: GetOneParams): Promise<TaskDto | null> {
-		return this.databaseService.task.findUnique({
+		const task = await this.databaseService.task.findUnique({
 			where: {
 				id_roomId: params,
 			},
+			select,
 		});
+
+		return task ? TaskRepository.map(task) : null;
 	}
 
 	async create(params: CreateParams): Promise<TaskDto> {
 		const { tagIds, ...rest } = params;
-		return this.databaseService.task.create({
+		const task = await this.databaseService.task.create({
 			data: {
 				...rest,
 				task_tag: {
@@ -56,13 +81,16 @@ export class TaskRepository {
 					},
 				},
 			},
+			select,
 		});
+
+		return task ? TaskRepository.map(task) : null;
 	}
 
 	async update(params: UpdateParams): Promise<TaskDto> {
 		const { id, roomId, tagIds, ...data } = params;
 
-		return this.databaseService.task.update({
+		const task = await this.databaseService.task.update({
 			where: {
 				id_roomId: {
 					id,
@@ -79,6 +107,8 @@ export class TaskRepository {
 				},
 			},
 		});
+
+		return task ? TaskRepository.map(task) : null;
 	}
 
 	async remove(params: RemoveParams): Promise<void> {
@@ -87,5 +117,15 @@ export class TaskRepository {
 				id_roomId: params,
 			},
 		});
+	}
+
+	private static map(task: any): TaskDto {
+		const { task_tag, author, ...rest } = task;
+
+		return {
+			...rest,
+			author: author.user,
+			tags: task_tag.map((task_tag) => task_tag.tag),
+		};
 	}
 }

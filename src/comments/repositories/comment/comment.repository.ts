@@ -1,5 +1,7 @@
 import { Injectable } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
 import { DatabaseService } from '@/database';
+import { SECURITY_USER_SELECT } from '@/users';
 import { CommentDto } from '../../dto';
 import {
 	CreateParams,
@@ -9,6 +11,22 @@ import {
 	UpdateParams
 } from './types';
 
+const select = {
+	id: true,
+	roomId: true,
+	taskId: true,
+	author: {
+		select: {
+			user: {
+				select: SECURITY_USER_SELECT,
+			},
+		},
+	},
+	content: true,
+	updatedAt: true,
+	createdAt: true,
+} satisfies Prisma.CommentSelect;
+
 @Injectable()
 export class CommentRepository {
 	constructor(private readonly databaseService: DatabaseService) {}
@@ -16,7 +34,8 @@ export class CommentRepository {
 	async getAll(params: GetAllParams): Promise<CommentDto[]> {
 		const { limit, offset, roomId, taskId, } = params;
 
-		return this.databaseService.comment.findMany({
+		const comments = await this.databaseService.comment.findMany({
+			select,
 			where: {
 				roomId,
 				taskId,
@@ -24,24 +43,30 @@ export class CommentRepository {
 			take: limit,
 			skip: offset,
 		});
+
+		return comments.map(CommentRepository.map);
 	}
 
 	async getOne(params: getOneParams): Promise<CommentDto | null> {
-		return this.databaseService.comment.findFirst({
+		const comment = await this.databaseService.comment.findFirst({
 			where: params,
 		});
+
+		return comment ? CommentRepository.map(comment) : null;
 	}
 
 	async create(params: CreateParams): Promise<CommentDto> {
-		return this.databaseService.comment.create({
+		const comment = await this.databaseService.comment.create({
 			data: params,
 		});
+
+		return CommentRepository.map(comment);
 	}
 
 	async update(params: UpdateParams): Promise<CommentDto> {
 		const { id, roomId, taskId, ...data } = params;
 
-		return this.databaseService.comment.update({
+		const comment = await this.databaseService.comment.update({
 			data,
 			where: {
 				id_roomId_taskId: {
@@ -51,6 +76,8 @@ export class CommentRepository {
 				},
 			},
 		});
+
+		return CommentRepository.map(comment);
 	}
 
 	async remove(params: RemoveParams): Promise<void> {
@@ -59,5 +86,14 @@ export class CommentRepository {
 				id_roomId_taskId: params,
 			},
 		});
+	}
+
+	private static map(comment: any): CommentDto {
+		const { author, ...rest } = comment;
+
+		return {
+			...rest,
+			author: author.user,
+		};
 	}
 }

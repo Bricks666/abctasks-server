@@ -38,7 +38,7 @@ async function bootstrap() {
 		.setVersion('1.0.0')
 		.addCookieAuth(process.env.COOKIE_NAME)
 		.addBearerAuth()
-		.addServer('http://localhost:5000')
+		.addServer(`http://localhost:${PORT}`)
 		.addTag('api')
 		.build();
 
