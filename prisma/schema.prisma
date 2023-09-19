@@ -3,116 +3,134 @@ generator client {
 }
 
 datasource db {
-  provider = "mysql"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
-model activity {
-  id         Int             @id @default(autoincrement())
-  roomId     Int
-  sphereId   Int
-  activistId Int
-  createdAt  DateTime?       @default(now()) @db.DateTime(0)
-  action     activity_action
-  sphere     activity_sphere @relation(fields: [sphereId], references: [id], onDelete: Cascade)
-
-  @@index([sphereId], map: "sphereId")
+model User {
+  id        Int        @id @default(autoincrement())
+  email     String     @unique() @db.VarChar(32)
+  username  String     @db.VarChar(32)
+  password  String     @db.VarChar(255)
+  photo     String?    @db.VarChar(255)
+  activated Boolean?   @default(false)
+  room_user RoomUser[]
+  room      Room[]
 }
 
-enum activity_action {
-  create
-  remove
-  update
+model RoomUser {
+  roomId    Int
+  userId    Int
+  removed   Boolean   @default(false)
+  activated Boolean   @default(false)
+  room      Room      @relation(fields: [roomId], references: [id], onDelete: Cascade, map: "room-user_ibfk_1")
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade, map: "room-user_ibfk_2")
+  task      Task[]
+  comments  Comment[]
+
+  @@id([roomId, userId])
+  @@unique([roomId, userId], map: "room-user_roomId_userId_unique")
+  @@index([userId], map: "userId")
 }
 
-model activity_sphere {
-  id         Int        @id @default(autoincrement())
-  name       String     @unique(map: "name") @db.VarChar(255)
-  activities activity[]
-
-  @@map("activity-sphere")
+model Room {
+  id          Int        @id @default(autoincrement())
+  ownerId     Int
+  name        String     @db.VarChar(32)
+  description String     @db.VarChar(255)
+  createdAt   DateTime?  @default(now())
+  updatedAt   DateTime?  @updatedAt
+  owner       User       @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  tags        Tag[]
+  room_user   RoomUser[]
 }
 
-model comment {
+model Comment {
   id        Int       @id @default(autoincrement())
   authorId  Int
   roomId    Int
   taskId    Int
   content   String    @db.VarChar(255)
   createdAt DateTime? @default(now())
-  task      task      @relation(fields: [taskId, roomId], references: [id, roomId])
-  author    room_user @relation(fields: [roomId, authorId], references: [roomId, userId])
+  updatedAt DateTime  @updatedAt
+  task      Task      @relation(fields: [taskId, roomId], references: [id, roomId])
+  author    RoomUser  @relation(fields: [roomId, authorId], references: [roomId, userId])
 
   @@unique([id, roomId, taskId])
 }
 
-model group {
-  id          Int    @id @default(autoincrement())
+model Tag {
+  id          Int       @id @default(autoincrement())
   roomId      Int
-  name        String @db.VarChar(255)
-  mainColor   String @db.VarChar(7)
-  secondColor String @db.VarChar(7)
-  room        room   @relation(fields: [roomId], references: [id], onDelete: Cascade, map: "groups_ibfk_1")
-  task        task[]
+  name        String    @db.VarChar(32)
+  mainColor   String    @db.VarChar(7)
+  secondColor String    @db.VarChar(7)
+  room        Room      @relation(fields: [roomId], references: [id], onDelete: Cascade, map: "tags_ibfk_1")
+  task_tag    TagTask[]
 
   @@unique([id, roomId])
   @@index([roomId], map: "roomId")
 }
 
-model room_user {
-  roomId   Int
-  userId   Int
-  removed  Boolean   @default(false)
-  room     room      @relation(fields: [roomId], references: [id], onDelete: Cascade, map: "room-user_ibfk_1")
-  user     user      @relation(fields: [userId], references: [id], onDelete: Cascade, map: "room-user_ibfk_2")
-  task     task[]
-  comments comment[]
-
-  @@id([roomId, userId])
-  @@unique([roomId, userId], map: "room-user_roomId_userId_unique")
-  @@index([userId], map: "userId")
-  @@map("room-user")
-}
-
-model room {
-  id          Int         @id @default(autoincrement())
-  name        String      @db.VarChar(255)
-  description String      @db.VarChar(255)
-  createdAt   DateTime?   @default(now())
-  updatedAt   DateTime?   @updatedAt
-  groups      group[]
-  room_user   room_user[]
-}
-
-model task {
-  id        Int         @id @default(autoincrement())
-  roomId    Int
-  groupId   Int
-  authorId  Int
-  status    task_status @default(ready)
-  content   String      @db.VarChar(255)
-  createdAt DateTime?   @default(now())
-  room_user room_user   @relation(fields: [roomId, authorId], references: [roomId, userId], onDelete: Cascade, map: "task_ibfk_1")
-  group     group       @relation(fields: [groupId, roomId], references: [id, roomId], onDelete: Cascade, map: "task_ibfk_2")
-  comments  comment[]
+model Task {
+  id          Int        @id @default(autoincrement())
+  roomId      Int
+  authorId    Int
+  tagIds      Int[]      @default([])
+  title       String     @db.VarChar(32)
+  description String?    @db.VarChar(255)
+  status      TaskStatus @default(ready)
+  createdAt   DateTime?  @default(now())
+  updatedAt   DateTime?  @updatedAt
+  room_user   RoomUser   @relation(fields: [roomId, authorId], references: [roomId, userId], onDelete: Cascade, map: "task_ibfk_1")
+  comments    Comment[]
+  task_tag    TagTask[]
 
   @@unique([id, roomId])
   @@index([authorId], map: "authorId")
-  @@index([groupId], map: "groupId")
-  @@index([roomId], map: "roomId")
+  @@index([roomId], map: "taskRoomId")
 }
 
-model user {
-  id        Int         @id @default(autoincrement())
-  login     String      @unique(map: "login") @db.VarChar(32)
-  password  String      @db.VarChar(255)
-  photo     String?     @db.VarChar(255)
-  room_user room_user[]
+model TagTask {
+  tagId  Int
+  taskId Int
+  roomId Int
+  task   Task @relation(fields: [taskId, roomId], references: [id, roomId], onDelete: Cascade)
+  tag    Tag  @relation(fields: [tagId, roomId], references: [id, roomId])
+
+  @@id([tagId, taskId])
+  @@unique([tagId, taskId])
+  @@index([roomId], map: "tagTaskRoomId")
 }
 
-enum task_status {
+enum TaskStatus {
   done
   in_progress @map("in progress")
   ready
   review
+}
+
+model Activity {
+  id         Int            @id @default(autoincrement())
+  roomId     Int
+  sphereId   Int
+  actionId   Int
+  activistId Int
+  createdAt  DateTime?      @default(now()) @db.Timestamptz(0)
+  action     ActivityAction @relation(fields: [actionId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  sphere     ActivitySphere @relation(fields: [sphereId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+
+  @@index([sphereId], map: "sphereId")
+}
+
+model ActivityAction {
+  id       Int        @id @default(autoincrement())
+  name     String     @unique() @db.VarChar(32)
+  Activity Activity[]
+}
+
+model ActivitySphere {
+  id         Int        @id @default(autoincrement())
+  name       String     @unique(map: "name") @db.VarChar(32)
+  activities Activity[]
 }

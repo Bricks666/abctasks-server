@@ -4,13 +4,13 @@ import * as transformerPackage from 'class-transformer';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import * as cookieParser from 'cookie-parser';
-import { AppModule } from './app.module';
-import { StandardResponseInterceptor } from './common';
-import { CORS } from './const';
-import { DatabaseService } from './database/database.service';
+import { AppModule } from '@/app.module';
+import { StandardResponseInterceptor } from '@/shared';
+import { ORIGIN } from '@/const';
+import { DatabaseService } from '@/database';
 
 async function bootstrap() {
-	const { HOST, PORT, } = process.env;
+	const { PORT, } = process.env;
 	const app = await NestFactory.create(AppModule);
 
 	const prismaService = app.get(DatabaseService);
@@ -19,7 +19,7 @@ async function bootstrap() {
 	app.use(cookieParser());
 	app.enableCors({
 		credentials: true,
-		origin: CORS.ORIGIN,
+		origin: ORIGIN,
 	});
 	app.useGlobalPipes(
 		new ValidationPipe({
@@ -28,6 +28,7 @@ async function bootstrap() {
 			forbidUnknownValues: false,
 		})
 	);
+
 	app.useGlobalInterceptors(new StandardResponseInterceptor());
 	app.setGlobalPrefix('api');
 
@@ -37,7 +38,10 @@ async function bootstrap() {
 		.setVersion('1.0.0')
 		.addCookieAuth(process.env.COOKIE_NAME)
 		.addBearerAuth()
+		.addServer('http://localhost:5000')
+		.addTag('api')
 		.build();
+
 	const document = SwaggerModule.createDocument(app, config);
 	SwaggerModule.setup('docs', app, document);
 
@@ -45,10 +49,11 @@ async function bootstrap() {
 	 * Для преобразования BigInt в JSON
 	 */
 	(BigInt.prototype as any).toJSON = function () {
-		return (this as bigint).toString();
+		return Number(this);
 	};
-	await app.listen(PORT, HOST, () => {
-		console.log(`server start PORT: ${PORT} and HOST: ${HOST}`);
+
+	await app.listen(PORT, '0.0.0.0', () => {
+		console.log(`server start PORT: ${PORT}`);
 	});
 }
 bootstrap();

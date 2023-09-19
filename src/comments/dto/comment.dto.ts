@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { comment as CommentModel } from '@prisma/client';
+import { Comment as CommentModel } from '@prisma/client';
 import { IsNumber, IsString, MinLength } from 'class-validator';
 
 export class CommentDto implements CommentModel {
@@ -45,4 +45,6 @@ export class CommentDto implements CommentModel {
 	declare content: string;
 
 	declare createdAt: Date;
+
+	declare updatedAt: Date;
 }

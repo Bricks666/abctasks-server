@@ -1,7 +1,10 @@
-import { activity_sphere as ActivitySphereModel } from '@prisma/client';
+import { ApiProperty } from '@nestjs/swagger';
+import { ActivitySphere } from '@prisma/client';
 
-export class ActivitySphereDto implements ActivitySphereModel {
+export class ActivitySphereDto implements ActivitySphere {
+	@ApiProperty()
 	declare id: number;
 
+	@ApiProperty()
 	declare name: string;
 }

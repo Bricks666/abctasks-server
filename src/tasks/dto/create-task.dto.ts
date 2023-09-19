@@ -2,7 +2,8 @@ import { PickType } from '@nestjs/swagger';
 import { TaskDto } from './task.dto';
 
 export class CreateTaskDto extends PickType(TaskDto, [
-	'groupId',
-	'status',
-	'content'
+	'title',
+	'description',
+	'tagIds',
+	'status'
 ]) {}

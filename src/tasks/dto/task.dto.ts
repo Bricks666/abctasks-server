@@ -1,8 +1,13 @@
-import { task as TaskModel, task_status } from '@prisma/client';
-import { IsDate, IsEnum, IsNumber, IsString } from 'class-validator';
+import { Task as TaskModel, TaskStatus } from '@prisma/client';
+import {
+	IsISO8601,
+	IsEnum,
+	IsNumber,
+	IsOptional,
+	IsString,
+	MaxLength
+} from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
-
-export type TaskStatus = task_status;
 
 export class TaskDto implements TaskModel {
 	@ApiProperty({
@@ -23,11 +28,12 @@ export class TaskDto implements TaskModel {
 
 	@ApiProperty({
 		type: Number,
-		description: 'Id группы',
-		example: 1,
+		isArray: true,
+		description: 'Id тэгов',
+		example: [1],
 	})
-	@IsNumber()
-	declare groupId: number;
+	@IsNumber({}, { each: true, })
+	declare tagIds: number[];
 
 	@ApiProperty({
 		type: Number,
@@ -36,6 +42,26 @@ export class TaskDto implements TaskModel {
 	})
 	@IsNumber()
 	declare authorId: number;
+
+	@ApiProperty({
+		type: String,
+		description: 'Заголовок задачи',
+		example: 'Некоторый заголовок задачи',
+	})
+	@IsString()
+	@MaxLength(32)
+	declare title: string;
+
+	@ApiProperty({
+		type: String,
+		description: 'Текст задачи',
+		example: 'Текс текст текст',
+		nullable: true,
+	})
+	@IsOptional()
+	@IsString()
+	@MaxLength(255)
+	declare description: string;
 
 	@ApiProperty({
 		enum: ['done', 'ready', 'review', 'in progress'],
@@ -52,17 +78,17 @@ export class TaskDto implements TaskModel {
 
 	@ApiProperty({
 		type: String,
-		description: 'Текст задачи',
-		example: 'Текс текст текст',
-	})
-	@IsString()
-	declare content: string;
-
-	@ApiProperty({
-		type: String,
 		description: 'Дата создания задачи',
 		example: '2022-07-07',
 	})
-	@IsDate()
+	@IsISO8601()
 	declare createdAt: Date;
+
+	@ApiProperty({
+		type: String,
+		description: 'Дата обновления',
+		example: '2022-07-07',
+	})
+	@IsISO8601()
+	declare updatedAt: Date;
 }

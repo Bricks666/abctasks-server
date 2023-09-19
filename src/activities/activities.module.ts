@@ -1,14 +1,37 @@
 import { Module } from '@nestjs/common';
-import { AuthModule } from '@/auth/auth.module';
-import { DatabaseModule } from '@/database/database.module';
-import { ActivitiesController } from './activities.controller';
-import { ActivitiesService } from './activities.service';
-import { ActivityRepository } from './repository';
+import { AuthModule } from '@/auth';
+
+import {
+	ActivitiesController,
+	ActivityActionsController,
+	ActivitySpheresController
+} from './controllers';
+import {
+	ActivitiesService,
+	ActivityActionsService,
+	ActivitySpheresService
+} from './services';
+import {
+	ActivityActionRepository,
+	ActivityRepository,
+	ActivitySphereRepository
+} from './repositories';
 
 @Module({
-	imports: [AuthModule, DatabaseModule],
-	controllers: [ActivitiesController],
-	providers: [ActivitiesService, ActivityRepository],
+	imports: [AuthModule],
+	controllers: [
+		ActivitiesController,
+		ActivityActionsController,
+		ActivitySpheresController
+	],
+	providers: [
+		ActivitiesService,
+		ActivityRepository,
+		ActivitySphereRepository,
+		ActivityActionRepository,
+		ActivitySpheresService,
+		ActivityActionsService
+	],
 	exports: [ActivitiesService, ActivityRepository],
 })
 export class ActivitiesModule {}

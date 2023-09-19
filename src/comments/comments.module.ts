@@ -1,14 +1,14 @@
 import { Module } from '@nestjs/common';
-import { AuthModule } from '@/auth/auth.module';
-import { RoomsModule } from '@/rooms/rooms.module';
-import { DatabaseModule } from '@/database/database.module';
-import { ActivitiesModule } from '@/activities/activities.module';
-import { CommentsController } from './comments.controller';
-import { CommentsService } from './comments.service';
-import { CommentRepository } from './repository';
+import { ActivitiesModule } from '@/activities';
+import { AuthModule } from '@/auth';
+import { RoomsModule } from '@/rooms';
+
+import { CommentsController } from './controllers';
+import { CommentsService } from './services';
+import { CommentRepository } from './repositories';
 
 @Module({
-	imports: [AuthModule, RoomsModule, DatabaseModule, ActivitiesModule],
+	imports: [AuthModule, RoomsModule, ActivitiesModule],
 	controllers: [CommentsController],
 	providers: [CommentsService, CommentRepository],
 })

@@ -1,9 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { activity as ActivityModel } from '@prisma/client';
-import { IsNumber, IsEnum } from 'class-validator';
-import { ActivitySphereDto } from './activity-sphere.dto';
-
-export type ActivityAction = 'update' | 'create' | 'remove';
+import { Activity as ActivityModel } from '@prisma/client';
+import { IsNumber } from 'class-validator';
 
 export class ActivityDto implements ActivityModel {
 	@ApiProperty({
@@ -31,16 +28,12 @@ export class ActivityDto implements ActivityModel {
 	declare sphereId: number;
 
 	@ApiProperty({
+		type: Number,
 		description: 'Тип активности',
-		example: 'create',
-		enum: ['create', 'remove', 'update'],
+		example: 1,
 	})
-	@IsEnum({
-		create: 'create',
-		update: 'update',
-		remove: 'remove',
-	})
-	declare action: ActivityAction;
+	@IsNumber()
+	declare actionId: number;
 
 	@ApiProperty({
 		description: 'Id создателя активности',
@@ -49,8 +42,6 @@ export class ActivityDto implements ActivityModel {
 	})
 	@IsNumber()
 	declare activistId: number;
-
-	declare sphere: ActivitySphereDto;
 
 	declare createdAt: Date;
 }

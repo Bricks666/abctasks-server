@@ -1,15 +1,20 @@
 import { Module } from '@nestjs/common';
-import { RoomsService } from './rooms.service';
-import { RoomsController } from './rooms.controller';
-import { AuthModule } from '@/auth/auth.module';
-import { DatabaseModule } from '@/database/database.module';
-import { RoomRepository, RoomUserRepository } from './repository';
-import { UsersModule } from '@/users/users.module';
+import { AuthModule } from '@/auth';
+import { MailModule } from '@/mail';
+import { UsersModule } from '@/users';
+import { RoomsController, RoomUserController } from './controllers';
+import { RoomsService, RoomUserService } from './services';
+import { RoomRepository, RoomUserRepository } from './repositories';
 
 @Module({
-	imports: [AuthModule, DatabaseModule, UsersModule],
-	providers: [RoomsService, RoomRepository, RoomUserRepository],
-	controllers: [RoomsController],
-	exports: [RoomsService, RoomRepository, RoomUserRepository],
+	imports: [AuthModule, UsersModule, MailModule],
+	providers: [
+		RoomsService,
+		RoomUserService,
+		RoomUserRepository,
+		RoomRepository
+	],
+	controllers: [RoomsController, RoomUserController],
+	exports: [RoomsService, RoomUserService, RoomUserRepository, RoomRepository],
 })
 export class RoomsModule {}
