@@ -1,7 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { Prisma, TaskStatus } from '@prisma/client';
 import { DatabaseService } from '@/database';
-import { ProgressDto } from '../../dto';
+import { map } from '@/shared';
+import { TagDto } from '@/tags';
+import { ProgressDto, ProgressQueryResult } from '../../dto';
 import { GetAllParams } from './types';
 
 @Injectable()
@@ -11,7 +13,9 @@ export class ProgressRepository {
 	async getAll(params: GetAllParams): Promise<ProgressDto[]> {
 		const { roomId, } = params;
 
-		return this.databaseService.$queryRawUnsafe<ProgressDto[]>(
+		const progressQuery = this.databaseService.$queryRawUnsafe<
+			ProgressQueryResult[]
+		>(
 			`SELECT \
  "${Prisma.TagTaskScalarFieldEnum.tagId}",\
  COUNT( \
@@ -27,5 +31,24 @@ export class ProgressRepository {
  WHERE "${Prisma.ModelName.TagTask}"."${Prisma.TagTaskScalarFieldEnum.roomId}" = ${roomId} \
  GROUP BY "${Prisma.TagTaskScalarFieldEnum.tagId}";`
 		);
+
+		const tagsQuery = this.databaseService.tag.findMany({
+			where: {
+				roomId,
+			},
+		});
+
+		const [progress, tags] = await Promise.all([progressQuery, tagsQuery]);
+
+		const mappedTags = map(tags, 'id');
+
+		return progress.map((progress) => {
+			const { tagId, ...rest } = progress;
+
+			return {
+				...rest,
+				tag: mappedTags[tagId] as TagDto,
+			};
+		});
 	}
 }

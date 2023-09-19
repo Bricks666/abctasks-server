@@ -1,1 +1,1 @@
-export { ProgressDto } from './progress.dto';
+export { type ProgressQueryResult, ProgressDto } from './progress.dto';

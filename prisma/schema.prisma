@@ -19,14 +19,15 @@ model User {
 }
 
 model RoomUser {
-  roomId    Int
-  userId    Int
-  removed   Boolean   @default(false)
-  activated Boolean   @default(false)
-  room      Room      @relation(fields: [roomId], references: [id], onDelete: Cascade, map: "room-user_ibfk_1")
-  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade, map: "room-user_ibfk_2")
-  task      Task[]
-  comments  Comment[]
+  roomId     Int
+  userId     Int
+  removed    Boolean    @default(false)
+  activated  Boolean    @default(false)
+  room       Room       @relation(fields: [roomId], references: [id], onDelete: Cascade, map: "room-user_ibfk_1")
+  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade, map: "room-user_ibfk_2")
+  task       Task[]
+  comments   Comment[]
+  activities Activity[]
 
   @@id([roomId, userId])
   @@unique([roomId, userId], map: "room-user_roomId_userId_unique")
@@ -82,7 +83,7 @@ model Task {
   status      TaskStatus @default(ready)
   createdAt   DateTime?  @default(now())
   updatedAt   DateTime?  @updatedAt
-  room_user   RoomUser   @relation(fields: [roomId, authorId], references: [roomId, userId], onDelete: Cascade, map: "task_ibfk_1")
+  author      RoomUser   @relation(fields: [roomId, authorId], references: [roomId, userId], onDelete: Cascade, map: "task_ibfk_1")
   comments    Comment[]
   task_tag    TagTask[]
 
@@ -119,6 +120,7 @@ model Activity {
   createdAt  DateTime?      @default(now()) @db.Timestamptz(0)
   action     ActivityAction @relation(fields: [actionId], references: [id], onDelete: Restrict, onUpdate: Cascade)
   sphere     ActivitySphere @relation(fields: [sphereId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  room_user  RoomUser       @relation(fields: [roomId, activistId], references: [roomId, userId], onDelete: Restrict, onUpdate: Cascade)
 
   @@index([sphereId], map: "sphereId")
 }
