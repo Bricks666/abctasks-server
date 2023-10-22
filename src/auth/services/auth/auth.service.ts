@@ -76,7 +76,7 @@ export class AuthService {
 		const isValidPassword = await compare(password, user.password);
 
 		if (!isValidPassword) {
-			throw new UnauthorizedException('Incorrect password');
+			throw new ForbiddenException('Incorrect password');
 		}
 
 		user.password = undefined;

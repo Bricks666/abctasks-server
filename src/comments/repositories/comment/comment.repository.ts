@@ -50,6 +50,7 @@ export class CommentRepository {
 	async getOne(params: getOneParams): Promise<CommentDto | null> {
 		const comment = await this.databaseService.comment.findFirst({
 			where: params,
+			select,
 		});
 
 		return comment ? CommentRepository.map(comment) : null;
@@ -58,6 +59,7 @@ export class CommentRepository {
 	async create(params: CreateParams): Promise<CommentDto> {
 		const comment = await this.databaseService.comment.create({
 			data: params,
+			select,
 		});
 
 		return CommentRepository.map(comment);
@@ -75,6 +77,7 @@ export class CommentRepository {
 					taskId,
 				},
 			},
+			select,
 		});
 
 		return CommentRepository.map(comment);

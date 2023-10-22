@@ -16,13 +16,14 @@ import {
 	ApiParam,
 	ApiTags
 } from '@nestjs/swagger';
-import { Auth, CurrentUser, DisableAuthCheck } from '@/auth';
+import { Auth, CurrentUser } from '@/auth';
 import { SecurityUserDto } from '@/users';
 import { IntParam } from '@/shared';
 import { RoomUserService } from '../services';
 import { InRoom, IsOwner } from '../lib';
 
 @ApiTags('Пользователи комнаты')
+@Auth()
 @Controller('rooms/:id/members')
 export class RoomUserController {
 	constructor(private readonly roomUserService: RoomUserService) {}
@@ -40,7 +41,6 @@ export class RoomUserController {
 		type: NotFoundException,
 		description: 'Такой комнаты не существует',
 	})
-	@DisableAuthCheck()
 	@UseInterceptors(CacheInterceptor)
 	@Get('')
 	async getUsers(@IntParam('id') id: number): Promise<SecurityUserDto[]> {
@@ -58,7 +58,6 @@ export class RoomUserController {
 	@ApiNotFoundResponse({
 		description: 'Такой комнаты не существует',
 	})
-	@DisableAuthCheck()
 	@Get('invited')
 	async getInvitations(
 		@IntParam('id') roomId: number
@@ -74,7 +73,6 @@ export class RoomUserController {
 		description: 'Добавленный пользователь',
 	})
 	@IsOwner()
-	@Auth()
 	@Put('/:userId')
 	async invite(
 		@IntParam('id') id: number,
@@ -90,8 +88,8 @@ export class RoomUserController {
 		type: String,
 		description: 'Hash дял добавления',
 	})
+	@IsOwner()
 	@InRoom()
-	@Auth()
 	@Get('/link-hash')
 	async generateInviteHash(@IntParam('id') id: number): Promise<string> {
 		return this.roomUserService.generateInviteHash({ roomId: id, });
@@ -104,7 +102,6 @@ export class RoomUserController {
 		type: SecurityUserDto,
 		description: 'Добавленный пользователь',
 	})
-	@Auth()
 	@Put('/invite/approve')
 	async approveInvite(
 		@IntParam('id') id: number,
@@ -120,7 +117,6 @@ export class RoomUserController {
 		type: Boolean,
 		description: 'Удалось ли отклонить приглашение',
 	})
-	@Auth()
 	@Put('/invite/reject')
 	async rejectInvite(
 		@IntParam('id') id: number,
@@ -167,7 +163,6 @@ export class RoomUserController {
 		description: 'Удалось ли выйти',
 	})
 	@InRoom()
-	@Auth()
 	@Delete('/exit')
 	async exit(
 		@IntParam('id') id: number,
@@ -187,7 +182,6 @@ export class RoomUserController {
 		description: 'Удалось ли удалить пользователя',
 	})
 	@IsOwner()
-	@Auth()
 	@Delete('/remove/:userId')
 	async removeUser(
 		@IntParam('id') id: number,

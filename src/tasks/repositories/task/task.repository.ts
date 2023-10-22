@@ -8,7 +8,8 @@ import {
 	GetAllParams,
 	GetOneParams,
 	RemoveParams,
-	UpdateParams
+	UpdateParams,
+	RemoveTasksWithoutTagParams
 } from './types';
 import { prepareWhere } from './lib';
 
@@ -106,6 +107,7 @@ export class TaskRepository {
 					},
 				},
 			},
+			select,
 		});
 
 		return task ? TaskRepository.map(task) : null;
@@ -115,6 +117,19 @@ export class TaskRepository {
 		await this.databaseService.task.delete({
 			where: {
 				id_roomId: params,
+			},
+		});
+	}
+
+	async removeTasksWithoutTag(
+		params: RemoveTasksWithoutTagParams
+	): Promise<void> {
+		await this.databaseService.task.deleteMany({
+			where: {
+				roomId: params.roomId,
+				tagIds: {
+					isEmpty: true,
+				},
 			},
 		});
 	}

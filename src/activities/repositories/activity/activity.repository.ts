@@ -100,7 +100,6 @@ export class ActivityRepository {
 		const { actionName, sphereName, ...data } = params;
 		const activity = await this.databaseService.activity.create({
 			data: {
-				...data,
 				action: {
 					connectOrCreate: {
 						where: {
@@ -121,7 +120,15 @@ export class ActivityRepository {
 						},
 					},
 				},
-			} as any,
+				room_user: {
+					connect: {
+						roomId_userId: {
+							roomId: data.roomId,
+							userId: data.activistId,
+						},
+					},
+				},
+			},
 			select,
 		});
 

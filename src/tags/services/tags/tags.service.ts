@@ -1,4 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { TasksService } from '@/tasks/services';
 import { TagDto } from '../../dto';
 import { TagRepository } from '../../repositories';
 import {
@@ -11,7 +12,10 @@ import {
 
 @Injectable()
 export class TagsService {
-	constructor(private readonly tagRepository: TagRepository) {}
+	constructor(
+		private readonly tagRepository: TagRepository,
+		private readonly tasksService: TasksService
+	) {}
 
 	async getAll(params: GetAllParams): Promise<TagDto[]> {
 		return this.tagRepository.getAll(params);
@@ -37,6 +41,7 @@ export class TagsService {
 
 	async remove(params: RemoveParams): Promise<boolean> {
 		await this.tagRepository.remove(params);
+		await this.tasksService.removeTasksWithoutTag(params);
 
 		return true;
 	}

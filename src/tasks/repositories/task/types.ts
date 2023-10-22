@@ -23,3 +23,7 @@ export interface RemoveParams {
 	readonly id: number;
 	readonly roomId: number;
 }
+
+export interface RemoveTasksWithoutTagParams {
+	readonly roomId: number;
+}

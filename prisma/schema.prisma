@@ -97,7 +97,7 @@ model TagTask {
   taskId Int
   roomId Int
   task   Task @relation(fields: [taskId, roomId], references: [id, roomId], onDelete: Cascade)
-  tag    Tag  @relation(fields: [tagId, roomId], references: [id, roomId])
+  tag    Tag  @relation(fields: [tagId, roomId], references: [id, roomId], onDelete: Cascade)
 
   @@id([tagId, taskId])
   @@unique([tagId, taskId])

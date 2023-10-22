@@ -31,11 +31,12 @@ import { MailModule } from '@/mail';
 		UsersModule,
 		RoomsModule,
 		TasksModule,
-		TagsModule,
 		ActivitiesModule,
+
 		ProgressModule,
 		CommentsModule,
-		MailModule
+		MailModule,
+		TagsModule
 	],
 	providers: [
 		{
