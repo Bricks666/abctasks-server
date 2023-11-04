@@ -9,6 +9,6 @@ import { AuthController } from './controllers';
 	imports: [TokensModule, forwardRef(() => UsersModule), MailModule],
 	providers: [AuthService, AuthTokensService],
 	controllers: [AuthController],
-	exports: [AuthService],
+	exports: [AuthService, AuthTokensService],
 })
 export class AuthModule {}
