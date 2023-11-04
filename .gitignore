@@ -3,4 +3,7 @@ dist
 node_modules
 .vscode
 .idea
-.env*
+.env
+.env.production
+.env.test
+.env.local

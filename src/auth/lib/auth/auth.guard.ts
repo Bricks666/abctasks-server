@@ -4,17 +4,17 @@ import {
 	Injectable,
 	UnauthorizedException
 } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
 import { Reflector } from '@nestjs/core';
 import { SecurityUserDto } from '@/users';
 import { extractAccessToken } from '@/shared';
+import { AuthTokensService } from '../../services';
 import { DISABLE_AUTH_CHECK_FLAG } from './config';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
 	constructor(
-		private readonly jwtService: JwtService,
+		private readonly authTokensService: AuthTokensService,
 		private readonly reflector: Reflector
 	) {}
 
@@ -44,9 +44,7 @@ export class AuthGuard implements CanActivate {
 
 		let user: SecurityUserDto;
 		try {
-			user = await this.jwtService.verifyAsync<SecurityUserDto>(token, {
-				secret: process.env.SECRET,
-			});
+			user = await this.authTokensService.verifyToken(token);
 		} catch {
 			if (noCheck) {
 				return true;
