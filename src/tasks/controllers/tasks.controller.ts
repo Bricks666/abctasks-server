@@ -25,7 +25,7 @@ import {
 	ActivityActionCodes
 } from '@/activities';
 import { Auth, CurrentUser } from '@/auth/lib';
-import { InRoom } from '@/rooms/lib';
+import { IsMember } from '@/members/lib';
 import { IntParam } from '@/shared';
 import { SecurityUserDto } from '@/users/dto';
 import { CreateTaskDto, TaskDto, UpdateTaskDto, GetTasksDto } from '../dto';
@@ -102,7 +102,7 @@ export class TasksController {
 		type: TaskDto,
 		description: 'Созданная задача',
 	})
-	@InRoom()
+	@IsMember()
 	@Auth()
 	@Post('/:roomId/create')
 	async create(
@@ -153,7 +153,7 @@ export class TasksController {
 	@ApiNotFoundResponse({
 		description: 'Такой задачи не существует',
 	})
-	@InRoom()
+	@IsMember()
 	@Auth()
 	@Put('/:roomId/:id/update')
 	async update(
@@ -193,7 +193,7 @@ export class TasksController {
 		type: Boolean,
 		description: 'Удались ли удалить задачу',
 	})
-	@InRoom()
+	@IsMember()
 	@Auth()
 	@Delete('/:roomId/:id/remove')
 	async remove(

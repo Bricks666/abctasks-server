@@ -17,12 +17,12 @@ export interface AddUserViaLinkParams {
 }
 
 export interface ApproveInviteParams {
-	readonly roomId: number;
 	readonly userId: number;
+	readonly token: string;
 }
 
 export interface RejectInviteParams {
-	readonly roomId: number;
+	readonly token: string;
 	readonly userId: number;
 }
 

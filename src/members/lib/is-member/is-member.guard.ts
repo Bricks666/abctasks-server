@@ -5,18 +5,18 @@ import {
 	ForbiddenException,
 	Injectable
 } from '@nestjs/common';
-import { RoomUserService } from '@/rooms';
 import { SecurityUserDto } from '@/users';
+import { MembersService } from '../../services';
 
 @Injectable()
-export class InRoomGuard implements CanActivate {
-	constructor(private readonly roomUserService: RoomUserService) {}
+export class IsMemberGuard implements CanActivate {
+	constructor(private readonly membersService: MembersService) {}
 
 	async canActivate(context: ExecutionContext): Promise<boolean> {
 		const req = context.switchToHttp().getRequest<Request>();
 		const { roomId, id, } = req.params;
 		if (typeof roomId === 'undefined' && typeof id === 'undefined') {
-			throw new Error('Incorrect using of InRoomGuard');
+			throw new Error('Incorrect using of IsMemberGuard');
 		}
 
 		const user = (req as any).user as SecurityUserDto;
@@ -24,7 +24,7 @@ export class InRoomGuard implements CanActivate {
 			return false;
 		}
 		const { id: userId, } = user;
-		const roomExistsUser = await this.roomUserService.isExists({
+		const roomExistsUser = await this.membersService.isExists({
 			roomId: Number(roomId || id),
 			userId,
 		});

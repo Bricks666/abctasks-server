@@ -14,7 +14,7 @@ export class MailService {
 	): Promise<boolean> {
 		const { email, name, token, } = params;
 
-		const url = `${process.env.CLIENT_APP_HOST}/rooms/invite/personal/${token}`;
+		const url = `${process.env.CLIENT_APP_HOST}/rooms/invite?token=${token}`;
 
 		const info = await this.mailerService.sendMail({
 			to: email,

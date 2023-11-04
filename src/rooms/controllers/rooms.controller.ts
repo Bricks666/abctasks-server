@@ -20,9 +20,10 @@ import {
 import { Auth, CurrentUser } from '@/auth';
 import { SecurityUserDto } from '@/users';
 import { IntParam } from '@/shared';
+import { IsMember } from '@/members/lib';
 import { RoomsService } from '../services';
 import { CreateRoomDto, RoomDto, UpdateRoomDto } from '../dto';
-import { InRoom, IsOwner } from '../lib';
+import { IsOwner } from '../lib';
 import { WithRights } from '../types';
 
 @ApiTags('Комнаты')
@@ -59,7 +60,7 @@ export class RoomsController {
 		type: RoomDto,
 	})
 	@ApiNotFoundResponse()
-	@InRoom()
+	@IsMember()
 	@UseInterceptors(CacheInterceptor)
 	@Get('/:id')
 	async getOne(

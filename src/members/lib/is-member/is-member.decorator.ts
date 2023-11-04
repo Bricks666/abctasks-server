@@ -1,11 +1,11 @@
 import { applyDecorators, UseGuards } from '@nestjs/common';
 import { ApiForbiddenResponse } from '@nestjs/swagger';
-import { InRoomGuard } from './in-room.guard';
+import { IsMemberGuard } from './is-member.guard';
 
-export const InRoom = () =>
+export const IsMember = () =>
 	applyDecorators(
 		ApiForbiddenResponse({
 			description: 'Пользователь не может совершать действия в данной комнате',
 		}),
-		UseGuards(InRoomGuard)
+		UseGuards(IsMemberGuard)
 	);

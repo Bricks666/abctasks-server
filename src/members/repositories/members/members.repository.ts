@@ -1,20 +1,20 @@
 import { Injectable } from '@nestjs/common';
 import { DatabaseService } from '@/database';
 import { SecurityUserDto, SECURITY_USER_SELECT } from '@/users';
-import { RoomUserDto } from '../../dto';
+import { MemberDto } from '../../dto';
 import {
 	ActivateUserParams,
 	AddInvitationParams,
 	AddUserParams,
-	ExistsUserParams,
+	ExistsMemberParams,
 	GetInvitationsParams,
 	GetUsersParams,
 	IsInvitedParams,
-	RemoveUserParams
+	RemoveMemberParams
 } from './types';
 
 @Injectable()
-export class RoomUserRepository {
+export class MembersRepository {
 	constructor(private readonly databaseService: DatabaseService) {}
 
 	async getUsers(params: GetUsersParams): Promise<SecurityUserDto[]> {
@@ -131,7 +131,7 @@ export class RoomUserRepository {
   Может стоит как либо декомпозировать
   */
 	async addUser(params: AddUserParams): Promise<SecurityUserDto | null> {
-		const pair: RoomUserDto | null =
+		const pair: MemberDto | null =
 			await this.databaseService.roomUser.findFirst({
 				where: params,
 			});
@@ -171,7 +171,7 @@ export class RoomUserRepository {
 		return null;
 	}
 
-	async removeUser(params: RemoveUserParams): Promise<boolean> {
+	async removeUser(params: RemoveMemberParams): Promise<boolean> {
 		const pair = await this.databaseService.roomUser.findFirst({
 			where: { ...params, activated: true, },
 		});
@@ -193,7 +193,7 @@ export class RoomUserRepository {
 		return true;
 	}
 
-	async removeUserHard(params: RemoveUserParams): Promise<boolean> {
+	async removeUserHard(params: RemoveMemberParams): Promise<boolean> {
 		const { count, } = await this.databaseService.roomUser.deleteMany({
 			where: params,
 		});
@@ -201,7 +201,7 @@ export class RoomUserRepository {
 		return Boolean(count);
 	}
 
-	async existsUser(params: ExistsUserParams): Promise<boolean> {
+	async existsUser(params: ExistsMemberParams): Promise<boolean> {
 		const { roomId, userId, } = params;
 
 		const pair = await this.databaseService.roomUser.findFirst({
