@@ -26,16 +26,12 @@ export interface AddUserParams {
 	readonly roomId: number;
 }
 
-export interface RemoveUserParams {
+export interface RemoveMemberParams {
 	readonly userId: number;
 	readonly roomId: number;
 }
 
-export interface RemoveUserHardParams extends RemoveUserParams {
-	readonly activated?: boolean;
-}
-
-export interface ExistsUserParams {
+export interface ExistsMemberParams {
 	readonly roomId: number;
 	readonly userId: number;
 }

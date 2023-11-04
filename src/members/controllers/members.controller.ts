@@ -3,32 +3,32 @@ import {
 	Get,
 	Put,
 	Delete,
-	HttpStatus,
 	NotFoundException,
 	CacheInterceptor,
-	UseInterceptors
+	UseInterceptors,
+	Query
 } from '@nestjs/common';
 import {
-	ApiConflictResponse,
 	ApiNotFoundResponse,
 	ApiOkResponse,
 	ApiOperation,
-	ApiParam,
+	ApiQuery,
 	ApiTags
 } from '@nestjs/swagger';
 import { Auth, CurrentUser } from '@/auth';
 import { SecurityUserDto } from '@/users';
 import { IntParam } from '@/shared';
-import { RoomTokensService, RoomUserService } from '../services';
-import { InRoom, IsOwner } from '../lib';
+import { IsOwner } from '@/rooms/lib';
+import { IsMember } from '../lib';
+import { MembersService, MembersTokensService } from '../services';
 
 @ApiTags('Пользователи комнаты')
 @Auth()
-@Controller('rooms/:id/members')
-export class RoomUserController {
+@Controller('members/:roomId')
+export class MembersController {
 	constructor(
-		private readonly roomUserService: RoomUserService,
-		private readonly roomTokensService: RoomTokensService
+		private readonly roomUserService: MembersService,
+		private readonly roomTokensService: MembersTokensService
 	) {}
 
 	@ApiOperation({
@@ -40,14 +40,15 @@ export class RoomUserController {
 		description: 'Пользователи комнаты',
 	})
 	@ApiNotFoundResponse({
-		status: HttpStatus.NOT_FOUND,
 		type: NotFoundException,
 		description: 'Такой комнаты не существует',
 	})
 	@UseInterceptors(CacheInterceptor)
-	@Get('')
-	async getUsers(@IntParam('id') id: number): Promise<SecurityUserDto[]> {
-		return this.roomUserService.getUsers({ roomId: id, });
+	@Get('/')
+	async getUsers(
+		@IntParam('roomId') roomId: number
+	): Promise<SecurityUserDto[]> {
+		return this.roomUserService.getUsers({ roomId, });
 	}
 
 	@ApiOperation({
@@ -61,11 +62,26 @@ export class RoomUserController {
 	@ApiNotFoundResponse({
 		description: 'Такой комнаты не существует',
 	})
-	@Get('invited')
+	@Get('/invited')
 	async getInvitations(
-		@IntParam('id') roomId: number
+		@IntParam('roomId') roomId: number
 	): Promise<SecurityUserDto[]> {
-		return this.roomUserService.getInvitations({ roomId, });
+		return this.roomUserService.getInvited({ roomId, });
+	}
+
+	@ApiOperation({
+		summary: 'Генерация ссылки для приглашения в комнату',
+	})
+	@ApiOkResponse({
+		type: String,
+		description: 'Hash дял добавления',
+	})
+	@IsOwner()
+	@Get('/invite/generate-link')
+	async generateInviteLink(
+		@IntParam('roomId') roomId: number
+	): Promise<string> {
+		return this.roomTokensService.generateInvitationToken({ roomId, });
 	}
 
 	@ApiOperation({
@@ -76,26 +92,12 @@ export class RoomUserController {
 		description: 'Добавленный пользователь',
 	})
 	@IsOwner()
-	@Put('/:userId')
+	@Put('/invite/:userId')
 	async invite(
-		@IntParam('id') id: number,
+		@IntParam('roomId') roomId: number,
 		@IntParam('userId') userId: number
 	): Promise<SecurityUserDto> {
-		return this.roomUserService.inviteUser({ userId, roomId: id, });
-	}
-
-	@ApiOperation({
-		summary: 'Генерация ссылки для приглашения человека в комнату',
-	})
-	@ApiOkResponse({
-		type: String,
-		description: 'Hash дял добавления',
-	})
-	@IsOwner()
-	@InRoom()
-	@Get('/link-hash')
-	async generateInviteHash(@IntParam('id') id: number): Promise<string> {
-		return this.roomTokensService.generateLinkToken({ roomId: id, });
+		return this.roomUserService.inviteUser({ userId, roomId, });
 	}
 
 	@ApiOperation({
@@ -105,12 +107,17 @@ export class RoomUserController {
 		type: SecurityUserDto,
 		description: 'Добавленный пользователь',
 	})
-	@Put('/invite/approve')
+	@ApiQuery({
+		name: 'token',
+		type: String,
+		description: 'Invitation token from email or link',
+	})
+	@Put('/invitation/approve')
 	async approveInvite(
-		@IntParam('id') id: number,
+		@Query('token') token: string,
 		@CurrentUser() user: SecurityUserDto
 	): Promise<SecurityUserDto> {
-		return this.roomUserService.approveInvite({ roomId: id, userId: user.id, });
+		return this.roomUserService.approveInvitation({ token, userId: user.id, });
 	}
 
 	@ApiOperation({
@@ -120,42 +127,12 @@ export class RoomUserController {
 		type: Boolean,
 		description: 'Удалось ли отклонить приглашение',
 	})
-	@Put('/invite/reject')
+	@Put('/invitation/reject')
 	async rejectInvite(
-		@IntParam('id') id: number,
+		@Query('token') token: string,
 		@CurrentUser() user: SecurityUserDto
 	): Promise<boolean> {
-		return this.roomUserService.rejectInvite({ roomId: id, userId: user.id, });
-	}
-
-	@ApiOperation({
-		summary: 'Добавление пользователя по ссылке',
-	})
-	@ApiParam({
-		type: String,
-		name: 'hash',
-	})
-	@ApiParam({
-		type: Number,
-		name: 'id',
-	})
-	@ApiOkResponse({
-		type: Boolean,
-		description: 'Удалось ли войти в комнату',
-	})
-	@ApiConflictResponse({
-		description: 'Пользователь уже вошел или не был ',
-	})
-	@Auth()
-	@Put('/invite/:token')
-	async addUserViaLink(
-		@IntParam('token') token: string,
-		@CurrentUser() user: SecurityUserDto
-	): Promise<SecurityUserDto> {
-		return this.roomUserService.addUserViaLink({
-			token,
-			userId: user.id,
-		});
+		return this.roomUserService.rejectInvitation({ token, userId: user.id, });
 	}
 
 	@ApiOperation({
@@ -165,14 +142,14 @@ export class RoomUserController {
 		type: Boolean,
 		description: 'Удалось ли выйти',
 	})
-	@InRoom()
+	@IsMember()
 	@Delete('/exit')
 	async exit(
-		@IntParam('id') id: number,
+		@IntParam('roomId') roomId: number,
 		@CurrentUser() user: SecurityUserDto
 	): Promise<boolean> {
 		const { id: userId, } = user;
-		await this.roomUserService.removeUser({ roomId: id, userId, });
+		await this.roomUserService.removeUser({ roomId, userId, });
 
 		return true;
 	}
@@ -187,9 +164,9 @@ export class RoomUserController {
 	@IsOwner()
 	@Delete('/remove/:userId')
 	async removeUser(
-		@IntParam('id') id: number,
+		@IntParam('roomId') roomId: number,
 		@IntParam('userId') userId: number
 	): Promise<boolean> {
-		return this.roomUserService.removeUser({ roomId: id, userId, });
+		return this.roomUserService.removeUser({ roomId, userId, });
 	}
 }

@@ -22,7 +22,7 @@ import {
 	ActivityActionCodes,
 	ActivitySphereCodes
 } from '@/activities';
-import { InRoom } from '@/rooms';
+import { IsMember } from '@/members/lib';
 import { Auth, CurrentUser, DisableAuthCheck } from '@/auth';
 import { IntParam } from '@/shared';
 import { SecurityUserDto } from '@/users';
@@ -99,7 +99,7 @@ export class TagsController {
 		type: TagDto,
 		description: 'Созданная тэга',
 	})
-	@InRoom()
+	@IsMember()
 	@Auth()
 	@Post('/:roomId/create')
 	async create(
@@ -142,7 +142,7 @@ export class TagsController {
 		type: TagDto,
 		description: 'Обновленная тэга',
 	})
-	@InRoom()
+	@IsMember()
 	@Auth()
 	@Put('/:roomId/:id/update')
 	async update(
@@ -182,7 +182,7 @@ export class TagsController {
 		type: Boolean,
 		description: 'Удалось ли удалить тэг',
 	})
-	@InRoom()
+	@IsMember()
 	@Auth()
 	@Delete('/:roomId/:id/remove')
 	async remove(

@@ -18,7 +18,7 @@ import {
 } from '@nestjs/swagger';
 import { IntParam, PaginationQueryDto } from '@/shared';
 import { Auth, CurrentUser } from '@/auth';
-import { InRoom } from '@/rooms';
+import { IsMember } from '@/members/lib';
 import {
 	ActivitiesService,
 	ActivityActionCodes,
@@ -118,7 +118,7 @@ export class CommentsController {
 		type: CommentDto,
 		description: 'Созданный комментарий',
 	})
-	@InRoom()
+	@IsMember()
 	@Auth()
 	@Post('/:roomId/:taskId/create')
 	async create(
@@ -172,7 +172,7 @@ export class CommentsController {
 	@ApiNotFoundResponse({
 		description: 'Комментарий не найден',
 	})
-	@InRoom()
+	@IsMember()
 	@Auth()
 	@Put('/:roomId/:taskId/:id/update')
 	async update(
@@ -223,7 +223,7 @@ export class CommentsController {
 	@ApiNotFoundResponse({
 		description: 'Комментарий не найден',
 	})
-	@InRoom()
+	@IsMember()
 	@Auth()
 	@Delete('/:roomId/:taskId/:id/remove')
 	async remove(

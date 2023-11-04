@@ -19,7 +19,7 @@ const select = {
 	title: true,
 	description: true,
 	status: true,
-	task_tag: {
+	tags: {
 		select: {
 			tag: true,
 		},
@@ -76,7 +76,7 @@ export class TaskRepository {
 		const task = await this.databaseService.task.create({
 			data: {
 				...rest,
-				task_tag: {
+				tags: {
 					createMany: {
 						data: tagIds.map((tagId) => ({ tagId, })),
 					},
@@ -100,7 +100,7 @@ export class TaskRepository {
 			},
 			data: {
 				...data,
-				task_tag: {
+				tags: {
 					createMany: {
 						skipDuplicates: true,
 						data: tagIds ? tagIds.map((tagId) => ({ tagId, })) : [],
@@ -127,20 +127,22 @@ export class TaskRepository {
 		await this.databaseService.task.deleteMany({
 			where: {
 				roomId: params.roomId,
-				tagIds: {
-					isEmpty: true,
+				tags: {
+					none: {
+						roomId: params.roomId,
+					},
 				},
 			},
 		});
 	}
 
 	private static map(task: any): TaskDto {
-		const { task_tag, author, ...rest } = task;
+		const { tags, author, ...rest } = task;
 
 		return {
 			...rest,
 			author: author.user,
-			tags: task_tag.map((task_tag) => task_tag.tag),
+			tags: tags.map((tags) => tags.tag),
 		};
 	}
 }

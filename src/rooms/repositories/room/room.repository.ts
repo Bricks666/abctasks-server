@@ -20,11 +20,10 @@ export class RoomRepository {
 			skip: offset,
 			take: limit,
 			where: {
-				room_user: {
+				members: {
 					some: {
 						userId,
-						removed: false,
-						activated: true,
+						status: 'activated',
 					},
 				},
 			},
@@ -47,10 +46,10 @@ export class RoomRepository {
 			data: {
 				...rest,
 				ownerId: userId,
-				room_user: {
+				members: {
 					create: {
 						userId,
-						activated: true,
+						status: 'activated',
 					},
 				},
 			},

@@ -7,8 +7,12 @@ export const prepareWhere = (
 	const where: Prisma.TaskWhereInput = {};
 
 	if (filters.tagIds) {
-		where.tagIds = {
-			hasSome: filters.tagIds,
+		where.tags = {
+			some: {
+				tagId: {
+					in: filters.tagIds,
+				},
+			},
 		};
 	}
 	if (filters.authorIds) {

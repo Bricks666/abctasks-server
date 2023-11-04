@@ -45,10 +45,12 @@ export class AuthService {
 
 		const tokens = await this.#generateTokens(user);
 
+		const url = `${process.env.CLIENT_APP_HOST}/registration/activate?token=${tokens.refreshToken}`;
+
 		await this.mailService.sendEmailConfirmation({
+			url,
 			name: user.username,
 			email: user.email,
-			token: tokens.refreshToken,
 		});
 
 		return user;
