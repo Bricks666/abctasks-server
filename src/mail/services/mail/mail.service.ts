@@ -12,9 +12,9 @@ export class MailService {
 	async sendRoomInviteConfirmation(
 		params: SendRoomInviteConfirmationParams
 	): Promise<boolean> {
-		const { email, name, roomId, } = params;
+		const { email, name, token, } = params;
 
-		const url = `http://localhost:3000/rooms/${roomId}/invite`;
+		const url = `${process.env.CLIENT_APP_HOST}/rooms/invite/personal/${token}`;
 
 		const info = await this.mailerService.sendMail({
 			to: email,
@@ -40,7 +40,7 @@ export class MailService {
 	): Promise<boolean> {
 		const { email, name, token, } = params;
 
-		const url = `http://localhost:3000/registration/activte?token=${token}`;
+		const url = `${process.env.CLIENT_APP_HOST}/registration/activate?token=${token}`;
 
 		const info = await this.mailerService.sendMail({
 			to: email,
