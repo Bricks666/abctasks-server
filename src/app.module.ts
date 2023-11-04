@@ -13,6 +13,7 @@ import { ProgressModule } from '@/progress';
 import { CommentsModule } from '@/comments';
 import { DatabaseModule } from '@/database';
 import { MailModule } from '@/mail';
+import { TokensModule } from './tokens/tokens.module';
 
 @Module({
 	imports: [
@@ -36,7 +37,8 @@ import { MailModule } from '@/mail';
 		ProgressModule,
 		CommentsModule,
 		MailModule,
-		TagsModule
+		TagsModule,
+		TokensModule
 	],
 	providers: [
 		{
