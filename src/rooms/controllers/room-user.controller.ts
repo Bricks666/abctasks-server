@@ -19,14 +19,17 @@ import {
 import { Auth, CurrentUser } from '@/auth';
 import { SecurityUserDto } from '@/users';
 import { IntParam } from '@/shared';
-import { RoomUserService } from '../services';
+import { RoomTokensService, RoomUserService } from '../services';
 import { InRoom, IsOwner } from '../lib';
 
 @ApiTags('Пользователи комнаты')
 @Auth()
 @Controller('rooms/:id/members')
 export class RoomUserController {
-	constructor(private readonly roomUserService: RoomUserService) {}
+	constructor(
+		private readonly roomUserService: RoomUserService,
+		private readonly roomTokensService: RoomTokensService
+	) {}
 
 	@ApiOperation({
 		summary: 'Получение всех пользователей комнаты',
@@ -92,7 +95,7 @@ export class RoomUserController {
 	@InRoom()
 	@Get('/link-hash')
 	async generateInviteHash(@IntParam('id') id: number): Promise<string> {
-		return this.roomUserService.generateInviteHash({ roomId: id, });
+		return this.roomTokensService.generateLinkToken({ roomId: id, });
 	}
 
 	@ApiOperation({
@@ -144,13 +147,13 @@ export class RoomUserController {
 		description: 'Пользователь уже вошел или не был ',
 	})
 	@Auth()
-	@Put('/invite/:hash')
-	async addUserByLink(
-		@IntParam('hash') hash: string,
+	@Put('/invite/:token')
+	async addUserViaLink(
+		@IntParam('token') token: string,
 		@CurrentUser() user: SecurityUserDto
 	): Promise<SecurityUserDto> {
-		return this.roomUserService.addUserByLink({
-			hash,
+		return this.roomUserService.addUserViaLink({
+			token,
 			userId: user.id,
 		});
 	}

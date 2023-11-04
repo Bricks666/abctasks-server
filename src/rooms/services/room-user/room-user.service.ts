@@ -3,27 +3,26 @@ import {
 	Injectable,
 	NotFoundException
 } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
 import { SecurityUserDto } from '@/users';
 import { MailService } from '@/mail';
 import { RoomUserRepository } from '../../repositories';
+import { RoomTokensService } from '../room-tokens';
 import {
 	GetUsersParams,
 	InviteUserParams,
-	GenerateInviteHashParams,
 	ApproveInviteParams,
 	RejectInviteParams,
 	RemoveUserParams,
 	IsExistsParams,
 	GetInvitationsParams,
-	AddUserParams
+	AddUserViaLinkParams
 } from './types';
 
 @Injectable()
 export class RoomUserService {
 	constructor(
 		private readonly roomUserRepository: RoomUserRepository,
-		private readonly jwtService: JwtService,
+		private readonly roomTokensService: RoomTokensService,
 		private readonly mailService: MailService
 	) {}
 
@@ -64,30 +63,24 @@ export class RoomUserService {
 
 		const user = await this.roomUserRepository.addInvitation(params);
 
+		const token = await this.roomTokensService.generateInviteToken({
+			roomId: params.roomId,
+			userId: user.id,
+		});
+
 		await this.mailService.sendRoomInviteConfirmation({
+			token,
 			email: user.email,
 			name: user.username,
-			roomId: params.roomId,
 		});
 
 		return user;
 	}
 
-	async generateInviteHash(params: GenerateInviteHashParams): Promise<string> {
-		return this.jwtService.signAsync(params, {
-			secret: process.env.SECRET,
-		});
-	}
+	async addUserViaLink(params: AddUserViaLinkParams): Promise<SecurityUserDto> {
+		const { token, userId, } = params;
 
-	async addUserByLink(params: AddUserParams): Promise<SecurityUserDto> {
-		const { hash, userId, } = params;
-
-		const { roomId, }: { roomId: number } = await this.jwtService.verifyAsync(
-			hash,
-			{
-				secret: process.env.SECRET,
-			}
-		);
+		const { roomId, } = await this.roomTokensService.verifyLinkToken(token);
 
 		const user = await this.roomUserRepository.addUser({ userId, roomId, });
 

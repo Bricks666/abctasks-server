@@ -11,9 +11,9 @@ export interface InviteUserParams {
 	readonly userId: number;
 }
 
-export interface AddUserParams {
+export interface AddUserViaLinkParams {
 	readonly userId: number;
-	readonly hash: string;
+	readonly token: string;
 }
 
 export interface ApproveInviteParams {
@@ -24,10 +24,6 @@ export interface ApproveInviteParams {
 export interface RejectInviteParams {
 	readonly roomId: number;
 	readonly userId: number;
-}
-
-export interface GenerateInviteHashParams {
-	readonly roomId: number;
 }
 
 export interface RemoveUserParams {
