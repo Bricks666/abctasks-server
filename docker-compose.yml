@@ -5,7 +5,7 @@ services:
     ports:
       - 5000:5000
     env_file:
-      - .env
+      - .env.production
     depends_on:
       - db
       - redis
@@ -19,7 +19,7 @@ services:
     volumes:
       - db-data:/var/lib/postgresql/data
     env_file:
-      - .env
+      - .env.production
     environment:
       POSTGRES_DB: ${DATABASE_NAME}
       POSTGRES_USER: ${DATABASE_USER}
@@ -30,7 +30,7 @@ services:
     ports:
       - 6379:6379
     env_file:
-      - .env
+      - .env.production
     volumes:
       - redis-data:/data
     restart:
