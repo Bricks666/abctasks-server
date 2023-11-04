@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
+import { JwtService, JwtSignOptions } from '@nestjs/jwt';
 
 @Injectable()
 export class TokensService {
@@ -9,10 +9,15 @@ export class TokensService {
 		payload: string | Buffer | object,
 		duration?: string | number
 	): Promise<string> {
-		return this.jwtService.signAsync(payload, {
+		const params: JwtSignOptions = {
 			secret: process.env.INSECURE_DATA_SECRET,
-			expiresIn: duration,
-		});
+		};
+
+		if (duration) {
+			params.expiresIn = duration;
+		}
+
+		return this.jwtService.signAsync(payload, params);
 	}
 
 	verifyInsecure<T extends object>(token: string): Promise<T> {

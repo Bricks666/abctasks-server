@@ -40,7 +40,6 @@ export class RoomsController {
 		isArray: true,
 		description: 'Все комнаты, в которых состоит пользователь',
 	})
-	@UseInterceptors(CacheInterceptor)
 	@Get('/')
 	async getAll(
 		@CurrentUser() user: SecurityUserDto
