@@ -16,7 +16,7 @@ export class MembersTokensService {
 		return this.tokensService.generateInsecure(params);
 	}
 
-	generatePersonalInvitationTOken(
+	generatePersonalInvitationToken(
 		params: GeneratePersonalRoomInvitationTokenParams
 	): Promise<string> {
 		return this.tokensService.generateInsecure(params);

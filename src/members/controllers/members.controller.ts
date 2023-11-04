@@ -20,16 +20,13 @@ import { SecurityUserDto } from '@/users';
 import { IntParam } from '@/shared';
 import { IsOwner } from '@/rooms/lib';
 import { IsMember } from '../lib';
-import { MembersService, MembersTokensService } from '../services';
+import { MembersService } from '../services';
 
 @ApiTags('Пользователи комнаты')
 @Auth()
 @Controller('members/:roomId')
 export class MembersController {
-	constructor(
-		private readonly roomUserService: MembersService,
-		private readonly roomTokensService: MembersTokensService
-	) {}
+	constructor(private readonly membersService: MembersService) {}
 
 	@ApiOperation({
 		summary: 'Получение всех пользователей комнаты',
@@ -48,7 +45,7 @@ export class MembersController {
 	async getUsers(
 		@IntParam('roomId') roomId: number
 	): Promise<SecurityUserDto[]> {
-		return this.roomUserService.getUsers({ roomId, });
+		return this.membersService.getUsers({ roomId, });
 	}
 
 	@ApiOperation({
@@ -66,7 +63,7 @@ export class MembersController {
 	async getInvitations(
 		@IntParam('roomId') roomId: number
 	): Promise<SecurityUserDto[]> {
-		return this.roomUserService.getInvited({ roomId, });
+		return this.membersService.getInvited({ roomId, });
 	}
 
 	@ApiOperation({
@@ -81,7 +78,7 @@ export class MembersController {
 	async generateInviteLink(
 		@IntParam('roomId') roomId: number
 	): Promise<string> {
-		return this.roomTokensService.generateInvitationToken({ roomId, });
+		return this.membersService.generateInvitationLink({ roomId, });
 	}
 
 	@ApiOperation({
@@ -97,7 +94,7 @@ export class MembersController {
 		@IntParam('roomId') roomId: number,
 		@IntParam('userId') userId: number
 	): Promise<SecurityUserDto> {
-		return this.roomUserService.inviteUser({ userId, roomId, });
+		return this.membersService.inviteUser({ userId, roomId, });
 	}
 
 	@ApiOperation({
@@ -117,7 +114,7 @@ export class MembersController {
 		@Query('token') token: string,
 		@CurrentUser() user: SecurityUserDto
 	): Promise<SecurityUserDto> {
-		return this.roomUserService.approveInvitation({ token, userId: user.id, });
+		return this.membersService.approveInvitation({ token, userId: user.id, });
 	}
 
 	@ApiOperation({
@@ -132,7 +129,7 @@ export class MembersController {
 		@Query('token') token: string,
 		@CurrentUser() user: SecurityUserDto
 	): Promise<boolean> {
-		return this.roomUserService.rejectInvitation({ token, userId: user.id, });
+		return this.membersService.rejectInvitation({ token, userId: user.id, });
 	}
 
 	@ApiOperation({
@@ -149,7 +146,7 @@ export class MembersController {
 		@CurrentUser() user: SecurityUserDto
 	): Promise<boolean> {
 		const { id: userId, } = user;
-		await this.roomUserService.removeUser({ roomId, userId, });
+		await this.membersService.removeUser({ roomId, userId, });
 
 		return true;
 	}
@@ -167,6 +164,6 @@ export class MembersController {
 		@IntParam('roomId') roomId: number,
 		@IntParam('userId') userId: number
 	): Promise<boolean> {
-		return this.roomUserService.removeUser({ roomId, userId, });
+		return this.membersService.removeUser({ roomId, userId, });
 	}
 }

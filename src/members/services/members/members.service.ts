@@ -14,7 +14,8 @@ import {
 	RemoveUserParams,
 	IsExistsParams,
 	GetInvitedParams,
-	AnswerInvitationParams
+	AnswerInvitationParams,
+	GenerateInvitationLinkParams
 } from './types';
 import { isPersonalInvitation } from './lib';
 
@@ -46,6 +47,27 @@ export class MembersService {
 		return users;
 	}
 
+	async generateInvitationLink(
+		params: GenerateInvitationLinkParams
+	): Promise<string> {
+		const { roomId, userId, } = params;
+
+		let token: string;
+
+		if (typeof userId !== 'undefined') {
+			token = await this.membersTokensService.generateInvitationToken({
+				roomId,
+			});
+		} else {
+			token = await this.membersTokensService.generatePersonalInvitationToken({
+				roomId,
+				userId,
+			});
+		}
+
+		return `${process.env.CLIENT_APP_HOST}/rooms/invite?token=${token}`;
+	}
+
 	async inviteUser(params: InviteUserParams): Promise<SecurityUserDto> {
 		const isExists = await this.isExists(params);
 
@@ -61,13 +83,10 @@ export class MembersService {
 
 		const user = await this.membersRepository.addInvitation(params);
 
-		const token =
-			await this.membersTokensService.generatePersonalInvitationTOken({
-				roomId: params.roomId,
-				userId: user.id,
-			});
-
-		const url = `${process.env.CLIENT_APP_HOST}/rooms/invite?token=${token}`;
+		const url = await this.generateInvitationLink({
+			roomId: params.roomId,
+			userId: user.id,
+		});
 
 		await this.mailService.sendRoomInviteConfirmation({
 			url,
