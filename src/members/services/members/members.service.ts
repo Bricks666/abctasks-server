@@ -1,33 +1,33 @@
 import {
 	ConflictException,
+	ForbiddenException,
 	Injectable,
 	NotFoundException
 } from '@nestjs/common';
 import { SecurityUserDto } from '@/users';
 import { MailService } from '@/mail';
-import { MembersTokensService } from '../members-tokens';
+import { MembersTokensService, RoomInvitation } from '../members-tokens';
 import { MembersRepository } from '../../repositories';
 import {
 	GetUsersParams,
 	InviteUserParams,
-	ApproveInviteParams,
-	RejectInviteParams,
 	RemoveUserParams,
 	IsExistsParams,
-	GetInvitationsParams,
-	AddUserViaLinkParams
+	GetInvitedParams,
+	AnswerInvitationParams
 } from './types';
+import { isPersonalInvitation } from './lib';
 
 @Injectable()
 export class MembersService {
 	constructor(
 		private readonly membersRepository: MembersRepository,
-		private readonly membersService: MembersTokensService,
+		private readonly membersTokensService: MembersTokensService,
 		private readonly mailService: MailService
 	) {}
 
 	async getUsers(params: GetUsersParams): Promise<SecurityUserDto[]> {
-		const users = await this.membersRepository.getUsers(params);
+		const users = await this.membersRepository.getMembers(params);
 
 		if (!users) {
 			throw new NotFoundException('Room was not found');
@@ -36,9 +36,7 @@ export class MembersService {
 		return users;
 	}
 
-	async getInvitations(
-		params: GetInvitationsParams
-	): Promise<SecurityUserDto[]> {
+	async getInvited(params: GetInvitedParams): Promise<SecurityUserDto[]> {
 		const users = await this.membersRepository.getInvitations(params);
 
 		if (!users) {
@@ -63,10 +61,11 @@ export class MembersService {
 
 		const user = await this.membersRepository.addInvitation(params);
 
-		const token = await this.membersService.generateInviteToken({
-			roomId: params.roomId,
-			userId: user.id,
-		});
+		const token =
+			await this.membersTokensService.generatePersonalInvitationTOken({
+				roomId: params.roomId,
+				userId: user.id,
+			});
 
 		await this.mailService.sendRoomInviteConfirmation({
 			token,
@@ -77,36 +76,54 @@ export class MembersService {
 		return user;
 	}
 
-	async addUserViaLink(params: AddUserViaLinkParams): Promise<SecurityUserDto> {
+	async approveInvitation(
+		params: AnswerInvitationParams
+	): Promise<SecurityUserDto> {
 		const { token, userId, } = params;
 
-		const { roomId, } = await this.membersService.verifyToken(token);
+		const tokenPayload = await this.membersTokensService.verifyToken(token);
 
-		const user = await this.membersRepository.addUser({ userId, roomId, });
+		const invitation = this.validateInvitation(tokenPayload, userId);
 
-		if (!user) {
-			throw new ConflictException('User already exists in this room');
-		}
-
-		return user;
-	}
-
-	async approveInvite(params: ApproveInviteParams): Promise<SecurityUserDto> {
-		const isInvited = await this.membersRepository.isInvited(params as any);
+		const isInvited = await this.membersRepository.isInvited({
+			userId,
+			roomId: invitation.roomId,
+		});
 
 		if (!isInvited) {
 			throw new ConflictException('User already exists');
 		}
 
-		return this.membersRepository.activateUser(params as any);
+		return this.membersRepository.activateMember({
+			userId,
+			roomId: invitation.roomId,
+		});
 	}
 
-	async rejectInvite(params: RejectInviteParams): Promise<boolean> {
-		return this.membersRepository.removeUserHard(params as any);
+	async rejectInvitation(params: AnswerInvitationParams): Promise<boolean> {
+		const { token, userId, } = params;
+
+		const tokenPayload = await this.membersTokensService.verifyToken(token);
+
+		const invitation = this.validateInvitation(tokenPayload, userId);
+
+		const isInvited = await this.membersRepository.isInvited({
+			userId,
+			roomId: invitation.roomId,
+		});
+
+		if (isInvited) {
+			throw new ConflictException('User has not been invited');
+		}
+
+		return this.membersRepository.removeMemberInvitation({
+			userId,
+			roomId: invitation.roomId,
+		});
 	}
 
 	async removeUser(params: RemoveUserParams): Promise<boolean> {
-		const isSuccess = await this.membersRepository.removeUser(params);
+		const isSuccess = await this.membersRepository.removeMember(params);
 
 		if (!isSuccess) {
 			throw new ConflictException("Room doesn't already exist this user");
@@ -117,5 +134,24 @@ export class MembersService {
 
 	async isExists(params: IsExistsParams): Promise<boolean> {
 		return this.membersRepository.existsUser(params);
+	}
+
+	private validateInvitation(
+		invitation: RoomInvitation,
+		userId: number
+	): RoomInvitation {
+		const personalInvitation = isPersonalInvitation(invitation);
+
+		if (!personalInvitation) {
+			return invitation;
+		}
+
+		const sameUser = invitation.userId === userId;
+
+		if (sameUser) {
+			throw new ForbiddenException('This invitation is not yours');
+		}
+
+		return invitation;
 	}
 }

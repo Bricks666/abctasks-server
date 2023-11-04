@@ -1,25 +1,28 @@
 import { Injectable } from '@nestjs/common';
 import { TokensService } from '@/tokens/tokens.service';
 import {
-	GenerateLinkTokenParams,
-	GenerateRoomInviteParams,
-	RoomInviteToken,
-	RoomLinkToken
+	GenerateRoomInvitationTokenParams,
+	GeneratePersonalRoomInvitationTokenParams,
+	RoomInvitation
 } from './types';
 
 @Injectable()
 export class MembersTokensService {
 	constructor(private readonly tokensService: TokensService) {}
 
-	generateLinkToken(params: GenerateLinkTokenParams): Promise<string> {
+	generateInvitationToken(
+		params: GenerateRoomInvitationTokenParams
+	): Promise<string> {
 		return this.tokensService.generateInsecure(params);
 	}
 
-	generateInviteToken(params: GenerateRoomInviteParams): Promise<string> {
+	generatePersonalInvitationTOken(
+		params: GeneratePersonalRoomInvitationTokenParams
+	): Promise<string> {
 		return this.tokensService.generateInsecure(params);
 	}
 
-	verifyToken(token: string): Promise<RoomInviteToken | RoomLinkToken> {
+	verifyToken(token: string): Promise<RoomInvitation> {
 		return this.tokensService.verifyInsecure(token);
 	}
 }

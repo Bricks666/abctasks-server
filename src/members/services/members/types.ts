@@ -2,7 +2,7 @@ export interface GetUsersParams {
 	readonly roomId: number;
 }
 
-export interface GetInvitationsParams {
+export interface GetInvitedParams {
 	readonly roomId: number;
 }
 
@@ -11,19 +11,9 @@ export interface InviteUserParams {
 	readonly userId: number;
 }
 
-export interface AddUserViaLinkParams {
+export interface AnswerInvitationParams {
 	readonly userId: number;
 	readonly token: string;
-}
-
-export interface ApproveInviteParams {
-	readonly userId: number;
-	readonly token: string;
-}
-
-export interface RejectInviteParams {
-	readonly token: string;
-	readonly userId: number;
 }
 
 export interface RemoveUserParams {

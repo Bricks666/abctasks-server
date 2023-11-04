@@ -1,11 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { DatabaseService } from '@/database';
 import { SecurityUserDto, SECURITY_USER_SELECT } from '@/users';
-import { MemberDto } from '../../dto';
 import {
 	ActivateUserParams,
 	AddInvitationParams,
-	AddUserParams,
 	ExistsMemberParams,
 	GetInvitationsParams,
 	GetUsersParams,
@@ -17,14 +15,13 @@ import {
 export class MembersRepository {
 	constructor(private readonly databaseService: DatabaseService) {}
 
-	async getUsers(params: GetUsersParams): Promise<SecurityUserDto[]> {
+	async getMembers(params: GetUsersParams): Promise<SecurityUserDto[]> {
 		const { roomId, } = params;
 
-		const pairs = await this.databaseService.roomUser.findMany({
+		const pairs = await this.databaseService.member.findMany({
 			where: {
 				roomId,
-				removed: false,
-				activated: true,
+				status: 'activated',
 			},
 			include: {
 				user: {
@@ -39,10 +36,10 @@ export class MembersRepository {
 	async getInvitations(
 		params: GetInvitationsParams
 	): Promise<SecurityUserDto[]> {
-		const rows = await this.databaseService.roomUser.findMany({
+		const rows = await this.databaseService.member.findMany({
 			where: {
 				...params,
-				activated: false,
+				status: 'invited',
 			},
 			include: {
 				user: {
@@ -55,19 +52,17 @@ export class MembersRepository {
 	}
 
 	async addInvitation(params: AddInvitationParams): Promise<SecurityUserDto> {
-		const isExited = await this.databaseService.roomUser.findFirst({
+		const isExited = await this.databaseService.member.findFirst({
 			where: {
 				...params,
-				removed: true,
-				activated: true,
+				status: 'removed',
 			},
 		});
 
 		if (isExited) {
-			const result = await this.databaseService.roomUser.update({
+			const result = await this.databaseService.member.update({
 				data: {
-					activated: false,
-					removed: false,
+					status: 'invited',
 				},
 				where: {
 					roomId_userId: params,
@@ -82,7 +77,7 @@ export class MembersRepository {
 			return result.user;
 		}
 
-		const result = await this.databaseService.roomUser.create({
+		const result = await this.databaseService.member.create({
 			data: {
 				...params,
 			},
@@ -97,23 +92,21 @@ export class MembersRepository {
 	}
 
 	async isInvited(params: IsInvitedParams): Promise<boolean> {
-		const user = await this.databaseService.roomUser.findFirst({
+		const user = await this.databaseService.member.findFirst({
 			where: {
 				...params,
-				activated: false,
+				status: 'invited',
 			},
 		});
 
 		return Boolean(user);
 	}
 
-	async activateUser(
+	async activateMember(
 		params: ActivateUserParams
 	): Promise<SecurityUserDto | null> {
-		const result = await this.databaseService.roomUser.update({
-			data: {
-				activated: true,
-			},
+		const result = await this.databaseService.member.update({
+			data: { status: 'activated', },
 			where: {
 				roomId_userId: params,
 			},
@@ -127,62 +120,18 @@ export class MembersRepository {
 		return result.user;
 	}
 
-	/*
-  Может стоит как либо декомпозировать
-  */
-	async addUser(params: AddUserParams): Promise<SecurityUserDto | null> {
-		const pair: MemberDto | null =
-			await this.databaseService.roomUser.findFirst({
-				where: params,
-			});
-
-		if (!pair) {
-			const result = await this.databaseService.roomUser.create({
-				data: { ...params, activated: true, },
-				include: {
-					user: {
-						select: SECURITY_USER_SELECT,
-					},
-				},
-			});
-
-			return result.user;
-		}
-
-		if (pair.removed) {
-			const result = await this.databaseService.roomUser.update({
-				data: {
-					removed: false,
-					activated: true,
-				},
-				where: {
-					roomId_userId: params,
-				},
-				include: {
-					user: {
-						select: SECURITY_USER_SELECT,
-					},
-				},
-			});
-
-			return result.user;
-		}
-
-		return null;
-	}
-
-	async removeUser(params: RemoveMemberParams): Promise<boolean> {
-		const pair = await this.databaseService.roomUser.findFirst({
-			where: { ...params, activated: true, },
+	async removeMember(params: RemoveMemberParams): Promise<boolean> {
+		const pair = await this.databaseService.member.findFirst({
+			where: { ...params, status: 'activated', },
 		});
 
-		if (!pair || pair.removed) {
+		if (!pair) {
 			return false;
 		}
 
-		await this.databaseService.roomUser.update({
+		await this.databaseService.member.update({
 			data: {
-				removed: true,
+				status: 'removed',
 			},
 
 			where: {
@@ -193,9 +142,12 @@ export class MembersRepository {
 		return true;
 	}
 
-	async removeUserHard(params: RemoveMemberParams): Promise<boolean> {
-		const { count, } = await this.databaseService.roomUser.deleteMany({
-			where: params,
+	async removeMemberInvitation(params: RemoveMemberParams): Promise<boolean> {
+		const { count, } = await this.databaseService.member.updateMany({
+			where: { ...params, status: 'invited', },
+			data: {
+				status: 'removed',
+			},
 		});
 
 		return Boolean(count);
@@ -204,12 +156,11 @@ export class MembersRepository {
 	async existsUser(params: ExistsMemberParams): Promise<boolean> {
 		const { roomId, userId, } = params;
 
-		const pair = await this.databaseService.roomUser.findFirst({
+		const pair = await this.databaseService.member.findFirst({
 			where: {
 				userId,
 				roomId,
-				removed: false,
-				activated: true,
+				status: 'activated',
 			},
 		});
 

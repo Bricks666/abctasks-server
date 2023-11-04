@@ -1,12 +1,11 @@
-export interface RoomLinkToken {
+export interface RoomInvitation {
 	readonly roomId: number;
 }
 
-export type GenerateLinkTokenParams = RoomLinkToken;
+export type GenerateRoomInvitationTokenParams = RoomInvitation;
 
-export interface RoomInviteToken {
-	readonly roomId: number;
+export interface PersonalRoomInvitation extends RoomInvitation {
 	readonly userId: number;
 }
 
-export type GenerateRoomInviteParams = RoomInviteToken;
+export type GeneratePersonalRoomInvitationTokenParams = PersonalRoomInvitation;

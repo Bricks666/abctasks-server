@@ -1,11 +1,9 @@
-import { RoomUser as RoomUserModel } from '@prisma/client';
+import { MemberStatus, Member as MemberModel } from '@prisma/client';
 
-export class MemberDto implements RoomUserModel {
+export class MemberDto implements MemberModel {
 	declare roomId: number;
 
 	declare userId: number;
 
-	declare activated: boolean;
-
-	declare removed: boolean;
+	declare status: MemberStatus;
 }
