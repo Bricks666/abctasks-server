@@ -67,8 +67,10 @@ export class MembersService {
 				userId: user.id,
 			});
 
+		const url = `${process.env.CLIENT_APP_HOST}/rooms/invite?token=${token}`;
+
 		await this.mailService.sendRoomInviteConfirmation({
-			token,
+			url,
 			email: user.email,
 			name: user.username,
 		});
