@@ -31,7 +31,7 @@ export class RoomInvitationsController {
 		summary: 'Возвращает все активные приглашения',
 	})
 	@ApiOkResponse({
-		type: SecurityUserDto,
+		type: RoomInvitationDto,
 		isArray: true,
 	})
 	@ApiNotFoundResponse({
@@ -44,6 +44,18 @@ export class RoomInvitationsController {
 		return this.invitationsService.getRoomInvitations({ roomId, });
 	}
 
+	@ApiOperation({
+		summary: 'Get invitation via token',
+		description:
+			'Should be used for taking invitation via token from invitation link',
+	})
+	@ApiOkResponse({
+		type: RoomInvitationDto,
+	})
+	@ApiNotFoundResponse({
+		description: 'Invitation not exists',
+	})
+	@IsOwner()
 	@Get('/via/:token')
 	getOneViaToken(
 		@Param('token') token: string,
