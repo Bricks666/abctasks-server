@@ -30,7 +30,6 @@ async function bootstrap() {
 	);
 
 	app.useGlobalInterceptors(new StandardResponseInterceptor());
-	app.setGlobalPrefix('api');
 
 	const config = new DocumentBuilder()
 		.setTitle('Документация по API сервера "Task manager"')

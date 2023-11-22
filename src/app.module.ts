@@ -15,6 +15,7 @@ import { DatabaseModule } from '@/database';
 import { MailModule } from '@/mail';
 import { TokensModule } from '@/tokens/tokens.module';
 import { MembersModule } from '@/members/members.module';
+import { InvitationsModule } from '@/room-invitations/invitations.module';
 
 @Module({
 	imports: [
@@ -39,7 +40,8 @@ import { MembersModule } from '@/members/members.module';
 		CommentsModule,
 		MailModule,
 		TagsModule,
-		TokensModule
+		TokensModule,
+		InvitationsModule
 	],
 	providers: [
 		{

@@ -1,4 +1,7 @@
-import { PersonalRoomInvitation, RoomInvitation } from '../members-tokens';
+import {
+	PersonalRoomInvitation,
+	RoomInvitation
+} from '../room-invitations-tokens';
 
 export const isPersonalInvitation = (
 	invitation: RoomInvitation

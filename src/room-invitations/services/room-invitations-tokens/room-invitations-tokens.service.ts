@@ -7,7 +7,7 @@ import {
 } from './types';
 
 @Injectable()
-export class MembersTokensService {
+export class RoomInvitationsTokensService {
 	constructor(private readonly tokensService: TokensService) {}
 
 	generateInvitationToken(

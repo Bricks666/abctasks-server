@@ -1,29 +1,18 @@
-export interface GetUsersParams {
+import { MemberStatus } from '@prisma/client';
+
+export interface GetMembersParams {
 	readonly roomId: number;
 }
 
-export interface AddInvitationParams {
+export interface AddMemberParams {
 	readonly userId: number;
 	readonly roomId: number;
 }
 
-export interface IsInvitedParams {
-	readonly roomId: number;
-	readonly userId: number;
-}
-
-export interface GetInvitationsParams {
-	readonly roomId: number;
-}
-
-export interface ActivateUserParams {
-	readonly roomId: number;
-	readonly userId: number;
-}
-
-export interface AddUserParams {
+export interface UpdateMemberParams {
 	readonly userId: number;
 	readonly roomId: number;
+	readonly status: MemberStatus;
 }
 
 export interface RemoveMemberParams {
