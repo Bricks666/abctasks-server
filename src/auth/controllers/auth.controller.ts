@@ -116,12 +116,15 @@ export class AuthController {
 		const { rememberMe, ...dto } = body;
 		const result = await this.authService.login(dto);
 
+		const cookieParams = {
+			...BASE_COOKIE_OPTIONS,
+		};
+
 		if (rememberMe) {
-			res.cookie(COOKIE_NAME, result.tokens.refreshToken, {
-				...BASE_COOKIE_OPTIONS,
-				maxAge: COOKIE_TIME,
-			});
+			cookieParams.maxAge = COOKIE_TIME;
 		}
+
+		res.cookie(COOKIE_NAME, result.tokens.refreshToken, cookieParams);
 
 		return result;
 	}

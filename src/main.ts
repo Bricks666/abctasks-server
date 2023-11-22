@@ -30,6 +30,7 @@ async function bootstrap() {
 	);
 
 	app.useGlobalInterceptors(new StandardResponseInterceptor());
+	app.setGlobalPrefix('api');
 
 	const config = new DocumentBuilder()
 		.setTitle('Документация по API сервера "Task manager"')
@@ -38,7 +39,6 @@ async function bootstrap() {
 		.addCookieAuth(process.env.COOKIE_NAME)
 		.addBearerAuth()
 		.addServer(`http://localhost:${PORT}`)
-		.addTag('api')
 		.build();
 
 	const document = SwaggerModule.createDocument(app, config);
