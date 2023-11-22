@@ -8,20 +8,22 @@ datasource db {
 }
 
 model User {
-  id        Int      @id @default(autoincrement())
-  email     String   @unique() @db.VarChar(32)
-  username  String   @db.VarChar(32)
-  password  String   @db.VarChar(255)
-  photo     String?  @db.VarChar(255)
-  activated Boolean? @default(false)
-  membering Member[]
-  room      Room[]
+  id                 Int              @id @default(autoincrement())
+  email              String           @unique() @db.VarChar(32)
+  username           String           @db.VarChar(32)
+  password           String           @db.VarChar(255)
+  photo              String?          @db.VarChar(255)
+  activated          Boolean?         @default(false)
+  membering          Member[]
+  room               Room[]
+  receivedInvitation RoomInvitation[] @relation("received_invitations")
+  sendedInvitation   RoomInvitation[] @relation("sended_invitations")
 }
 
 model Member {
   roomId     Int
   userId     Int
-  status     MemberStatus @default(invited)
+  status     MemberStatus @default(activated)
   room       Room         @relation(fields: [roomId], references: [id], onDelete: Cascade)
   user       User         @relation(fields: [userId], references: [id], onDelete: Cascade)
   task       Task[]
@@ -34,21 +36,39 @@ model Member {
 }
 
 enum MemberStatus {
-  invited
   activated
   removed
 }
 
+model RoomInvitation {
+  id        Int                  @id @default(autoincrement())
+  roomId    Int
+  userId    Int
+  inviterId Int
+  status    RoomInvitationStatus @default(sended)
+
+  room    Room @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  user    User @relation("received_invitations", fields: [userId], references: [id], onDelete: Cascade)
+  inviter User @relation("sended_invitations", fields: [inviterId], references: [id], onDelete: Cascade)
+}
+
+enum RoomInvitationStatus {
+  sended
+  approved
+  rejected
+}
+
 model Room {
-  id          Int       @id @default(autoincrement())
+  id          Int              @id @default(autoincrement())
   ownerId     Int
-  name        String    @db.VarChar(32)
-  description String    @db.VarChar(255)
-  createdAt   DateTime? @default(now())
-  updatedAt   DateTime? @updatedAt
-  owner       User      @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  name        String           @db.VarChar(32)
+  description String           @db.VarChar(255)
+  createdAt   DateTime?        @default(now())
+  updatedAt   DateTime?        @updatedAt
+  owner       User             @relation(fields: [ownerId], references: [id], onDelete: Cascade)
   tags        Tag[]
   members     Member[]
+  invitations RoomInvitation[]
 }
 
 model Comment {
