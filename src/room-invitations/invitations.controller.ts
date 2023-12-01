@@ -14,11 +14,11 @@ import {
 	ApiQuery,
 	ApiTags
 } from '@nestjs/swagger';
-import { Auth, CurrentUser } from '@/auth';
-import { SecurityUserDto } from '@/users';
+import { Auth, CurrentUser } from '@/auth/lib';
+import { SecurityUserDto } from '@/users/dto';
 import { IntParam } from '@/shared';
-import { IsOwner } from '@/rooms';
-import { RoomInvitationsService } from './services/room-invitations/room-invitations.service';
+import { IsOwner } from '@/rooms/lib';
+import { RoomInvitationsService } from './services';
 import { CreateRoomInvitationDto, RoomInvitationDto } from './dto';
 
 @ApiTags('Приглашения')
@@ -31,7 +31,7 @@ export class RoomInvitationsController {
 		summary: 'Возвращает все активные приглашения',
 	})
 	@ApiOkResponse({
-		type: RoomInvitationDto,
+		type: () => RoomInvitationDto,
 		isArray: true,
 	})
 	@ApiNotFoundResponse({
@@ -50,7 +50,7 @@ export class RoomInvitationsController {
 			'Should be used for taking invitation via token from invitation link',
 	})
 	@ApiOkResponse({
-		type: RoomInvitationDto,
+		type: () => RoomInvitationDto,
 	})
 	@ApiNotFoundResponse({
 		description: 'Invitation not exists',
@@ -86,7 +86,7 @@ export class RoomInvitationsController {
 		summary: 'Send to user personal invitation',
 	})
 	@ApiOkResponse({
-		type: SecurityUserDto,
+		type: () => RoomInvitationDto,
 		description: 'New invitation',
 	})
 	@IsOwner()
@@ -94,7 +94,7 @@ export class RoomInvitationsController {
 	async invite(
 		@Body() body: CreateRoomInvitationDto,
 		@CurrentUser() user: SecurityUserDto
-	) {
+	): Promise<RoomInvitationDto> {
 		return this.invitationsService.createPersonalInvitation({
 			...body,
 			inviterId: user.id,
@@ -105,8 +105,8 @@ export class RoomInvitationsController {
 		summary: 'Принятие приглашения в комнату',
 	})
 	@ApiOkResponse({
-		type: SecurityUserDto,
-		description: 'Updated invitation',
+		type: Boolean,
+		description: 'Was invitation approved',
 	})
 	@ApiQuery({
 		name: 'token',

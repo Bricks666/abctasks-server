@@ -5,7 +5,7 @@ import {
 	Injectable
 } from '@nestjs/common';
 import { Request } from 'express';
-import { SecurityUserDto } from '@/users';
+import { SecurityUserDto } from '@/users/dto';
 import { RoomsService } from '../../services';
 
 @Injectable()

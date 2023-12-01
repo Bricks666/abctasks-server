@@ -1,6 +1,5 @@
 import { Controller, Get } from '@nestjs/common';
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { DisableAuthCheck } from '@/auth';
 import { ActivitySphereDto } from '../dto';
 import { ActivitySpheresService } from '../services';
 
@@ -18,7 +17,6 @@ export class ActivitySpheresController {
 		type: ActivitySphereDto,
 		isArray: true,
 	})
-	@DisableAuthCheck()
 	@Get('/all')
 	getAll(): Promise<ActivitySphereDto[]> {
 		return this.activitySpheresService.getAll();

@@ -1,6 +1,6 @@
 import { Module, forwardRef } from '@nestjs/common';
-import { AuthModule } from '@/auth';
-import { UsersModule } from '@/users';
+import { AuthModule } from '@/auth/auth.module';
+import { UsersModule } from '@/users/users.module';
 import { MembersModule } from '@/members/members.module';
 import { RoomsController } from './controllers';
 import { RoomsService } from './services';

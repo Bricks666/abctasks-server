@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { Request } from 'express';
 import { Reflector } from '@nestjs/core';
-import { SecurityUserDto } from '@/users';
+import { SecurityUserDto } from '@/users/dto';
 import { extractAccessToken } from '@/shared';
 import { AuthTokensService } from '../../services';
 import { DISABLE_AUTH_CHECK_FLAG } from './config';

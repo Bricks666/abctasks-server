@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { AuthModule } from '@/auth';
+import { AuthModule } from '@/auth/auth.module';
 import { MembersModule } from '@/members/members.module';
 import { MailModule } from '@/mail/mail.module';
 import { TokensModule } from '@/tokens/tokens.module';
@@ -19,5 +19,6 @@ import { RoomInvitationsRepository } from './repositories';
 		RoomInvitationsTokensService,
 		RoomInvitationsRepository
 	],
+	exports: [RoomInvitationsService],
 })
 export class InvitationsModule {}

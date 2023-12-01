@@ -3,7 +3,7 @@ import {
 	Injectable,
 	NotFoundException
 } from '@nestjs/common';
-import { SecurityUserDto } from '@/users';
+import { SecurityUserDto } from '@/users/dto';
 import { MembersRepository } from '../../repositories';
 import {
 	GetUsersParams as GetMembersParams,

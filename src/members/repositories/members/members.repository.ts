@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { DatabaseService } from '@/database';
-import { SecurityUserDto, SECURITY_USER_SELECT } from '@/users';
+import { SECURITY_USER_SELECT } from '@/users/repositories';
+import { SecurityUserDto } from '@/users/dto';
 import {
 	AddMemberParams,
 	ExistsMemberParams,

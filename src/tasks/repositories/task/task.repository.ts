@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
-import { DatabaseService } from '@/database';
-import { SECURITY_USER_SELECT } from '@/users';
+import { DatabaseService } from '@/database/database.service';
+import { SECURITY_USER_SELECT } from '@/users/repositories';
 import { TaskDto } from '../../dto';
 import {
 	CreateParams,

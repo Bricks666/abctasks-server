@@ -5,7 +5,8 @@ import {
 	UnauthorizedException
 } from '@nestjs/common';
 import { compare } from 'bcrypt';
-import { UsersService, SecurityUserDto } from '@/users';
+import { SecurityUserDto } from '@/users/dto';
+import { UsersService } from '@/users/services';
 import { MailService } from '@/mail';
 import { AuthenticationResultDto, TokensDto } from '../../dto';
 import { AuthTokensService } from '../auth-tokens';

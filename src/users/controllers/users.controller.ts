@@ -15,8 +15,8 @@ import {
 	ApiOkResponse,
 	ApiNotFoundResponse
 } from '@nestjs/swagger';
-import { GetUsersQueryDto, SecurityUserDto } from '@/users';
-import { Auth } from '@/auth';
+import { GetUsersQueryDto, SecurityUserDto } from '@/users/dto';
+import { Auth } from '@/auth/lib';
 import { IntParam } from '@/shared';
 import { UpdateUserDto } from '../dto';
 import { UsersService } from '../services';

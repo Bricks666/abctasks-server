@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Activity as ActivityModel } from '@prisma/client';
 import { IsNumber, IsObject } from 'class-validator';
-import { SecurityUserDto } from '@/users';
+import { SecurityUserDto } from '@/users/dto';
 import { ActivitySphereDto } from './activity-sphere.dto';
 import { ActivityActionDto } from './activity-action.dto';
 

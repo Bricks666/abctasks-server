@@ -1,6 +1,5 @@
 import { Controller, Get } from '@nestjs/common';
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { DisableAuthCheck } from '@/auth';
 import { ActivityActionDto } from '../dto';
 import { ActivityActionsService } from '../services';
 
@@ -18,7 +17,6 @@ export class ActivityActionsController {
 		type: ActivityActionDto,
 		isArray: true,
 	})
-	@DisableAuthCheck()
 	@Get('/all')
 	getAll(): Promise<ActivityActionDto[]> {
 		return this.activityActionsService.getAll();

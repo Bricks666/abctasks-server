@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Comment as CommentModel } from '@prisma/client';
 import { IsNumber, IsObject, IsString, MinLength } from 'class-validator';
-import { SecurityUserDto } from '@/users';
+import { SecurityUserDto } from '@/users/dto';
 
 export class CommentDto implements Omit<CommentModel, 'authorId'> {
 	@ApiProperty({

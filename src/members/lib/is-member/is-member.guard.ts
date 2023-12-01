@@ -5,7 +5,7 @@ import {
 	ForbiddenException,
 	Injectable
 } from '@nestjs/common';
-import { SecurityUserDto } from '@/users';
+import { SecurityUserDto } from '@/users/dto';
 import { MembersService } from '../../services';
 
 @Injectable()

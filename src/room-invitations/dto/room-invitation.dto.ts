@@ -30,7 +30,7 @@ export class RoomInvitationDto {
 
 	@ApiProperty({
 		description: 'In which status invitation now',
-		type: RoomInvitationStatus,
+		enum: RoomInvitationStatus,
 	})
 	readonly status: RoomInvitationStatus;
 }

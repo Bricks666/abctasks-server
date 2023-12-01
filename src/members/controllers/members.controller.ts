@@ -12,8 +12,8 @@ import {
 	ApiOperation,
 	ApiTags
 } from '@nestjs/swagger';
-import { Auth, CurrentUser } from '@/auth';
-import { SecurityUserDto } from '@/users';
+import { Auth, CurrentUser } from '@/auth/lib';
+import { SecurityUserDto } from '@/users/dto';
 import { IntParam } from '@/shared';
 import { IsOwner } from '@/rooms/lib';
 import { IsMember } from '../lib';

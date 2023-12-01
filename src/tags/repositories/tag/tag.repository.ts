@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { DatabaseService } from '@/database';
+import { DatabaseService } from '@/database/database.service';
 import { TagDto } from '../../dto';
 import {
 	CreateParams,

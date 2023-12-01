@@ -6,7 +6,8 @@ import {
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { Request } from 'express';
-import { SecurityUserDto, UsersService } from '@/users';
+import { SecurityUserDto } from '@/users/dto';
+import { UsersService } from '@/users/services';
 import { DISABLE_AUTH_CHECK_FLAG } from '../auth';
 import { DISABLE_IS_ACTIVATED_FLAG } from './config';
 

@@ -17,15 +17,12 @@ import {
 	ApiParam,
 	ApiTags
 } from '@nestjs/swagger';
-import {
-	ActivitiesService,
-	ActivityActionCodes,
-	ActivitySphereCodes
-} from '@/activities';
+import { ActivitiesService } from '@/activities/services';
+import { ActivityActionCodes, ActivitySphereCodes } from '@/activities/config';
 import { IsMember } from '@/members/lib';
-import { Auth, CurrentUser, DisableAuthCheck } from '@/auth';
+import { Auth, CurrentUser } from '@/auth/lib';
 import { IntParam } from '@/shared';
-import { SecurityUserDto } from '@/users';
+import { SecurityUserDto } from '@/users/dto';
 import { TagsService } from '../services';
 import { CreateTagDto, TagDto, UpdateTagDto } from '../dto';
 
@@ -49,7 +46,6 @@ export class TagsController {
 		type: TagDto,
 		isArray: true,
 	})
-	@DisableAuthCheck()
 	@UseInterceptors(CacheInterceptor)
 	@Get('/:roomId')
 	async getAll(@IntParam('roomId') roomId: number): Promise<TagDto[]> {
@@ -73,7 +69,6 @@ export class TagsController {
 		type: TagDto,
 	})
 	@ApiNotFoundResponse()
-	@DisableAuthCheck()
 	@UseInterceptors(CacheInterceptor)
 	@Get('/:roomId/:id')
 	async getOne(

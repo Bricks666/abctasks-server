@@ -17,14 +17,11 @@ import {
 	ApiTags
 } from '@nestjs/swagger';
 import { IntParam, PaginationQueryDto } from '@/shared';
-import { Auth, CurrentUser } from '@/auth';
+import { Auth, CurrentUser } from '@/auth/lib';
 import { IsMember } from '@/members/lib';
-import {
-	ActivitiesService,
-	ActivityActionCodes,
-	ActivitySphereCodes
-} from '@/activities';
-import { SecurityUserDto } from '@/users';
+import { ActivitiesService } from '@/activities/services';
+import { ActivityActionCodes, ActivitySphereCodes } from '@/activities/config';
+import { SecurityUserDto } from '@/users/dto';
 import { CommentDto, CreateCommentDto, UpdateCommentDto } from '../dto';
 import { CommentsService } from '../services';
 

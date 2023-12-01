@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { TagDto } from '@/tags';
+import { TagDto } from '@/tags/dto';
 
 export interface ProgressQueryResult {
 	readonly tagId: number;

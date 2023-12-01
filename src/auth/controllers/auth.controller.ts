@@ -22,7 +22,7 @@ import {
 	ApiUnauthorizedResponse
 } from '@nestjs/swagger';
 import { BASE_COOKIE_OPTIONS, COOKIE_NAME, COOKIE_TIME } from '@/const';
-import { CreateUserDto, SecurityUserDto } from '@/users';
+import { CreateUserDto, SecurityUserDto } from '@/users/dto';
 import { Cookie } from '@/shared';
 import { AuthService } from '../services';
 import {

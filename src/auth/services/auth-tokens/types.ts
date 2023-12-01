@@ -1,4 +1,4 @@
-import { SecurityUserDto } from '@/users';
+import { SecurityUserDto } from '@/users/dto';
 
 export type UserToken = SecurityUserDto;
 
