@@ -55,7 +55,6 @@ export class RoomInvitationsController {
 	@ApiNotFoundResponse({
 		description: 'Invitation not exists',
 	})
-	@IsOwner()
 	@Get('/via/:token')
 	getOneViaToken(
 		@Param('token') token: string,
@@ -90,13 +89,15 @@ export class RoomInvitationsController {
 		description: 'New invitation',
 	})
 	@IsOwner()
-	@Put('/invite')
+	@Put('/invite/:roomId')
 	async invite(
+		@IntParam('roomId') roomId: number,
 		@Body() body: CreateRoomInvitationDto,
 		@CurrentUser() user: SecurityUserDto
 	): Promise<RoomInvitationDto> {
 		return this.invitationsService.createPersonalInvitation({
 			...body,
+			roomId,
 			inviterId: user.id,
 		});
 	}
