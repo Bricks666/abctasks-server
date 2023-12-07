@@ -6,7 +6,13 @@ export interface GetInvitationParams {
 	readonly userId: number;
 }
 
+export interface CreateMassInvitationParams {
+	readonly roomId: number;
+	readonly inviterId: number;
+}
+
 export interface GenerateInvitationLinkParams {
+	readonly id: number;
 	readonly roomId: number;
 	readonly userId?: number;
 }

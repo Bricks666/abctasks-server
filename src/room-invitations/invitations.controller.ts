@@ -76,9 +76,13 @@ export class RoomInvitationsController {
 	@IsOwner()
 	@Get('/invite/:roomId/generate-link')
 	async generateInviteLink(
-		@IntParam('roomId') roomId: number
+		@IntParam('roomId') roomId: number,
+		@CurrentUser() user: SecurityUserDto
 	): Promise<string> {
-		return this.invitationsService.generateInvitationLink({ roomId, });
+		return this.invitationsService.createMassInvitation({
+			roomId,
+			inviterId: user.id,
+		});
 	}
 
 	@ApiOperation({

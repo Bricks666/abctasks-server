@@ -6,7 +6,9 @@ import { RoomInvitationDto } from '../../dto';
 import {
 	AnswerRoomInvitationParams,
 	CreateRoomInvitationParams,
-	GetRoomInvitationParams,
+	GetInvitationParams,
+	GetMassRoomInvitationParams,
+	GetPersonalRoomInvitationParams,
 	GetRoomInvitationsParams,
 	RemoveRoomInvitationParams
 } from './types';
@@ -40,19 +42,46 @@ export class RoomInvitationsRepository {
 		});
 	}
 
-	async getOne(
-		params: GetRoomInvitationParams
+	async getInvitation(
+		params: GetInvitationParams
 	): Promise<RoomInvitationDto | null> {
-		const { roomId, userId, inviterId, } = params;
+		const { id, } = params;
+
+		return this.databaseService.roomInvitation.findUnique({
+			where: {
+				id,
+			},
+			select,
+		});
+	}
+
+	async getPersonalInvitation(
+		params: GetPersonalRoomInvitationParams
+	): Promise<RoomInvitationDto | null> {
+		const { roomId, userId, } = params;
 
 		return this.databaseService.roomInvitation.findFirst({
 			where: {
 				roomId,
 				userId,
-				inviterId,
 			},
 			select,
 		});
+	}
+
+	async getMassInvitation(
+		params: GetMassRoomInvitationParams
+	): Promise<RoomInvitationDto | null> {
+		const { roomId, } = params;
+
+		return this.databaseService.roomInvitation
+			.findFirst({
+				where: {
+					roomId,
+				},
+				select,
+			})
+			.then((value) => value ?? null);
 	}
 
 	async create(params: CreateRoomInvitationParams): Promise<RoomInvitationDto> {
