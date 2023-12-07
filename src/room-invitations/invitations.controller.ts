@@ -97,7 +97,7 @@ export class RoomInvitationsController {
 		description: 'New invitation',
 	})
 	@IsOwner()
-	@Put('/invite/:roomId')
+	@Post('/invite/:roomId')
 	async invite(
 		@IntParam('roomId') roomId: number,
 		@Body() body: CreateRoomInvitationDto,
