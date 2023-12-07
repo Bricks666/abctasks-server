@@ -240,7 +240,7 @@ export class RoomInvitationsService {
 	): void {
 		const isThisPerson = isThisPersonInvitation(invitation, userId);
 
-		if (isThisPerson) {
+		if (!isThisPerson) {
 			throw new ForbiddenException('This invitation is not yours');
 		}
 	}
