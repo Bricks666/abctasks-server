@@ -25,7 +25,7 @@ export interface CreatePersonalInvitation {
 
 export interface AnswerInvitationParams {
 	readonly userId: number;
-	readonly token: string;
+	readonly id: number;
 }
 
 export interface RemoveInvitationParams {

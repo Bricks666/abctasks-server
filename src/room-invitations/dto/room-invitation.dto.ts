@@ -26,7 +26,7 @@ export class RoomInvitationDto {
 		description: 'Who was invited into room',
 		type: SecurityUserDto,
 	})
-	readonly user: SecurityUserDto;
+	readonly user?: SecurityUserDto;
 
 	@ApiProperty({
 		description: 'In which status invitation now',

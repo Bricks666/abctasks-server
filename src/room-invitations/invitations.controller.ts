@@ -5,14 +5,13 @@ import {
 	Get,
 	Param,
 	Post,
-	Put,
-	Query
+	Put
 } from '@nestjs/common';
 import {
+	ApiBody,
 	ApiNotFoundResponse,
 	ApiOkResponse,
 	ApiOperation,
-	ApiQuery,
 	ApiTags
 } from '@nestjs/swagger';
 import { Auth, CurrentUser } from '@/auth/lib';
@@ -20,7 +19,11 @@ import { SecurityUserDto } from '@/users/dto';
 import { IntParam } from '@/shared';
 import { IsOwner } from '@/rooms/lib';
 import { RoomInvitationsService } from './services';
-import { CreateRoomInvitationDto, RoomInvitationDto } from './dto';
+import {
+	AnswerInvitationDto,
+	CreateRoomInvitationDto,
+	RoomInvitationDto
+} from './dto';
 
 @ApiTags('Приглашения')
 @Auth()
@@ -110,22 +113,20 @@ export class RoomInvitationsController {
 	@ApiOperation({
 		summary: 'Принятие приглашения в комнату',
 	})
+	@ApiBody({
+		type: AnswerInvitationDto,
+	})
 	@ApiOkResponse({
 		type: Boolean,
 		description: 'Was invitation approved',
 	})
-	@ApiQuery({
-		name: 'token',
-		type: String,
-		description: 'Invitation token from email or link',
-	})
 	@Put('invite/approve')
 	async approve(
-		@Query('token') token: string,
+		@Body() body: AnswerInvitationDto,
 		@CurrentUser() user: SecurityUserDto
 	): Promise<boolean> {
 		return this.invitationsService.approve({
-			token,
+			id: body.id,
 			userId: user.id,
 		});
 	}
@@ -133,16 +134,23 @@ export class RoomInvitationsController {
 	@ApiOperation({
 		summary: 'Reject invitation',
 	})
+	@ApiBody({
+		type: AnswerInvitationDto,
+	})
 	@ApiOkResponse({
 		type: Boolean,
 		description: 'Отклонилось ли приглашение',
 	})
 	@Put('invite/reject')
 	async reject(
-		@Query('token') token: string,
+		@Body() body: AnswerInvitationDto,
+
 		@CurrentUser() user: SecurityUserDto
 	): Promise<boolean> {
-		return this.invitationsService.reject({ token, userId: user.id, });
+		return this.invitationsService.reject({
+			id: body.id,
+			userId: user.id,
+		});
 	}
 
 	@ApiOperation({

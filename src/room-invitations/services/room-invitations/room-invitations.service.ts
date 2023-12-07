@@ -10,10 +10,7 @@ import { RoomInvitationDto } from '@/room-invitations/dto';
 import { MailService } from '@/mail/services';
 import { MembersService } from '@/members/services';
 import { RoomInvitationsRepository } from '../../repositories';
-import {
-	RoomInvitationTokenPayload,
-	RoomInvitationsTokensService
-} from '../room-invitations-tokens';
+import { RoomInvitationsTokensService } from '../room-invitations-tokens';
 import {
 	GetInvitationsParams,
 	GetInvitationParams,
@@ -23,7 +20,7 @@ import {
 	RemoveInvitationParams,
 	CreateMassInvitationParams
 } from './types';
-import { isPersonalInvitation } from './lib';
+import { isPersonalInvitation, isThisPersonInvitation } from './lib';
 
 @Injectable()
 export class RoomInvitationsService {
@@ -57,14 +54,18 @@ export class RoomInvitationsService {
 			token
 		);
 
-		this.validateInvitation(tokenPayload, userId);
-
 		const invitation = await this.roomInvitationsRepository.getInvitation({
 			id: tokenPayload.id,
 		});
 
 		if (!invitation) {
 			throw new NotFoundException('Invitation was not found');
+		}
+
+		const isPersonal = isPersonalInvitation(invitation);
+
+		if (isPersonal) {
+			this.validateInvitation(invitation, userId);
 		}
 
 		return invitation;
@@ -129,17 +130,18 @@ export class RoomInvitationsService {
 			throw new ConflictException('User already exists in room');
 		}
 
-		const isInvited =
-			await this.roomInvitationsRepository.getPersonalInvitation({
+		let invitation = await this.roomInvitationsRepository.getPersonalInvitation(
+			{
 				roomId,
 				userId,
-			});
+			}
+		);
 
-		if (isInvited) {
+		if (invitation) {
 			throw new ConflictException('User has already been invited into room');
 		}
 
-		const invitation = await this.roomInvitationsRepository.create({
+		invitation = await this.roomInvitationsRepository.create({
 			roomId,
 			userId,
 			inviterId,
@@ -161,32 +163,29 @@ export class RoomInvitationsService {
 	}
 
 	async approve(params: AnswerInvitationParams): Promise<boolean> {
-		const { token, userId, } = params;
+		const { id, userId, } = params;
 
-		const tokenPayload = await this.roomInvitationsTokensService.verifyToken(
-			token
-		);
-
-		const roomInvitation = this.validateInvitation(tokenPayload, userId);
-
-		const invitation =
-			await this.roomInvitationsRepository.getPersonalInvitation({
-				userId,
-				roomId: roomInvitation.roomId,
-			});
-
-		const isInvited = invitation.status === 'sended';
-
-		if (!isInvited) {
-			throw new ConflictException('User has not been invited');
-		}
-
-		const approved = await this.roomInvitationsRepository.approve({
-			id: invitation.id,
+		const invitation = await this.roomInvitationsRepository.getInvitation({
+			id,
 		});
 
-		if (!approved) {
-			throw new InternalServerErrorException('Something went wrong');
+		const isPersonal = isPersonalInvitation(invitation);
+
+		if (isPersonal) {
+			this.validateInvitation(invitation, userId);
+			const isInvited = invitation.status === 'sended';
+
+			if (!isInvited) {
+				throw new ConflictException('User has not been invited');
+			}
+
+			const approved = await this.roomInvitationsRepository.approve({
+				id: invitation.id,
+			});
+
+			if (!approved) {
+				throw new InternalServerErrorException('Something went wrong');
+			}
 		}
 
 		await this.membersService.addMember({
@@ -198,19 +197,19 @@ export class RoomInvitationsService {
 	}
 
 	async reject(params: AnswerInvitationParams): Promise<boolean> {
-		const { token, userId, } = params;
+		const { id, userId, } = params;
 
-		const tokenPayload = await this.roomInvitationsTokensService.verifyToken(
-			token
-		);
+		const invitation = await this.roomInvitationsRepository.getInvitation({
+			id,
+		});
 
-		const roomInvitation = this.validateInvitation(tokenPayload, userId);
+		const isPersonal = isPersonalInvitation(invitation);
 
-		const invitation =
-			await this.roomInvitationsRepository.getPersonalInvitation({
-				userId,
-				roomId: roomInvitation.roomId,
-			});
+		if (!isPersonal) {
+			return true;
+		}
+
+		this.validateInvitation(invitation, userId);
 
 		const isInvited = invitation.status === 'sended';
 
@@ -236,21 +235,13 @@ export class RoomInvitationsService {
 	}
 
 	private validateInvitation(
-		invitation: RoomInvitationTokenPayload,
+		invitation: Required<RoomInvitationDto>,
 		userId: number
-	): RoomInvitationTokenPayload {
-		const personalInvitation = isPersonalInvitation(invitation);
+	): void {
+		const isThisPerson = isThisPersonInvitation(invitation, userId);
 
-		if (!personalInvitation) {
-			return invitation;
-		}
-
-		const sameUser = invitation.userId === userId;
-
-		if (sameUser) {
+		if (isThisPerson) {
 			throw new ForbiddenException('This invitation is not yours');
 		}
-
-		return invitation;
 	}
 }

@@ -1,10 +1,14 @@
-import {
-	PersonalRoomInvitationTokenPayload,
-	RoomInvitationTokenPayload
-} from '../room-invitations-tokens';
+import { RoomInvitationDto } from '../../dto';
 
 export const isPersonalInvitation = (
-	invitation: RoomInvitationTokenPayload
-): invitation is PersonalRoomInvitationTokenPayload => {
-	return 'userId' in invitation;
+	invitation: RoomInvitationDto
+): invitation is Required<RoomInvitationDto> => {
+	return 'user' in invitation;
+};
+
+export const isThisPersonInvitation = (
+	invitation: Required<RoomInvitationDto>,
+	userId: number
+): boolean => {
+	return invitation.user.id === userId;
 };
