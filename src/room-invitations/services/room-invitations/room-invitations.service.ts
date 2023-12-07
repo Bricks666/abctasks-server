@@ -148,6 +148,7 @@ export class RoomInvitationsService {
 		const url = await this.generateInvitationLink({
 			roomId,
 			userId,
+			id: invitation.id,
 		});
 
 		await this.mailService.sendRoomInviteConfirmation({
