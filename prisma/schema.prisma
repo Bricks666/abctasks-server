@@ -43,13 +43,13 @@ enum MemberStatus {
 model RoomInvitation {
   id        Int                  @id @default(autoincrement())
   roomId    Int
-  userId    Int
+  userId    Int?
   inviterId Int
   status    RoomInvitationStatus @default(sended)
 
-  room    Room @relation(fields: [roomId], references: [id], onDelete: Cascade)
-  user    User @relation("received_invitations", fields: [userId], references: [id], onDelete: Cascade)
-  inviter User @relation("sended_invitations", fields: [inviterId], references: [id], onDelete: Cascade)
+  room    Room  @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  user    User? @relation("received_invitations", fields: [userId], references: [id], onDelete: Cascade)
+  inviter User  @relation("sended_invitations", fields: [inviterId], references: [id], onDelete: Cascade)
 }
 
 enum RoomInvitationStatus {
