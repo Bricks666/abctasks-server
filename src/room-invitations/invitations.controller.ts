@@ -4,6 +4,7 @@ import {
 	Delete,
 	Get,
 	Param,
+	Post,
 	Put,
 	Query
 } from '@nestjs/common';
@@ -74,7 +75,7 @@ export class RoomInvitationsController {
 		description: 'Ссылка дял добавления',
 	})
 	@IsOwner()
-	@Get('/invite/:roomId/generate-link')
+	@Post('/invite/:roomId/generate-link')
 	async generateInviteLink(
 		@IntParam('roomId') roomId: number,
 		@CurrentUser() user: SecurityUserDto
