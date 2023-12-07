@@ -1,11 +1,14 @@
-export interface RoomInvitation {
+export interface RoomInvitationTokenPayload {
+	readonly id: number;
 	readonly roomId: number;
 }
 
-export type GenerateRoomInvitationTokenParams = RoomInvitation;
+export type GenerateRoomInvitationTokenParams = RoomInvitationTokenPayload;
 
-export interface PersonalRoomInvitation extends RoomInvitation {
+export interface PersonalRoomInvitationTokenPayload
+	extends RoomInvitationTokenPayload {
 	readonly userId: number;
 }
 
-export type GeneratePersonalRoomInvitationTokenParams = PersonalRoomInvitation;
+export type GeneratePersonalRoomInvitationTokenParams =
+	PersonalRoomInvitationTokenPayload;

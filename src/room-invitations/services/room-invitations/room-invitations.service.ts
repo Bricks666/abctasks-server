@@ -11,7 +11,7 @@ import { MailService } from '@/mail/services';
 import { MembersService } from '@/members/services';
 import { RoomInvitationsRepository } from '../../repositories';
 import {
-	RoomInvitation,
+	RoomInvitationTokenPayload,
 	RoomInvitationsTokensService
 } from '../room-invitations-tokens';
 import {
@@ -20,7 +20,8 @@ import {
 	GenerateInvitationLinkParams,
 	CreatePersonalInvitation,
 	AnswerInvitationParams,
-	RemoveInvitationParams
+	RemoveInvitationParams,
+	CreateMassInvitationParams
 } from './types';
 import { isPersonalInvitation } from './lib';
 
@@ -52,15 +53,14 @@ export class RoomInvitationsService {
 	): Promise<RoomInvitationDto> {
 		const { token, userId, } = params;
 
-		const roomInvitation = await this.roomInvitationsTokensService.verifyToken(
+		const tokenPayload = await this.roomInvitationsTokensService.verifyToken(
 			token
 		);
 
-		this.validateInvitation(roomInvitation, userId);
+		this.validateInvitation(tokenPayload, userId);
 
-		const invitation = await this.roomInvitationsRepository.getOne({
-			userId,
-			roomId: roomInvitation.roomId,
+		const invitation = await this.roomInvitationsRepository.getInvitation({
+			id: tokenPayload.id,
 		});
 
 		if (!invitation) {
@@ -70,16 +70,36 @@ export class RoomInvitationsService {
 		return invitation;
 	}
 
+	async createMassInvitation(
+		props: CreateMassInvitationParams
+	): Promise<string> {
+		const { roomId, inviterId, } = props;
+
+		let invitation = await this.roomInvitationsRepository.getMassInvitation({
+			roomId,
+		});
+
+		if (!invitation) {
+			invitation = await this.roomInvitationsRepository.create({
+				inviterId,
+				roomId,
+			});
+		}
+
+		return this.generateInvitationLink({ roomId, id: invitation.id, });
+	}
+
 	async generateInvitationLink(
 		params: GenerateInvitationLinkParams
 	): Promise<string> {
-		const { roomId, userId, } = params;
+		const { roomId, userId, id, } = params;
 
 		let token: string;
 
 		if (typeof userId === 'undefined') {
 			token = await this.roomInvitationsTokensService.generateInvitationToken({
 				roomId,
+				id,
 			});
 		} else {
 			token =
@@ -87,6 +107,7 @@ export class RoomInvitationsService {
 					{
 						roomId,
 						userId,
+						id,
 					}
 				);
 		}
@@ -108,10 +129,11 @@ export class RoomInvitationsService {
 			throw new ConflictException('User already exists in room');
 		}
 
-		const isInvited = await this.roomInvitationsRepository.getOne({
-			roomId,
-			userId,
-		});
+		const isInvited =
+			await this.roomInvitationsRepository.getPersonalInvitation({
+				roomId,
+				userId,
+			});
 
 		if (isInvited) {
 			throw new ConflictException('User has already been invited into room');
@@ -146,10 +168,11 @@ export class RoomInvitationsService {
 
 		const roomInvitation = this.validateInvitation(tokenPayload, userId);
 
-		const invitation = await this.roomInvitationsRepository.getOne({
-			userId,
-			roomId: roomInvitation.roomId,
-		});
+		const invitation =
+			await this.roomInvitationsRepository.getPersonalInvitation({
+				userId,
+				roomId: roomInvitation.roomId,
+			});
 
 		const isInvited = invitation.status === 'sended';
 
@@ -182,10 +205,11 @@ export class RoomInvitationsService {
 
 		const roomInvitation = this.validateInvitation(tokenPayload, userId);
 
-		const invitation = await this.roomInvitationsRepository.getOne({
-			userId,
-			roomId: roomInvitation.roomId,
-		});
+		const invitation =
+			await this.roomInvitationsRepository.getPersonalInvitation({
+				userId,
+				roomId: roomInvitation.roomId,
+			});
 
 		const isInvited = invitation.status === 'sended';
 
@@ -211,9 +235,9 @@ export class RoomInvitationsService {
 	}
 
 	private validateInvitation(
-		invitation: RoomInvitation,
+		invitation: RoomInvitationTokenPayload,
 		userId: number
-	): RoomInvitation {
+	): RoomInvitationTokenPayload {
 		const personalInvitation = isPersonalInvitation(invitation);
 
 		if (!personalInvitation) {

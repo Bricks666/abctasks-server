@@ -3,7 +3,7 @@ import { TokensService } from '@/tokens/tokens.service';
 import {
 	GenerateRoomInvitationTokenParams,
 	GeneratePersonalRoomInvitationTokenParams,
-	RoomInvitation
+	RoomInvitationTokenPayload
 } from './types';
 
 @Injectable()
@@ -22,7 +22,7 @@ export class RoomInvitationsTokensService {
 		return this.tokensService.generateInsecure(params);
 	}
 
-	verifyToken(token: string): Promise<RoomInvitation> {
+	verifyToken(token: string): Promise<RoomInvitationTokenPayload> {
 		return this.tokensService.verifyInsecure(token);
 	}
 }

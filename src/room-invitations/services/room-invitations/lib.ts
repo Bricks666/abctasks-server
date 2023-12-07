@@ -1,10 +1,10 @@
 import {
-	PersonalRoomInvitation,
-	RoomInvitation
+	PersonalRoomInvitationTokenPayload,
+	RoomInvitationTokenPayload
 } from '../room-invitations-tokens';
 
 export const isPersonalInvitation = (
-	invitation: RoomInvitation
-): invitation is PersonalRoomInvitation => {
+	invitation: RoomInvitationTokenPayload
+): invitation is PersonalRoomInvitationTokenPayload => {
 	return 'userId' in invitation;
 };
