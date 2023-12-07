@@ -37,6 +37,7 @@ export class RoomInvitationsRepository {
 		return this.databaseService.roomInvitation.findMany({
 			where: {
 				roomId,
+				status: 'sended',
 			},
 			select,
 		});
@@ -64,6 +65,7 @@ export class RoomInvitationsRepository {
 			where: {
 				roomId,
 				userId,
+				status: 'sended',
 			},
 			select,
 		});
@@ -78,6 +80,7 @@ export class RoomInvitationsRepository {
 			.findFirst({
 				where: {
 					roomId,
+					status: 'sended',
 				},
 				select,
 			})

@@ -28,10 +28,18 @@ export class MembersService {
 	}
 
 	async addMember(params: AddMemberParams): Promise<SecurityUserDto> {
-		return this.membersRepository.create({
-			roomId: params.roomId,
-			userId: params.userId,
-		});
+		try {
+			return await this.membersRepository.create({
+				roomId: params.roomId,
+				userId: params.userId,
+			});
+		} catch {
+			return this.membersRepository.update({
+				roomId: params.roomId,
+				userId: params.userId,
+				status: 'activated',
+			});
+		}
 	}
 
 	async exit(params: ExitMemberParams): Promise<boolean> {

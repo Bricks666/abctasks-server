@@ -68,6 +68,12 @@ export class RoomInvitationsService {
 			this.validateInvitation(invitation, userId);
 		}
 
+		const isActive = invitation.status === 'sended';
+
+		if (!isActive) {
+			throw new BadRequestException('Invitation was already answered');
+		}
+
 		return invitation;
 	}
 
