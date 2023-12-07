@@ -58,7 +58,7 @@ export class RoomInvitationsRepository {
 
 	async getPersonalInvitation(
 		params: GetPersonalRoomInvitationParams
-	): Promise<RoomInvitationDto | null> {
+	): Promise<Required<RoomInvitationDto> | null> {
 		const { roomId, userId, } = params;
 
 		return this.databaseService.roomInvitation.findFirst({

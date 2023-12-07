@@ -65,14 +65,10 @@ export class RoomInvitationsService {
 		const isPersonal = isPersonalInvitation(invitation);
 
 		if (isPersonal) {
-			this.validateInvitation(invitation, userId);
+			this.validateInvitationUser(invitation, userId);
 		}
 
-		const isActive = invitation.status === 'sended';
-
-		if (!isActive) {
-			throw new BadRequestException('Invitation was already answered');
-		}
+		this.validateInvitationStatus(invitation);
 
 		return invitation;
 	}
@@ -136,16 +132,13 @@ export class RoomInvitationsService {
 			throw new ConflictException('User already exists in room');
 		}
 
-		let invitation = await this.roomInvitationsRepository.getPersonalInvitation(
-			{
+		let invitation: RoomInvitationDto =
+			await this.roomInvitationsRepository.getPersonalInvitation({
 				roomId,
 				userId,
-			}
-		);
+			});
 
-		if (invitation) {
-			throw new ConflictException('User has already been invited into room');
-		}
+		this.validateInvitationStatus(invitation);
 
 		invitation = await this.roomInvitationsRepository.create({
 			roomId,
@@ -178,12 +171,8 @@ export class RoomInvitationsService {
 		const isPersonal = isPersonalInvitation(invitation);
 
 		if (isPersonal) {
-			this.validateInvitation(invitation, userId);
-			const isInvited = invitation.status === 'sended';
-
-			if (!isInvited) {
-				throw new ConflictException('User has not been invited');
-			}
+			this.validateInvitationUser(invitation, userId);
+			this.validateInvitationStatus(invitation);
 
 			const approved = await this.roomInvitationsRepository.approve({
 				id: invitation.id,
@@ -215,13 +204,8 @@ export class RoomInvitationsService {
 			return true;
 		}
 
-		this.validateInvitation(invitation, userId);
-
-		const isInvited = invitation.status === 'sended';
-
-		if (!isInvited) {
-			throw new ConflictException('User has not been invited');
-		}
+		this.validateInvitationUser(invitation, userId);
+		this.validateInvitationStatus(invitation);
 
 		return this.roomInvitationsRepository.reject({
 			id: invitation.id,
@@ -240,7 +224,7 @@ export class RoomInvitationsService {
 		return removed;
 	}
 
-	private validateInvitation(
+	private validateInvitationUser(
 		invitation: Required<RoomInvitationDto>,
 		userId: number
 	): void {
@@ -248,6 +232,14 @@ export class RoomInvitationsService {
 
 		if (!isThisPerson) {
 			throw new ForbiddenException('This invitation is not yours');
+		}
+	}
+
+	private validateInvitationStatus(invitation: RoomInvitationDto): void {
+		const isInvited = invitation.status === 'sended';
+
+		if (!isInvited) {
+			throw new ConflictException('Invitation has been already answered');
 		}
 	}
 }
