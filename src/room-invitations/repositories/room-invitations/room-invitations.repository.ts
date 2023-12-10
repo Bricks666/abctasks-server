@@ -38,6 +38,9 @@ export class RoomInvitationsRepository {
 			where: {
 				roomId,
 				status: 'sended',
+				user: {
+					NOT: null,
+				},
 			},
 			select,
 		});
