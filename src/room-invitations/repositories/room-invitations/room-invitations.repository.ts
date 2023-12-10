@@ -39,7 +39,7 @@ export class RoomInvitationsRepository {
 				roomId,
 				status: 'sended',
 				user: {
-					NOT: null,
+					isNot: null,
 				},
 			},
 			select,
