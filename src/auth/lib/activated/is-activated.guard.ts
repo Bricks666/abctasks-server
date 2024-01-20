@@ -20,13 +20,13 @@ export class IsActivatedGuard implements CanActivate {
 
 	async canActivate(context: ExecutionContext): Promise<boolean> {
 		const disable =
-			this.reflector.get<boolean | undefined>(
+			this.reflector.getAllAndOverride<boolean | undefined>(
 				DISABLE_IS_ACTIVATED_FLAG,
-				context.getHandler()
+				[context.getHandler(), context.getClass()]
 			) ||
-			this.reflector.get<boolean | undefined>(
+			this.reflector.getAllAndOverride<boolean | undefined>(
 				DISABLE_AUTH_CHECK_FLAG,
-				context.getHandler()
+				[context.getHandler(), context.getClass()]
 			);
 
 		if (disable) {
