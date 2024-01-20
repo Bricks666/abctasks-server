@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { Prisma, TaskStatus } from '@prisma/client';
-import { DatabaseService } from '@/database';
+import { DatabaseService } from '@/database/database.service';
 import { map } from '@/shared';
-import { TagDto } from '@/tags';
+import { TagDto } from '@/tags/dto';
 import { ProgressDto, ProgressQueryResult } from '../../dto';
 import { GetAllParams } from './types';
 

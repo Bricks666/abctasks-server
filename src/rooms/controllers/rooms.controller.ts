@@ -17,9 +17,10 @@ import {
 	ApiParam,
 	ApiTags
 } from '@nestjs/swagger';
-import { Auth, CurrentUser, DisableAuthCheck } from '@/auth';
-import { SecurityUserDto } from '@/users';
+import { Auth, CurrentUser } from '@/auth/lib';
+import { SecurityUserDto } from '@/users/dto';
 import { IntParam } from '@/shared';
+import { IsMember } from '@/members/lib';
 import { RoomsService } from '../services';
 import { CreateRoomDto, RoomDto, UpdateRoomDto } from '../dto';
 import { IsOwner } from '../lib';
@@ -27,6 +28,7 @@ import { WithRights } from '../types';
 
 @ApiTags('Комнаты')
 @Controller('rooms')
+@Auth()
 export class RoomsController {
 	constructor(private readonly roomsService: RoomsService) {}
 
@@ -38,8 +40,6 @@ export class RoomsController {
 		isArray: true,
 		description: 'Все комнаты, в которых состоит пользователь',
 	})
-	@Auth()
-	@UseInterceptors(CacheInterceptor)
 	@Get('/')
 	async getAll(
 		@CurrentUser() user: SecurityUserDto
@@ -59,8 +59,7 @@ export class RoomsController {
 		type: RoomDto,
 	})
 	@ApiNotFoundResponse()
-	@Auth()
-	@DisableAuthCheck()
+	@IsMember()
 	@UseInterceptors(CacheInterceptor)
 	@Get('/:id')
 	async getOne(
@@ -81,7 +80,6 @@ export class RoomsController {
 	@ApiCreatedResponse({
 		type: RoomDto,
 	})
-	@Auth()
 	@Post('/create')
 	async create(
 		@CurrentUser() user: SecurityUserDto,
@@ -106,7 +104,6 @@ export class RoomsController {
 		description: 'Обновленная комната',
 	})
 	@IsOwner()
-	@Auth()
 	@Put('/:id/update')
 	async update(
 		@CurrentUser() user: SecurityUserDto,
@@ -126,7 +123,6 @@ export class RoomsController {
 		description: 'Удалось ли выполнить удаление комнаты',
 	})
 	@IsOwner()
-	@Auth()
 	@Delete('/:id/remove')
 	async remove(@IntParam('id') id: number): Promise<boolean> {
 		return this.roomsService.remove({ id, });

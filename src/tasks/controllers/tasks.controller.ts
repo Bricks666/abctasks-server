@@ -24,10 +24,10 @@ import {
 	ActivitySphereCodes,
 	ActivityActionCodes
 } from '@/activities';
-import { Auth, CurrentUser, DisableAuthCheck } from '@/auth';
-import { InRoom } from '@/rooms';
+import { Auth, CurrentUser } from '@/auth/lib';
+import { IsMember } from '@/members/lib';
 import { IntParam } from '@/shared';
-import { SecurityUserDto } from '@/users';
+import { SecurityUserDto } from '@/users/dto';
 import { CreateTaskDto, TaskDto, UpdateTaskDto, GetTasksDto } from '../dto';
 import { TasksService } from '../services';
 
@@ -51,7 +51,6 @@ export class TasksController {
 		type: TaskDto,
 		isArray: true,
 	})
-	@DisableAuthCheck()
 	@UseInterceptors(CacheInterceptor)
 	@Get('/:roomId')
 	async getAll(
@@ -78,7 +77,6 @@ export class TasksController {
 		type: TaskDto,
 	})
 	@ApiNotFoundResponse()
-	@DisableAuthCheck()
 	@UseInterceptors(CacheInterceptor)
 	@Get('/:roomId/:id')
 	async getOne(
@@ -104,7 +102,7 @@ export class TasksController {
 		type: TaskDto,
 		description: 'Созданная задача',
 	})
-	@InRoom()
+	@IsMember()
 	@Auth()
 	@Post('/:roomId/create')
 	async create(
@@ -155,7 +153,7 @@ export class TasksController {
 	@ApiNotFoundResponse({
 		description: 'Такой задачи не существует',
 	})
-	@InRoom()
+	@IsMember()
 	@Auth()
 	@Put('/:roomId/:id/update')
 	async update(
@@ -195,7 +193,7 @@ export class TasksController {
 		type: Boolean,
 		description: 'Удались ли удалить задачу',
 	})
-	@InRoom()
+	@IsMember()
 	@Auth()
 	@Delete('/:roomId/:id/remove')
 	async remove(

@@ -1,15 +1,16 @@
 import { Module } from '@nestjs/common';
-import { AuthModule } from '@/auth';
-import { ActivitiesModule } from '@/activities';
-import { RoomsModule } from '@/rooms';
+import { AuthModule } from '@/auth/auth.module';
+import { ActivitiesModule } from '@/activities/activities.module';
+import { TasksModule } from '@/tasks/tasks.module';
 
+import { MembersModule } from '@/members/members.module';
+import { TagRepository } from './repositories';
 import { TagsService } from './services';
 import { TagsController } from './controllers';
-import { TagRepository } from './repositories';
 
 @Module({
-	imports: [AuthModule, ActivitiesModule, RoomsModule],
-	providers: [TagsService, TagRepository],
+	imports: [TasksModule, AuthModule, ActivitiesModule, MembersModule],
+	providers: [TagRepository, TagsService],
 	controllers: [TagsController],
 })
 export class TagsModule {}

@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { Prisma, User as UserModel } from '@prisma/client';
-import { DatabaseService } from '@/database';
+import { DatabaseService } from '@/database/database.service';
 import { SecurityUserDto } from '../../dto';
 import { SECURITY_USER_SELECT } from './config';
 import {

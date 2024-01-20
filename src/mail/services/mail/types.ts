@@ -1,11 +1,11 @@
 export interface SendRoomInviteConfirmationParams {
 	readonly name: string;
-	readonly roomId: number;
+	readonly url: string;
 	readonly email: string;
 }
 
 export interface SendEmailConfirmationParams {
 	readonly name: string;
-	readonly token: string;
+	readonly url: string;
 	readonly email: string;
 }

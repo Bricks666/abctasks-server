@@ -5,7 +5,6 @@ import {
 	ApiParam,
 	ApiTags
 } from '@nestjs/swagger';
-import { DisableAuthCheck } from '@/auth';
 import { IntParam } from '@/shared';
 import { ProgressDto } from '../dto';
 import { ProgressService } from '../services';
@@ -28,7 +27,6 @@ export class ProgressController {
 		isArray: true,
 		description: 'Прогресс в комнате',
 	})
-	@DisableAuthCheck()
 	@Get('/:roomId')
 	async getAll(@IntParam('roomId') roomId: number): Promise<ProgressDto[]> {
 		return this.progressService.getAll({ roomId, });

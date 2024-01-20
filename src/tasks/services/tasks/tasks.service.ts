@@ -6,6 +6,7 @@ import {
 	GetAllParams,
 	GetOneParams,
 	RemoveParams,
+	RemoveTasksWithoutTagParams,
 	UpdateParams
 } from './types';
 
@@ -40,6 +41,14 @@ export class TasksService {
 
 	async remove(params: RemoveParams): Promise<boolean> {
 		await this.tasksRepository.remove(params);
+
+		return true;
+	}
+
+	async removeTasksWithoutTag(
+		params: RemoveTasksWithoutTagParams
+	): Promise<boolean> {
+		await this.tasksRepository.removeTasksWithoutTag(params);
 
 		return true;
 	}

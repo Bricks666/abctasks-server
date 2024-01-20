@@ -48,9 +48,10 @@ export class RoomsService {
 	}
 
 	async update(params: UpdateParams): Promise<WithRights<RoomDto>> {
-		const room = await this.roomsRepository.update(params);
+		const { userId, ...data } = params;
+		const room = await this.roomsRepository.update(data);
 
-		return { ...room, canChange: room.ownerId === params.userId, };
+		return { ...room, canChange: room.ownerId === userId, };
 	}
 
 	async isOwner(params: IsOwnerParams): Promise<boolean> {

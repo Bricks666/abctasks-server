@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
-import { DatabaseService } from '@/database';
-import { SECURITY_USER_SELECT } from '@/users';
+import { DatabaseService } from '@/database/database.service';
+import { SECURITY_USER_SELECT } from '@/users/repositories';
 import { ActivityDto } from '../../dto';
 import {
 	CreateParams,
@@ -100,7 +100,6 @@ export class ActivityRepository {
 		const { actionName, sphereName, ...data } = params;
 		const activity = await this.databaseService.activity.create({
 			data: {
-				...data,
 				action: {
 					connectOrCreate: {
 						where: {
@@ -121,7 +120,15 @@ export class ActivityRepository {
 						},
 					},
 				},
-			} as any,
+				room_user: {
+					connect: {
+						roomId_userId: {
+							roomId: data.roomId,
+							userId: data.activistId,
+						},
+					},
+				},
+			},
 			select,
 		});
 

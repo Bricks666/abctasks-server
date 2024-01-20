@@ -1,4 +1,3 @@
-import { JwtService } from '@nestjs/jwt';
 import {
 	ConflictException,
 	ForbiddenException,
@@ -6,9 +5,11 @@ import {
 	UnauthorizedException
 } from '@nestjs/common';
 import { compare } from 'bcrypt';
-import { UsersService, SecurityUserDto } from '@/users';
+import { SecurityUserDto } from '@/users/dto';
+import { UsersService } from '@/users/services';
 import { MailService } from '@/mail';
 import { AuthenticationResultDto, TokensDto } from '../../dto';
+import { AuthTokensService } from '../auth-tokens';
 import {
 	ActivateParams,
 	AuthenticationParams,
@@ -22,7 +23,7 @@ import {
 export class AuthService {
 	constructor(
 		private readonly usersService: UsersService,
-		private readonly jwtService: JwtService,
+		private readonly authTokenService: AuthTokensService,
 		private readonly mailService: MailService
 	) {}
 
@@ -45,10 +46,12 @@ export class AuthService {
 
 		const tokens = await this.#generateTokens(user);
 
+		const url = `${process.env.CLIENT_APP_HOST}/registration/activate?token=${tokens.refreshToken}`;
+
 		await this.mailService.sendEmailConfirmation({
+			url,
 			name: user.username,
 			email: user.email,
-			token: tokens.refreshToken,
 		});
 
 		return user;
@@ -76,7 +79,7 @@ export class AuthService {
 		const isValidPassword = await compare(password, user.password);
 
 		if (!isValidPassword) {
-			throw new UnauthorizedException('Incorrect password');
+			throw new ForbiddenException('Incorrect password');
 		}
 
 		user.password = undefined;
@@ -107,23 +110,16 @@ export class AuthService {
 		const { token, } = params;
 
 		try {
-			return await this.jwtService.verifyAsync<SecurityUserDto>(token, {
-				secret: process.env.SECRET,
-			});
+			return await this.authTokenService.verifyToken(token);
 		} catch (error) {
 			throw new UnauthorizedException('jwt expired', { cause: error, });
 		}
 	}
 
 	async #generateTokens(user: SecurityUserDto): Promise<TokensDto> {
-		const accessToken = this.jwtService.signAsync(user, {
-			secret: process.env.SECRET,
-			expiresIn: '10m',
-		});
-		const refreshToke = this.jwtService.signAsync(user, {
-			secret: process.env.SECRET,
-			expiresIn: '30d',
-		});
+		const accessToken = this.authTokenService.generateAccessToken(user);
+		const refreshToke = this.authTokenService.generateRefreshToken(user);
+
 		const tokens = await Promise.all([refreshToke, accessToken]);
 		return {
 			refreshToken: tokens[0],

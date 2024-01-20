@@ -3,16 +3,20 @@ import { CacheModule, CacheStore, Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { RedisClientOptions } from 'redis';
 import { redisStore } from 'cache-manager-redis-store';
-import { UsersModule } from '@/users';
-import { RoomsModule } from '@/rooms';
-import { TasksModule } from '@/tasks';
-import { TagsModule } from '@/tags';
-import { ActivitiesModule } from '@/activities';
-import { AuthGuard, AuthModule, IsActivatedGuard } from '@/auth';
-import { ProgressModule } from '@/progress';
-import { CommentsModule } from '@/comments';
-import { DatabaseModule } from '@/database';
-import { MailModule } from '@/mail';
+import { UsersModule } from '@/users/users.module';
+import { RoomsModule } from '@/rooms/rooms.module';
+import { TasksModule } from '@/tasks/tasks.module';
+import { TagsModule } from '@/tags/tags.module';
+import { ActivitiesModule } from '@/activities/activities.module';
+import { AuthModule } from '@/auth/auth.module';
+import { AuthGuard, IsActivatedGuard } from '@/auth/lib';
+import { ProgressModule } from '@/progress/progress.module';
+import { CommentsModule } from '@/comments/comments.module';
+import { DatabaseModule } from '@/database/database.module';
+import { MailModule } from '@/mail/mail.module';
+import { TokensModule } from '@/tokens/tokens.module';
+import { MembersModule } from '@/members/members.module';
+import { InvitationsModule } from '@/room-invitations/invitations.module';
 
 @Module({
 	imports: [
@@ -31,11 +35,14 @@ import { MailModule } from '@/mail';
 		UsersModule,
 		RoomsModule,
 		TasksModule,
-		TagsModule,
 		ActivitiesModule,
+		MembersModule,
 		ProgressModule,
 		CommentsModule,
-		MailModule
+		MailModule,
+		TagsModule,
+		TokensModule,
+		InvitationsModule
 	],
 	providers: [
 		{

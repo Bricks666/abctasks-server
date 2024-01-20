@@ -1,4 +1,4 @@
-import { CreateUserDto, SecurityUserDto } from '@/users';
+import { CreateUserDto, SecurityUserDto } from '@/users/dto';
 import { LoginDto } from '../../dto';
 
 export interface AuthenticationParams {

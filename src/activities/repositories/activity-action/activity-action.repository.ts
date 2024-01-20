@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { DatabaseService } from '@/database';
+import { DatabaseService } from '@/database/database.service';
 import { ActivityActionDto } from '../../dto';
 import { CreateParams, GetOneParams } from './types';
 

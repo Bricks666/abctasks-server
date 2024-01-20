@@ -8,42 +8,67 @@ datasource db {
 }
 
 model User {
-  id        Int        @id @default(autoincrement())
-  email     String     @unique() @db.VarChar(32)
-  username  String     @db.VarChar(32)
-  password  String     @db.VarChar(255)
-  photo     String?    @db.VarChar(255)
-  activated Boolean?   @default(false)
-  room_user RoomUser[]
-  room      Room[]
+  id                 Int              @id @default(autoincrement())
+  email              String           @unique() @db.VarChar(32)
+  username           String           @db.VarChar(32)
+  password           String           @db.VarChar(255)
+  photo              String?          @db.VarChar(255)
+  activated          Boolean?         @default(false)
+  membering          Member[]
+  room               Room[]
+  receivedInvitation RoomInvitation[] @relation("received_invitations")
+  sendedInvitation   RoomInvitation[] @relation("sended_invitations")
 }
 
-model RoomUser {
+model Member {
   roomId     Int
   userId     Int
-  removed    Boolean    @default(false)
-  activated  Boolean    @default(false)
-  room       Room       @relation(fields: [roomId], references: [id], onDelete: Cascade, map: "room-user_ibfk_1")
-  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade, map: "room-user_ibfk_2")
+  status     MemberStatus @default(activated)
+  room       Room         @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  user       User         @relation(fields: [userId], references: [id], onDelete: Cascade)
   task       Task[]
   comments   Comment[]
   activities Activity[]
 
   @@id([roomId, userId])
-  @@unique([roomId, userId], map: "room-user_roomId_userId_unique")
-  @@index([userId], map: "userId")
+  @@unique([roomId, userId])
+  @@index([userId])
+}
+
+enum MemberStatus {
+  activated
+  removed
+}
+
+model RoomInvitation {
+  id        Int                  @id @default(autoincrement())
+  roomId    Int
+  userId    Int?
+  inviterId Int
+  status    RoomInvitationStatus @default(sended)
+
+  room    Room  @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  user    User? @relation("received_invitations", fields: [userId], references: [id], onDelete: Cascade)
+  inviter User  @relation("sended_invitations", fields: [inviterId], references: [id], onDelete: Cascade)
+}
+
+enum RoomInvitationStatus {
+  sended
+  approved
+  rejected
 }
 
 model Room {
-  id          Int        @id @default(autoincrement())
+  id          Int              @id @default(autoincrement())
   ownerId     Int
-  name        String     @db.VarChar(32)
-  description String     @db.VarChar(255)
-  createdAt   DateTime?  @default(now())
-  updatedAt   DateTime?  @updatedAt
-  owner       User       @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  name        String           @db.VarChar(32)
+  description String           @db.VarChar(255)
+  createdAt   DateTime?        @default(now())
+  updatedAt   DateTime?        @updatedAt
+  owner       User             @relation(fields: [ownerId], references: [id], onDelete: Cascade)
   tags        Tag[]
-  room_user   RoomUser[]
+  members     Member[]
+  invitations RoomInvitation[]
 }
 
 model Comment {
@@ -55,7 +80,7 @@ model Comment {
   createdAt DateTime? @default(now())
   updatedAt DateTime  @updatedAt
   task      Task      @relation(fields: [taskId, roomId], references: [id, roomId])
-  author    RoomUser  @relation(fields: [roomId, authorId], references: [roomId, userId])
+  author    Member    @relation(fields: [roomId, authorId], references: [roomId, userId])
 
   @@unique([id, roomId, taskId])
 }
@@ -66,42 +91,29 @@ model Tag {
   name        String    @db.VarChar(32)
   mainColor   String    @db.VarChar(7)
   secondColor String    @db.VarChar(7)
-  room        Room      @relation(fields: [roomId], references: [id], onDelete: Cascade, map: "tags_ibfk_1")
-  task_tag    TagTask[]
+  room        Room      @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  tasks       TagTask[]
 
   @@unique([id, roomId])
-  @@index([roomId], map: "roomId")
+  @@index([roomId])
 }
 
 model Task {
   id          Int        @id @default(autoincrement())
   roomId      Int
   authorId    Int
-  tagIds      Int[]      @default([])
   title       String     @db.VarChar(32)
   description String?    @db.VarChar(255)
   status      TaskStatus @default(ready)
   createdAt   DateTime?  @default(now())
   updatedAt   DateTime?  @updatedAt
-  author      RoomUser   @relation(fields: [roomId, authorId], references: [roomId, userId], onDelete: Cascade, map: "task_ibfk_1")
+  author      Member     @relation(fields: [roomId, authorId], references: [roomId, userId], onDelete: Cascade)
   comments    Comment[]
-  task_tag    TagTask[]
+  tags        TagTask[]
 
   @@unique([id, roomId])
-  @@index([authorId], map: "authorId")
-  @@index([roomId], map: "taskRoomId")
-}
-
-model TagTask {
-  tagId  Int
-  taskId Int
-  roomId Int
-  task   Task @relation(fields: [taskId, roomId], references: [id, roomId], onDelete: Cascade)
-  tag    Tag  @relation(fields: [tagId, roomId], references: [id, roomId])
-
-  @@id([tagId, taskId])
-  @@unique([tagId, taskId])
-  @@index([roomId], map: "tagTaskRoomId")
+  @@index([authorId])
+  @@index([roomId])
 }
 
 enum TaskStatus {
@@ -109,6 +121,18 @@ enum TaskStatus {
   in_progress @map("in progress")
   ready
   review
+}
+
+model TagTask {
+  tagId  Int
+  taskId Int
+  roomId Int
+  task   Task @relation(fields: [taskId, roomId], references: [id, roomId], onDelete: Cascade)
+  tag    Tag  @relation(fields: [tagId, roomId], references: [id, roomId], onDelete: Cascade)
+
+  @@id([tagId, taskId])
+  @@unique([tagId, taskId])
+  @@index([roomId])
 }
 
 model Activity {
@@ -120,9 +144,9 @@ model Activity {
   createdAt  DateTime?      @default(now()) @db.Timestamptz(0)
   action     ActivityAction @relation(fields: [actionId], references: [id], onDelete: Restrict, onUpdate: Cascade)
   sphere     ActivitySphere @relation(fields: [sphereId], references: [id], onDelete: Restrict, onUpdate: Cascade)
-  room_user  RoomUser       @relation(fields: [roomId, activistId], references: [roomId, userId], onDelete: Restrict, onUpdate: Cascade)
+  room_user  Member         @relation(fields: [roomId, activistId], references: [roomId, userId], onDelete: Restrict, onUpdate: Cascade)
 
-  @@index([sphereId], map: "sphereId")
+  @@index([sphereId])
 }
 
 model ActivityAction {
@@ -133,6 +157,6 @@ model ActivityAction {
 
 model ActivitySphere {
   id         Int        @id @default(autoincrement())
-  name       String     @unique(map: "name") @db.VarChar(32)
+  name       String     @unique() @db.VarChar(32)
   activities Activity[]
 }

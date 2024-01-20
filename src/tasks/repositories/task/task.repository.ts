@@ -1,14 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
-import { DatabaseService } from '@/database';
-import { SECURITY_USER_SELECT } from '@/users';
+import { DatabaseService } from '@/database/database.service';
+import { SECURITY_USER_SELECT } from '@/users/repositories';
 import { TaskDto } from '../../dto';
 import {
 	CreateParams,
 	GetAllParams,
 	GetOneParams,
 	RemoveParams,
-	UpdateParams
+	UpdateParams,
+	RemoveTasksWithoutTagParams
 } from './types';
 import { prepareWhere } from './lib';
 
@@ -18,7 +19,7 @@ const select = {
 	title: true,
 	description: true,
 	status: true,
-	task_tag: {
+	tags: {
 		select: {
 			tag: true,
 		},
@@ -75,7 +76,7 @@ export class TaskRepository {
 		const task = await this.databaseService.task.create({
 			data: {
 				...rest,
-				task_tag: {
+				tags: {
 					createMany: {
 						data: tagIds.map((tagId) => ({ tagId, })),
 					},
@@ -99,13 +100,14 @@ export class TaskRepository {
 			},
 			data: {
 				...data,
-				task_tag: {
+				tags: {
 					createMany: {
 						skipDuplicates: true,
 						data: tagIds ? tagIds.map((tagId) => ({ tagId, })) : [],
 					},
 				},
 			},
+			select,
 		});
 
 		return task ? TaskRepository.map(task) : null;
@@ -119,13 +121,28 @@ export class TaskRepository {
 		});
 	}
 
+	async removeTasksWithoutTag(
+		params: RemoveTasksWithoutTagParams
+	): Promise<void> {
+		await this.databaseService.task.deleteMany({
+			where: {
+				roomId: params.roomId,
+				tags: {
+					none: {
+						roomId: params.roomId,
+					},
+				},
+			},
+		});
+	}
+
 	private static map(task: any): TaskDto {
-		const { task_tag, author, ...rest } = task;
+		const { tags, author, ...rest } = task;
 
 		return {
 			...rest,
 			author: author.user,
-			tags: task_tag.map((task_tag) => task_tag.tag),
+			tags: tags.map((tags) => tags.tag),
 		};
 	}
 }

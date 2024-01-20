@@ -5,7 +5,6 @@ import {
 	IntParam,
 	PaginationResponseDto
 } from '@/shared';
-import { DisableAuthCheck } from '@/auth';
 import { ActivityDto, GetActivitiesQueryDto } from '../dto';
 import { ActivitiesService } from '../services';
 
@@ -19,7 +18,6 @@ export class ActivitiesController {
 		summary: 'Получение активностей в комнате',
 	})
 	@ApiPaginatedResponse(ActivityDto)
-	@DisableAuthCheck()
 	@Get('/:roomId')
 	getAll(
 		@IntParam('roomId') roomId: number,

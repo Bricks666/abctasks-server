@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNumber, IsOptional, Min } from 'class-validator';
-import { NumberTransform } from '../lib';
+import { NumberTransform } from '../lib/number-transform.decorator';
 
 export class PaginationQueryDto {
 	@ApiProperty({

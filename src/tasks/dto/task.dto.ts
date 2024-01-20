@@ -9,8 +9,8 @@ import {
 	IsObject
 } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
-import { TagDto } from '@/tags';
-import { SecurityUserDto } from '@/users';
+import { TagDto } from '@/tags/dto';
+import { SecurityUserDto } from '@/users/dto';
 
 export class TaskDto implements Omit<TaskModel, 'tagIds' | 'authorId'> {
 	@ApiProperty({
