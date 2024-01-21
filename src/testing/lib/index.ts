@@ -1,2 +1,2 @@
 export * from './convertTestingUserDtoToUserFilter';
-export * from './convertTestingUserDtoToCreateData';
+export * from './convertTestingUserDtoToUserData';

@@ -1,11 +1,25 @@
-import { Body, Controller, Delete, Post, Query } from '@nestjs/common';
+import {
+	Body,
+	Controller,
+	Delete,
+	Post,
+	Query,
+	Response
+} from '@nestjs/common';
+import { Response as ExpressResponse } from 'express';
+import { ApiTags } from '@nestjs/swagger';
 import { UserDto } from '@/users';
 import { RoomDto } from '@/rooms';
 import { TaskDto } from '@/tasks';
 import { TagDto } from '@/tags';
 import { MemberDto } from '@/members/dto';
 import { RoomInvitationDto } from '@/room-invitations/dto';
-import { DisableAuthCheck, DisableIsActivatedCheck } from '@/auth';
+import {
+	AuthenticationResultDto,
+	DisableAuthCheck,
+	DisableIsActivatedCheck
+} from '@/auth';
+import { BASE_COOKIE_OPTIONS, COOKIE_NAME, COOKIE_TIME } from '@/const';
 import { TestingService } from './testing.service';
 import {
 	TestingInvitationDto,
@@ -16,11 +30,27 @@ import {
 	TestingUserDto
 } from './dto';
 
+@ApiTags('Testing')
 @DisableIsActivatedCheck()
 @DisableAuthCheck()
 @Controller('testing')
 export class TestingController {
 	constructor(private readonly testingService: TestingService) {}
+
+	@Post('/login')
+	async auth(
+		@Body() params: TestingUserDto,
+		@Response({ passthrough: true, }) res: ExpressResponse
+	): Promise<AuthenticationResultDto> {
+		const result = await this.testingService.login(params);
+
+		res.cookie(COOKIE_NAME, result.tokens.refreshToken, {
+			...BASE_COOKIE_OPTIONS,
+			maxAge: COOKIE_TIME,
+		});
+
+		return result;
+	}
 
 	@Post('/user')
 	user(@Body() params: TestingUserDto): Promise<UserDto> {

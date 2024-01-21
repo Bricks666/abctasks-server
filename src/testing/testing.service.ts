@@ -9,6 +9,8 @@ import { TagDto } from '@/tags';
 import { TaskDto } from '@/tasks';
 import { UserDto } from '@/users';
 
+import { AuthenticationResultDto, TokensDto } from '@/auth';
+import { TokensService } from '@/tokens/tokens.service';
 import {
 	TestingUserDto,
 	TestingRoomDto,
@@ -18,13 +20,24 @@ import {
 	TestingInvitationDto
 } from './dto';
 import {
-	convertTestingUserDtoToCreateData,
+	convertTestingUserDtoToUserData,
 	convertTestingUserDtoToUserFilter
 } from './lib';
 
 @Injectable()
 export class TestingService {
-	constructor(private readonly databaseService: DatabaseService) {}
+	constructor(
+		private readonly databaseService: DatabaseService,
+		private readonly tokensService: TokensService
+	) {}
+
+	async login(params: TestingUserDto): Promise<AuthenticationResultDto> {
+		const user = await this.user(params);
+
+		const tokens = await this.#generateTokens(user);
+
+		return { user, tokens, };
+	}
 
 	async user(params: TestingUserDto): Promise<UserDto> {
 		const where = convertTestingUserDtoToUserFilter(params);
@@ -37,7 +50,14 @@ export class TestingService {
 			return existing;
 		}
 
-		const data = convertTestingUserDtoToCreateData(params);
+		await this.databaseService.user.deleteMany({
+			where: {
+				email: where.email as string,
+				id: where.id as number,
+			},
+		});
+
+		const data = convertTestingUserDtoToUserData(params);
 
 		const password = await hash(data.password, Number(process.env.ROUND_COUNT));
 
@@ -75,5 +95,16 @@ export class TestingService {
 
 	invitation(params: TestingInvitationDto): Promise<RoomInvitationDto> {
 		return params as any;
+	}
+
+	async #generateTokens(user: UserDto): Promise<TokensDto> {
+		const accessToken = this.tokensService.generateSecure(user, '15m');
+		const refreshToke = this.tokensService.generateSecure(user, '30d');
+
+		const tokens = await Promise.all([refreshToke, accessToken]);
+		return {
+			refreshToken: tokens[0],
+			accessToken: tokens[1],
+		};
 	}
 }
