@@ -1,9 +1,4 @@
-import {
-	CanActivate,
-	ExecutionContext,
-	ForbiddenException,
-	Injectable
-} from '@nestjs/common';
+import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { Request } from 'express';
 import { SecurityUserDto } from '@/users/dto';
@@ -31,7 +26,7 @@ export class IsActivatedGuard implements CanActivate {
 		const user = (req as any).user as SecurityUserDto;
 
 		if (!user) {
-			throw new ForbiddenException('User is not activated');
+			return true;
 		}
 
 		return this.usersService.isActivated({ id: user.id, });
