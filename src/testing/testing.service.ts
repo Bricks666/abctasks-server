@@ -20,6 +20,8 @@ import {
 	TestingInvitationDto
 } from './dto';
 import {
+	convertTestingRoomDtoToRoomData,
+	convertTestingRoomDtoToRoomFilter,
 	convertTestingUserDtoToUserData,
 	convertTestingUserDtoToUserFilter
 } from './lib';
@@ -70,15 +72,54 @@ export class TestingService {
 	}
 
 	async removeUser(params: TestingUserDto): Promise<boolean> {
+		const where = convertTestingUserDtoToUserFilter(params);
+
 		return this.databaseService.user
 			.deleteMany({
-				where: convertTestingUserDtoToUserFilter(params),
+				where,
 			})
 			.then(({ count, }) => !!count);
 	}
 
-	room(params: TestingRoomDto): Promise<RoomDto> {
-		return params as any;
+	async room(params: TestingRoomDto): Promise<RoomDto> {
+		const where = convertTestingRoomDtoToRoomFilter(params);
+
+		const existing = await this.databaseService.room.findFirst({
+			where,
+		});
+
+		if (existing) {
+			return existing;
+		}
+
+		const user = await this.user({ id: params.ownerId, });
+
+		const data = convertTestingRoomDtoToRoomData({
+			...params,
+			ownerId: user.id,
+		});
+
+		return this.databaseService.room.create({
+			data: {
+				...data,
+				members: {
+					create: {
+						userId: data.ownerId,
+						status: 'activated',
+					},
+				},
+			},
+		});
+	}
+
+	async removeRoom(params: TestingRoomDto): Promise<boolean> {
+		const where = convertTestingRoomDtoToRoomFilter(params);
+
+		return this.databaseService.room
+			.deleteMany({
+				where,
+			})
+			.then(({ count, }) => !!count);
 	}
 
 	task(params: TestingTaskDto): Promise<TaskDto> {

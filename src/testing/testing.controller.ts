@@ -67,6 +67,11 @@ export class TestingController {
 		return this.testingService.room(params);
 	}
 
+	@Delete('/room')
+	removeRoom(@Query() params: TestingRoomDto): Promise<boolean> {
+		return this.testingService.removeRoom(params);
+	}
+
 	@Post('/task')
 	task(@Body() params: TestingTaskDto): Promise<TaskDto> {
 		return this.testingService.task(params);
