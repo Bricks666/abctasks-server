@@ -4,6 +4,8 @@ on:
   push:
     branches: [ "main" ]
     tags: [ 'v*.*.*' ]
+  pull_request:
+    branches: [ "main", "develop" ]
   release:
     types: [ published ]
 
@@ -33,6 +35,6 @@ jobs:
         with:
           context: .
           file: ./Dockerfile
-          push: true
+          push: ${{ github.event != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
