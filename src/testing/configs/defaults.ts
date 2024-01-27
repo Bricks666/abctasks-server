@@ -1,4 +1,4 @@
-import { TestingRoomDto, TestingUserDto } from '../dto';
+import { TestingMemberDto, TestingRoomDto, TestingUserDto } from '../dto';
 
 export const DEFAULT_USER: TestingUserDto = {
 	activated: true,
@@ -10,4 +10,8 @@ export const DEFAULT_USER: TestingUserDto = {
 export const DEFAULT_ROOM: TestingRoomDto = {
 	name: 'Room',
 	description: 'Description',
+};
+
+export const DEFAULT_MEMBER: TestingMemberDto = {
+	status: 'activated',
 };

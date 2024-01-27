@@ -25,7 +25,10 @@ import {
 	convertTestingUserDtoToUserData,
 	convertTestingUserDtoToUniqueUserFilter,
 	convertTestingUserDtoToUserFilter,
-	convertTestingRoomDtoToUniqueRoomFilter
+	convertTestingRoomDtoToUniqueRoomFilter,
+	convertTestingMemberDtoToUniqueMemberFilter,
+	convertTestingMemberDtoToMemberData,
+	convertTestingMemberDtoToMemberFilter
 } from './lib';
 
 @Injectable()
@@ -125,8 +128,44 @@ export class TestingService {
 		return params as any;
 	}
 
-	member(params: TestingMemberDto): Promise<MemberDto> {
-		return params as any;
+	async member(params: TestingMemberDto): Promise<MemberDto> {
+		const user = await this.user({ id: params.userId, });
+		const room = await this.room({ id: params.roomId, });
+		const where = convertTestingMemberDtoToUniqueMemberFilter({
+			...params,
+			userId: user.id,
+			roomId: room.id,
+		});
+		const data = convertTestingMemberDtoToMemberData({
+			...params,
+			userId: user.id,
+			roomId: room.id,
+		});
+
+		const existing = await this.databaseService.member.findUnique({
+			where,
+		});
+
+		if (existing) {
+			return this.databaseService.member.update({
+				where,
+				data,
+			});
+		}
+
+		return this.databaseService.member.create({
+			data,
+		});
+	}
+
+	async removeMember(params: TestingMemberDto): Promise<boolean> {
+		const where = convertTestingMemberDtoToMemberFilter(params);
+
+		return this.databaseService.member
+			.deleteMany({
+				where,
+			})
+			.then(({ count, }) => !!count);
 	}
 
 	invitation(params: TestingInvitationDto): Promise<RoomInvitationDto> {

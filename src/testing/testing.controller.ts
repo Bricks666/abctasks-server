@@ -94,7 +94,7 @@ export class TestingController {
 		required: false,
 	})
 	@ApiOkResponse({
-		type: UserDto,
+		type: RoomDto,
 		description: 'Room with requested params',
 	})
 	@HttpCode(HttpStatus.OK)
@@ -126,8 +126,34 @@ export class TestingController {
 		return this.testingService.tag(params);
 	}
 
+	@ApiOperation({
+		summary: 'Get or create member',
+	})
+	@ApiBody({
+		type: TestingUserDto,
+		description: 'Filter to select or data to create',
+		required: false,
+	})
+	@ApiOkResponse({
+		type: MemberDto,
+		description: 'Member with requested params',
+	})
+	@HttpCode(HttpStatus.OK)
 	@Post('/member')
 	member(@Body() params: TestingMemberDto): Promise<MemberDto> {
+		return this.testingService.member(params);
+	}
+
+	@ApiOperation({
+		summary: 'Remove members via params',
+	})
+	@ApiOkResponse({
+		type: Boolean,
+		description: 'There was any member removed',
+	})
+	@HttpCode(HttpStatus.OK)
+	@Delete('/member')
+	removeMember(@Query() params: TestingMemberDto): Promise<MemberDto> {
 		return this.testingService.member(params);
 	}
 
