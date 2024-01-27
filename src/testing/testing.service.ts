@@ -24,7 +24,8 @@ import {
 	convertTestingRoomDtoToRoomFilter,
 	convertTestingUserDtoToUserData,
 	convertTestingUserDtoToUniqueUserFilter,
-	convertTestingUserDtoToUserFilter
+	convertTestingUserDtoToUserFilter,
+	convertTestingRoomDtoToUniqueRoomFilter
 } from './lib';
 
 @Injectable()
@@ -80,33 +81,29 @@ export class TestingService {
 	}
 
 	async room(params: TestingRoomDto): Promise<RoomDto> {
-		const where = convertTestingRoomDtoToRoomFilter(params);
+		const user = await this.user({ id: params.ownerId, });
+		const where = convertTestingRoomDtoToUniqueRoomFilter({
+			...params,
+			ownerId: user.id,
+		});
+		const data = convertTestingRoomDtoToRoomData({
+			...params,
+			ownerId: user.id,
+		});
 
 		const existing = await this.databaseService.room.findFirst({
 			where,
 		});
 
 		if (existing) {
-			return existing;
+			return this.databaseService.room.update({
+				where,
+				data,
+			});
 		}
 
-		const user = await this.user({ id: params.ownerId, });
-
-		const data = convertTestingRoomDtoToRoomData({
-			...params,
-			ownerId: user.id,
-		});
-
 		return this.databaseService.room.create({
-			data: {
-				...data,
-				members: {
-					create: {
-						userId: data.ownerId,
-						status: 'activated',
-					},
-				},
-			},
+			data,
 		});
 	}
 

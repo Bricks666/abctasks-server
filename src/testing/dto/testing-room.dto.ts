@@ -1,6 +1,7 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { IsNumber, IsString, IsOptional } from 'class-validator';
+import { ApiProperty, OmitType } from '@nestjs/swagger';
+import { IsNumber, IsString, IsOptional, IsObject } from 'class-validator';
 import { NumberTransform } from '@/shared';
+import { TestingMemberDto } from './testing-member.dto';
 
 export class TestingRoomDto {
 	@ApiProperty({
@@ -44,4 +45,16 @@ export class TestingRoomDto {
 	@IsString()
 	@IsOptional()
 	declare description?: string;
+
+	@ApiProperty({
+		example: [],
+		description: 'Описание комнаты',
+		type: OmitType(TestingMemberDto, ['roomId']),
+		required: false,
+	})
+	@IsObject({
+		each: true,
+	})
+	@IsOptional()
+	declare members?: Omit<TestingMemberDto, 'roomId'>[];
 }

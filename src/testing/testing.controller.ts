@@ -85,11 +85,32 @@ export class TestingController {
 		return this.testingService.removeUser(params);
 	}
 
+	@ApiOperation({
+		summary: 'Get or create room',
+	})
+	@ApiBody({
+		type: TestingUserDto,
+		description: 'Filter to select or data to create',
+		required: false,
+	})
+	@ApiOkResponse({
+		type: UserDto,
+		description: 'Room with requested params',
+	})
+	@HttpCode(HttpStatus.OK)
 	@Post('/room')
 	room(@Body() params: TestingRoomDto): Promise<RoomDto> {
 		return this.testingService.room(params);
 	}
 
+	@ApiOperation({
+		summary: 'Remove rooms via params',
+	})
+	@ApiOkResponse({
+		type: Boolean,
+		description: 'There was any room removed',
+	})
+	@HttpCode(HttpStatus.OK)
 	@Delete('/room')
 	removeRoom(@Query() params: TestingRoomDto): Promise<boolean> {
 		return this.testingService.removeRoom(params);

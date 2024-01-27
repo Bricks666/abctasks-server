@@ -4,7 +4,11 @@ import { TestingRoomDto } from '../dto';
 export const convertTestingRoomDtoToRoomFilter = (
 	params: TestingRoomDto
 ): Prisma.RoomWhereInput => {
-	const { description, id, name, ownerId, } = params;
+	const { description, id, name, ownerId, members = [], } = params;
+
+	const userIds = members.map((member) => member.userId);
+
+	const statuses = members.map((member) => member.status);
 
 	return {
 		id,
@@ -13,8 +17,14 @@ export const convertTestingRoomDtoToRoomFilter = (
 		name,
 		members: {
 			some: {
-				status: 'activated',
-				userId: ownerId,
+				AND: {
+					userId: {
+						in: userIds,
+					},
+					status: {
+						in: statuses,
+					},
+				},
 			},
 		},
 	};
