@@ -3,10 +3,9 @@ name: Docker
 on:
   push:
     tags: [ 'v*.*.*' ]
+    branches: [ "main" ]
   pull_request:
     branches: [ "main", "develop" ]
-  release:
-    types: [ published ]
 
 
 jobs:
@@ -29,11 +28,17 @@ jobs:
         with:
           images: bricks667/abctasks-server
 
+      - name: Extract package version
+        run: |
+          echo "TAG=$(jq -r '.version' package.json)" >> $GITHUB_ENV
+
       - name: Build and push Docker image
         uses: docker/build-push-action@3b5e8027fcad23fda98b2e3ac259d8d67585f671
         with:
           context: .
           file: ./Dockerfile
           push: ${{ github.event_name != 'pull_request' }}
-          tags: ${{ steps.meta.outputs.tags }}
+          tags: |
+                  ${{ steps.meta.outputs.tags }}
+                  v${{ env.TAG }}
           labels: ${{ steps.meta.outputs.labels }}
