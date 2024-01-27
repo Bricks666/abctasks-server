@@ -17,8 +17,8 @@ import { MailModule } from '@/mail/mail.module';
 import { TokensModule } from '@/tokens/tokens.module';
 import { MembersModule } from '@/members/members.module';
 import { InvitationsModule } from '@/room-invitations/invitations.module';
-import { TestingModule } from './testing/testing.module';
-import { __TESTING__ } from './shared/configs';
+import { __TESTING__ } from '@/shared';
+import { TestingModule } from '@/testing/testing.module';
 
 const modules = [
 	CacheModule.register<RedisClientOptions>({

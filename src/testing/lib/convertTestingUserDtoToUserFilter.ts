@@ -9,7 +9,7 @@ export const convertTestingUserDtoToUserFilter = (
 	return {
 		id,
 		email,
-		username,
 		activated,
+		username,
 	};
 };

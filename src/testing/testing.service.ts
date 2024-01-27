@@ -23,6 +23,7 @@ import {
 	convertTestingRoomDtoToRoomData,
 	convertTestingRoomDtoToRoomFilter,
 	convertTestingUserDtoToUserData,
+	convertTestingUserDtoToUniqueUserFilter,
 	convertTestingUserDtoToUserFilter
 } from './lib';
 
@@ -42,26 +43,23 @@ export class TestingService {
 	}
 
 	async user(params: TestingUserDto): Promise<UserDto> {
-		const where = convertTestingUserDtoToUserFilter(params);
+		const where = convertTestingUserDtoToUniqueUserFilter(params);
+		const data = convertTestingUserDtoToUserData(params);
+		const password = await hash(data.password, Number(process.env.ROUND_COUNT));
 
 		const existing = await this.databaseService.user.findFirst({
 			where,
 		});
 
 		if (existing) {
-			return existing;
+			return this.databaseService.user.update({
+				where,
+				data: {
+					...data,
+					password,
+				},
+			});
 		}
-
-		await this.databaseService.user.deleteMany({
-			where: {
-				email: where.email as string,
-				id: where.id as number,
-			},
-		});
-
-		const data = convertTestingUserDtoToUserData(params);
-
-		const password = await hash(data.password, Number(process.env.ROUND_COUNT));
 
 		return this.databaseService.user.create({
 			data: {

@@ -2,12 +2,14 @@ import {
 	Body,
 	Controller,
 	Delete,
+	HttpCode,
 	Post,
 	Query,
-	Response
+	Response,
+	HttpStatus
 } from '@nestjs/common';
 import { Response as ExpressResponse } from 'express';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBody, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { UserDto } from '@/users';
 import { RoomDto } from '@/rooms';
 import { TaskDto } from '@/tasks';
@@ -52,11 +54,32 @@ export class TestingController {
 		return result;
 	}
 
+	@ApiOperation({
+		summary: 'Get or create user',
+	})
+	@ApiBody({
+		type: TestingUserDto,
+		description: 'Filter to select or data to create',
+		required: false,
+	})
+	@ApiOkResponse({
+		type: UserDto,
+		description: 'User with requested params',
+	})
+	@HttpCode(HttpStatus.OK)
 	@Post('/user')
 	user(@Body() params: TestingUserDto): Promise<UserDto> {
 		return this.testingService.user(params);
 	}
 
+	@ApiOperation({
+		summary: 'Remove users via params',
+	})
+	@ApiOkResponse({
+		type: Boolean,
+		description: 'There was any user removed',
+	})
+	@HttpCode(HttpStatus.OK)
 	@Delete('/user')
 	removeUser(@Query() params: TestingUserDto): Promise<boolean> {
 		return this.testingService.removeUser(params);
