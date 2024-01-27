@@ -1,14 +1,8 @@
-import {
-	CanActivate,
-	ExecutionContext,
-	Injectable,
-	InternalServerErrorException
-} from '@nestjs/common';
+import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { Request } from 'express';
 import { SecurityUserDto } from '@/users/dto';
 import { UsersService } from '@/users/services';
-import { DISABLE_AUTH_CHECK_FLAG } from '../auth';
 import { DISABLE_IS_ACTIVATED_FLAG } from './config';
 
 @Injectable()
@@ -19,15 +13,10 @@ export class IsActivatedGuard implements CanActivate {
 	) {}
 
 	async canActivate(context: ExecutionContext): Promise<boolean> {
-		const disable =
-			this.reflector.get<boolean | undefined>(
-				DISABLE_IS_ACTIVATED_FLAG,
-				context.getHandler()
-			) ||
-			this.reflector.get<boolean | undefined>(
-				DISABLE_AUTH_CHECK_FLAG,
-				context.getHandler()
-			);
+		const disable = this.reflector.getAllAndOverride<boolean | undefined>(
+			DISABLE_IS_ACTIVATED_FLAG,
+			[context.getHandler(), context.getClass()]
+		);
 
 		if (disable) {
 			return true;
@@ -37,9 +26,7 @@ export class IsActivatedGuard implements CanActivate {
 		const user = (req as any).user as SecurityUserDto;
 
 		if (!user) {
-			throw new InternalServerErrorException(
-				'Is activated must be used only with authorized users'
-			);
+			return true;
 		}
 
 		return this.usersService.isActivated({ id: user.id, });

@@ -76,13 +76,17 @@ export class AuthService {
 
 		const user = await this.usersService.getInsecure({ email, });
 
+		if (!user.activated) {
+			throw new ConflictException('User is not activated');
+		}
+
 		const isValidPassword = await compare(password, user.password);
 
 		if (!isValidPassword) {
 			throw new ForbiddenException('Incorrect password');
 		}
 
-		user.password = undefined;
+		delete user.password;
 
 		const tokens = await this.#generateTokens(user);
 
