@@ -6,12 +6,14 @@ import { DEFAULT_USER } from '../configs';
 export const convertTestingUserDtoToUserData = (
 	data: TestingUserDto
 ): Prisma.UserUncheckedCreateInput => {
+	const { id, password, activated, email, username, } = data;
+
 	return {
-		id: data.id,
-		email: data.email ?? DEFAULT_USER.email,
-		password: data.password ?? DEFAULT_USER.password,
+		id,
+		email: email ?? DEFAULT_USER.email,
+		password: password ?? DEFAULT_USER.password,
 		photo: null,
-		username: data.username ?? DEFAULT_USER.username,
-		activated: data.activated ?? DEFAULT_USER.activated,
+		username: username ?? DEFAULT_USER.username,
+		activated: activated ?? DEFAULT_USER.activated,
 	};
 };

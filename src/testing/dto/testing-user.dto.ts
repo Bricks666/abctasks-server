@@ -43,7 +43,7 @@ export class TestingUserDto {
 	@ApiProperty({
 		type: String,
 		description: 'Password',
-		example: true,
+		example: 'some password',
 		required: false,
 	})
 	@IsOptional()

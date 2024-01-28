@@ -17,7 +17,8 @@ import {
 	TestingTaskDto,
 	TestingTagDto,
 	TestingMemberDto,
-	TestingInvitationDto
+	TestingInvitationDto,
+	TestingLoginDto
 } from './dto';
 import {
 	convertTestingRoomDtoToRoomData,
@@ -38,7 +39,7 @@ export class TestingService {
 		private readonly tokensService: TokensService
 	) {}
 
-	async login(params: TestingUserDto): Promise<AuthenticationResultDto> {
+	async login(params: TestingLoginDto): Promise<AuthenticationResultDto> {
 		const user = await this.user(params);
 
 		const tokens = await this.#generateTokens(user);

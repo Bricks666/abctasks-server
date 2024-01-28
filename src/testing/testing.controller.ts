@@ -25,6 +25,7 @@ import { BASE_COOKIE_OPTIONS, COOKIE_NAME, COOKIE_TIME } from '@/const';
 import { TestingService } from './testing.service';
 import {
 	TestingInvitationDto,
+	TestingLoginDto,
 	TestingMemberDto,
 	TestingRoomDto,
 	TestingTagDto,
@@ -39,19 +40,46 @@ import {
 export class TestingController {
 	constructor(private readonly testingService: TestingService) {}
 
-	@Post('/login')
+	@ApiOperation({
+		summary: 'Login into account',
+		description:
+			'Login into user account with passed params. If there is not user with passed params, It will be created',
+	})
+	@ApiOkResponse({
+		type: AuthenticationResultDto,
+		description: 'User and auth token',
+	})
+	@HttpCode(HttpStatus.OK)
+	@Post('/auth')
 	async auth(
-		@Body() params: TestingUserDto,
+		@Body() params: TestingLoginDto,
 		@Response({ passthrough: true, }) res: ExpressResponse
 	): Promise<AuthenticationResultDto> {
 		const result = await this.testingService.login(params);
 
-		res.cookie(COOKIE_NAME, result.tokens.refreshToken, {
+		const options = {
 			...BASE_COOKIE_OPTIONS,
-			maxAge: COOKIE_TIME,
-		});
+		};
+
+		if (params.remember ?? true) {
+			options.maxAge = COOKIE_TIME;
+		}
+
+		res.cookie(COOKIE_NAME, result.tokens.refreshToken, options);
 
 		return result;
+	}
+
+	@ApiOperation({
+		summary: 'Logout from current logged in account',
+	})
+	@Delete('/logout')
+	async logout(
+		@Response({ passthrough: true, }) res: ExpressResponse
+	): Promise<boolean> {
+		res.clearCookie(COOKIE_NAME);
+
+		return true;
 	}
 
 	@ApiOperation({
