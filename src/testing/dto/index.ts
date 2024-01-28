@@ -1,4 +1,4 @@
-export * from './invitation.dto';
+export * from './testing-invitation.dto';
 export * from './testing-member.dto';
 export * from './testing-room.dto';
 export * from './testing-tag.dto';

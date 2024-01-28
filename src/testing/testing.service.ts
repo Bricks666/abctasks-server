@@ -12,6 +12,7 @@ import { UserDto } from '@/users';
 import { AuthenticationResultDto, TokensDto } from '@/auth';
 import { TokensService } from '@/tokens/tokens.service';
 import { taskSelect } from '@/tasks/repositories';
+import { invitationSelect } from '@/room-invitations/repositories';
 import {
 	TestingUserDto,
 	TestingRoomDto,
@@ -36,7 +37,10 @@ import {
 	convertTestingTagDtoToTagFilter,
 	convertTestingTaskDtoToTaskUniqueFilter,
 	convertTestingTaskDtoToTaskData,
-	convertTestingTaskDtoToTaskFilter
+	convertTestingTaskDtoToTaskFilter,
+	convertTestingInvitationDtoToInvitationUniqueFilter,
+	convertTestingInvitationDtoToInvitationData,
+	convertTestingInvitationDtoToInvitationFilter
 } from './lib';
 
 @Injectable()
@@ -260,8 +264,52 @@ export class TestingService {
 			.then(({ count, }) => !!count);
 	}
 
-	invitation(params: TestingInvitationDto = {}): Promise<RoomInvitationDto> {
-		return params as any;
+	async invitation(
+		params: TestingInvitationDto = {}
+	): Promise<RoomInvitationDto> {
+		const inviter = await this.user(params.inviter);
+		const user = await this.user(params.user);
+		const room = await this.room(params.room);
+
+		const where = convertTestingInvitationDtoToInvitationUniqueFilter({
+			...params,
+			inviter,
+			user,
+			room,
+		});
+		const data = convertTestingInvitationDtoToInvitationData({
+			...params,
+			inviter,
+			user,
+			room,
+		});
+
+		const existing = await this.databaseService.roomInvitation.findFirst({
+			where,
+		});
+
+		if (existing) {
+			return this.databaseService.roomInvitation.update({
+				where: convertTestingInvitationDtoToInvitationUniqueFilter(existing),
+				data,
+				select: invitationSelect,
+			});
+		}
+
+		return this.databaseService.roomInvitation.create({
+			data,
+			select: invitationSelect,
+		});
+	}
+
+	removeInvitation(params: TestingInvitationDto = {}): Promise<boolean> {
+		const where = convertTestingInvitationDtoToInvitationFilter(params);
+
+		return this.databaseService.roomInvitation
+			.deleteMany({
+				where,
+			})
+			.then(({ count, }) => !!count);
 	}
 
 	async #generateTokens(user: UserDto): Promise<TokensDto> {

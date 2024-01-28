@@ -264,12 +264,43 @@ export class TestingController {
 	})
 	@HttpCode(HttpStatus.OK)
 	@Put('/member')
-	removeMember(@Body() params: TestingMemberDto): Promise<MemberDto> {
-		return this.testingService.member(params);
+	removeMember(@Body() params: TestingMemberDto): Promise<boolean> {
+		return this.testingService.removeMember(params);
 	}
 
+	@ApiOperation({
+		summary: 'Remove members via params',
+	})
+	@ApiBody({
+		type: TestingInvitationDto,
+		description: 'Filter to remove',
+		required: false,
+	})
+	@ApiOkResponse({
+		type: RoomInvitationDto,
+		description: 'There was any member removed',
+	})
+	@HttpCode(HttpStatus.OK)
 	@Post('/invitation')
 	invitation(@Body() params: TestingInvitationDto): Promise<RoomInvitationDto> {
 		return this.testingService.invitation(params);
+	}
+
+	@ApiOperation({
+		summary: 'Remove invitations via params',
+	})
+	@ApiBody({
+		type: TestingInvitationDto,
+		description: 'Filter to remove',
+		required: false,
+	})
+	@ApiOkResponse({
+		type: Boolean,
+		description: 'There was any invitation removed',
+	})
+	@HttpCode(HttpStatus.OK)
+	@Put('/invitation')
+	removeInvitation(@Body() params: TestingInvitationDto): Promise<boolean> {
+		return this.testingService.removeInvitation(params);
 	}
 }

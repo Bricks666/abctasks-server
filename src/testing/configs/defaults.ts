@@ -1,4 +1,5 @@
 import {
+	TestingInvitationDto,
 	TestingMemberDto,
 	TestingRoomDto,
 	TestingTagDto,
@@ -37,4 +38,10 @@ export const DEFAULT_TASK: TestingTaskDto = {
 	tags: [DEFAULT_TAG],
 	createdAt: new Date('2022-07-07'),
 	updatedAt: new Date('2022-07-10'),
+};
+
+export const DEFAULT_INVITATION: TestingInvitationDto = {
+	inviter: DEFAULT_USER,
+	room: DEFAULT_ROOM,
+	status: 'sended',
 };
