@@ -6,11 +6,12 @@ import { MemberDto } from '@/members/dto';
 import { RoomInvitationDto } from '@/room-invitations/dto';
 import { RoomDto } from '@/rooms';
 import { TagDto } from '@/tags';
-import { TaskDto } from '@/tasks';
+import { TaskDto, convertTaskRecordToTaskDto } from '@/tasks';
 import { UserDto } from '@/users';
 
 import { AuthenticationResultDto, TokensDto } from '@/auth';
 import { TokensService } from '@/tokens/tokens.service';
+import { taskSelect } from '@/tasks/repositories';
 import {
 	TestingUserDto,
 	TestingRoomDto,
@@ -32,7 +33,10 @@ import {
 	convertTestingMemberDtoToMemberFilter,
 	convertTestingTagDtoToTagUniqueFilter,
 	convertTestingTagDtoToTagData,
-	convertTestingTagDtoToTagFilter
+	convertTestingTagDtoToTagFilter,
+	convertTestingTaskDtoToTaskUniqueFilter,
+	convertTestingTaskDtoToTaskData,
+	convertTestingTaskDtoToTaskFilter
 } from './lib';
 
 @Injectable()
@@ -42,7 +46,7 @@ export class TestingService {
 		private readonly tokensService: TokensService
 	) {}
 
-	async login(params: TestingLoginDto): Promise<AuthenticationResultDto> {
+	async login(params: TestingLoginDto = {}): Promise<AuthenticationResultDto> {
 		const user = await this.user(params);
 
 		const tokens = await this.#generateTokens(user);
@@ -50,7 +54,7 @@ export class TestingService {
 		return { user, tokens, };
 	}
 
-	async user(params: TestingUserDto): Promise<UserDto> {
+	async user(params: TestingUserDto = {}): Promise<UserDto> {
 		const where = convertTestingUserDtoToUniqueUserFilter(params);
 		const data = convertTestingUserDtoToUserData(params);
 		const password = await hash(data.password, Number(process.env.ROUND_COUNT));
@@ -77,7 +81,7 @@ export class TestingService {
 		});
 	}
 
-	async removeUser(params: TestingUserDto): Promise<boolean> {
+	async removeUser(params: TestingUserDto = {}): Promise<boolean> {
 		const where = convertTestingUserDtoToUserFilter(params);
 
 		return this.databaseService.user
@@ -87,7 +91,7 @@ export class TestingService {
 			.then(({ count, }) => !!count);
 	}
 
-	async room(params: TestingRoomDto): Promise<RoomDto> {
+	async room(params: TestingRoomDto = {}): Promise<RoomDto> {
 		const user = await this.user({ id: params.ownerId, });
 		const where = convertTestingRoomDtoToUniqueRoomFilter({
 			...params,
@@ -114,7 +118,7 @@ export class TestingService {
 		});
 	}
 
-	async removeRoom(params: TestingRoomDto): Promise<boolean> {
+	async removeRoom(params: TestingRoomDto = {}): Promise<boolean> {
 		const where = convertTestingRoomDtoToRoomFilter(params);
 
 		return this.databaseService.room
@@ -124,11 +128,58 @@ export class TestingService {
 			.then(({ count, }) => !!count);
 	}
 
-	task(params: TestingTaskDto): Promise<TaskDto> {
-		return params as any;
+	async task(params: TestingTaskDto = {}): Promise<TaskDto> {
+		const author = await this.user(params.author);
+		const room = await this.room(params.room);
+		const tags = await Promise.all(
+			params.tags.map((tag) => this.tag({ ...tag, room, }))
+		);
+		const where = convertTestingTaskDtoToTaskUniqueFilter({
+			...params,
+			author,
+			room,
+			tags,
+		});
+		const data = convertTestingTaskDtoToTaskData({
+			...params,
+			author,
+			room,
+			tags,
+		});
+
+		const existing = await this.databaseService.task.findFirst({
+			where,
+		});
+
+		if (existing) {
+			return this.databaseService.task
+				.update({
+					where: convertTestingTaskDtoToTaskUniqueFilter(existing),
+					data,
+					select: taskSelect,
+				})
+				.then(convertTaskRecordToTaskDto);
+		}
+
+		return this.databaseService.task
+			.create({
+				data,
+				select: taskSelect,
+			})
+			.then(convertTaskRecordToTaskDto);
 	}
 
-	async tag(params: TestingTagDto): Promise<TagDto> {
+	async removeTask(params: TestingTaskDto = {}): Promise<boolean> {
+		const where = convertTestingTaskDtoToTaskFilter(params);
+
+		return this.databaseService.task
+			.deleteMany({
+				where,
+			})
+			.then(({ count, }) => !!count);
+	}
+
+	async tag(params: TestingTagDto = {}): Promise<TagDto> {
 		const room = await this.room(params.room);
 
 		const where = convertTestingTagDtoToTagUniqueFilter({ ...params, room, });
@@ -155,7 +206,7 @@ export class TestingService {
 		}) as Promise<TagDto>;
 	}
 
-	async removeTag(params: TestingTagDto): Promise<boolean> {
+	async removeTag(params: TestingTagDto = {}): Promise<boolean> {
 		const room = await this.room(params.room);
 		const where = convertTestingTagDtoToTagFilter({
 			...params,
@@ -169,7 +220,7 @@ export class TestingService {
 			.then(({ count, }) => !!count);
 	}
 
-	async member(params: TestingMemberDto): Promise<MemberDto> {
+	async member(params: TestingMemberDto = {}): Promise<MemberDto> {
 		const user = await this.user({ id: params.userId, });
 		const room = await this.room({ id: params.roomId, });
 		const where = convertTestingMemberDtoToUniqueMemberFilter({
@@ -199,7 +250,7 @@ export class TestingService {
 		});
 	}
 
-	async removeMember(params: TestingMemberDto): Promise<boolean> {
+	async removeMember(params: TestingMemberDto = {}): Promise<boolean> {
 		const where = convertTestingMemberDtoToMemberFilter(params);
 
 		return this.databaseService.member
@@ -209,7 +260,7 @@ export class TestingService {
 			.then(({ count, }) => !!count);
 	}
 
-	invitation(params: TestingInvitationDto): Promise<RoomInvitationDto> {
+	invitation(params: TestingInvitationDto = {}): Promise<RoomInvitationDto> {
 		return params as any;
 	}
 

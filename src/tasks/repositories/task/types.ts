@@ -1,4 +1,8 @@
+import { Prisma } from '@prisma/client';
 import { CreateTaskDto, GetTasksDto, UpdateTaskDto } from '../../dto';
+import { taskSelect } from '../configs';
+
+export type TaskRecord = Prisma.TaskGetPayload<{ select: typeof taskSelect }>;
 
 export interface GetAllParams extends GetTasksDto {
 	readonly roomId: number;

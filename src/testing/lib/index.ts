@@ -13,3 +13,7 @@ export * from './convertTestingMemberDtoToMemberData';
 export * from './convertTestingTagDtoToTagFilter';
 export * from './convertTestingTagDtoToTagUniqueFilter';
 export * from './convertTestingTagDtoToTagData';
+
+export * from './convertTestingTaskDtoToTaskFilter';
+export * from './convertTestingTaskDtoToTaskUniqueFilter';
+export * from './convertTestingTaskDtoToTaskData';

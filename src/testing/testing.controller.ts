@@ -160,9 +160,40 @@ export class TestingController {
 		return this.testingService.removeRoom(params);
 	}
 
+	@ApiOperation({
+		summary: 'Get or create task',
+	})
+	@ApiBody({
+		type: TestingTaskDto,
+		description: 'Filter to select or data to create',
+		required: false,
+	})
+	@ApiOkResponse({
+		type: TaskDto,
+		description: 'Task with requested params',
+	})
+	@HttpCode(HttpStatus.OK)
 	@Post('/task')
 	task(@Body() params: TestingTaskDto): Promise<TaskDto> {
 		return this.testingService.task(params);
+	}
+
+	@ApiOperation({
+		summary: 'Remove task via params',
+	})
+	@ApiBody({
+		type: TestingTaskDto,
+		description: 'Filter to remove',
+		required: false,
+	})
+	@ApiOkResponse({
+		type: Boolean,
+		description: 'There was any task removed',
+	})
+	@HttpCode(HttpStatus.OK)
+	@Put('/task')
+	removeTask(@Body() params: TestingTaskDto): Promise<boolean> {
+		return this.testingService.removeTask(params);
 	}
 
 	@ApiOperation({
