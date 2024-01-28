@@ -3,15 +3,14 @@ import { Prisma } from '@prisma/client';
 import { TestingRoomDto } from '../dto';
 import { DEFAULT_ROOM } from '../configs';
 
-export const convertTestingRoomDtoToRoomData = (
+export const convertTestingRoomDtoToRoomUpdate = (
 	data: TestingRoomDto
-): Prisma.RoomUncheckedCreateInput => {
+): Prisma.RoomUpdateInput => {
 	const { description, name, ownerId, members = [], } = data;
 
 	return {
 		description: description ?? DEFAULT_ROOM.description,
 		name: name ?? DEFAULT_ROOM.name,
-		ownerId,
 		members: {
 			createMany: {
 				data: members

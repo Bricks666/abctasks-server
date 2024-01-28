@@ -6,7 +6,6 @@ export const convertTestingInvitationDtoToInvitationData = (
 	data: TestingInvitationDto
 ): Prisma.RoomInvitationUncheckedCreateInput => {
 	const {
-		id,
 		user,
 		status = DEFAULT_INVITATION.status,
 		inviter = DEFAULT_INVITATION.inviter,
@@ -14,7 +13,6 @@ export const convertTestingInvitationDtoToInvitationData = (
 	} = data;
 
 	return {
-		id,
 		status,
 		userId: user?.id,
 		inviterId: inviter.id,

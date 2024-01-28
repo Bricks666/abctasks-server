@@ -40,7 +40,13 @@ import {
 	convertTestingTaskDtoToTaskFilter,
 	convertTestingInvitationDtoToInvitationUniqueFilter,
 	convertTestingInvitationDtoToInvitationData,
-	convertTestingInvitationDtoToInvitationFilter
+	convertTestingInvitationDtoToInvitationFilter,
+	convertTestingUserDtoToUserUpdate,
+	convertTestingRoomDtoToRoomUpdate,
+	convertTestingTaskDtoToTaskUpdate,
+	convertTestingTagDtoToTagUpdate,
+	convertTestingMemberDtoToMemberUpdate,
+	convertTestingInvitationDtoToInvitationUpdate
 } from './lib';
 
 @Injectable()
@@ -70,10 +76,7 @@ export class TestingService {
 		if (existing) {
 			return this.databaseService.user.update({
 				where: convertTestingUserDtoToUniqueUserFilter(existing),
-				data: {
-					...data,
-					password,
-				},
+				data: convertTestingUserDtoToUserUpdate({ ...data, password, }),
 			});
 		}
 
@@ -101,10 +104,6 @@ export class TestingService {
 			...params,
 			ownerId: user.id,
 		});
-		const data = convertTestingRoomDtoToRoomData({
-			...params,
-			ownerId: user.id,
-		});
 
 		const existing = await this.databaseService.room.findFirst({
 			where,
@@ -113,9 +112,14 @@ export class TestingService {
 		if (existing) {
 			return this.databaseService.room.update({
 				where: convertTestingRoomDtoToUniqueRoomFilter(existing),
-				data,
+				data: convertTestingRoomDtoToRoomUpdate(params),
 			});
 		}
+
+		const data = convertTestingRoomDtoToRoomData({
+			...params,
+			ownerId: user.id,
+		});
 
 		return this.databaseService.room.create({
 			data,
@@ -144,12 +148,6 @@ export class TestingService {
 			room,
 			tags,
 		});
-		const data = convertTestingTaskDtoToTaskData({
-			...params,
-			author,
-			room,
-			tags,
-		});
 
 		const existing = await this.databaseService.task.findFirst({
 			where,
@@ -159,11 +157,18 @@ export class TestingService {
 			return this.databaseService.task
 				.update({
 					where: convertTestingTaskDtoToTaskUniqueFilter(existing),
-					data,
+					data: convertTestingTaskDtoToTaskUpdate(params),
 					select: taskSelect,
 				})
 				.then(convertTaskRecordToTaskDto);
 		}
+
+		const data = convertTestingTaskDtoToTaskData({
+			...params,
+			author,
+			room,
+			tags,
+		});
 
 		return this.databaseService.task
 			.create({
@@ -187,7 +192,6 @@ export class TestingService {
 		const room = await this.room(params.room);
 
 		const where = convertTestingTagDtoToTagUniqueFilter({ ...params, room, });
-		const data = convertTestingTagDtoToTagData({ ...params, room, });
 
 		const existing = await this.databaseService.tag.findFirst({
 			where,
@@ -201,9 +205,11 @@ export class TestingService {
 						id: existing.roomId,
 					},
 				}),
-				data,
+				data: convertTestingTagDtoToTagUpdate(params),
 			}) as Promise<TagDto>;
 		}
+
+		const data = convertTestingTagDtoToTagData({ ...params, room, });
 
 		return this.databaseService.tag.create({
 			data,
@@ -232,11 +238,6 @@ export class TestingService {
 			userId: user.id,
 			roomId: room.id,
 		});
-		const data = convertTestingMemberDtoToMemberData({
-			...params,
-			userId: user.id,
-			roomId: room.id,
-		});
 
 		const existing = await this.databaseService.member.findUnique({
 			where,
@@ -245,9 +246,15 @@ export class TestingService {
 		if (existing) {
 			return this.databaseService.member.update({
 				where: convertTestingMemberDtoToUniqueMemberFilter(existing),
-				data,
+				data: convertTestingMemberDtoToMemberUpdate(params),
 			});
 		}
+
+		const data = convertTestingMemberDtoToMemberData({
+			...params,
+			userId: user.id,
+			roomId: room.id,
+		});
 
 		return this.databaseService.member.create({
 			data,
@@ -277,12 +284,6 @@ export class TestingService {
 			user,
 			room,
 		});
-		const data = convertTestingInvitationDtoToInvitationData({
-			...params,
-			inviter,
-			user,
-			room,
-		});
 
 		const existing = await this.databaseService.roomInvitation.findFirst({
 			where,
@@ -291,10 +292,17 @@ export class TestingService {
 		if (existing) {
 			return this.databaseService.roomInvitation.update({
 				where: convertTestingInvitationDtoToInvitationUniqueFilter(existing),
-				data,
+				data: convertTestingInvitationDtoToInvitationUpdate(params),
 				select: invitationSelect,
 			});
 		}
+
+		const data = convertTestingInvitationDtoToInvitationData({
+			...params,
+			inviter,
+			user,
+			room,
+		});
 
 		return this.databaseService.roomInvitation.create({
 			data,
