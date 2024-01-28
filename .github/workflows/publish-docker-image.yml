@@ -40,5 +40,5 @@ jobs:
           push: ${{ github.event_name != 'pull_request' }}
           tags: |
                   ${{ steps.meta.outputs.tags }}
-                  v${{ env.TAG }}
+                  bricks667/abctasks-server:v${{ env.TAG }}
           labels: ${{ steps.meta.outputs.labels }}
