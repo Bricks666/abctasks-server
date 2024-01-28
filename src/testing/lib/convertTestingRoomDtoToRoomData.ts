@@ -14,17 +14,20 @@ export const convertTestingRoomDtoToRoomData = (
 		name: name ?? DEFAULT_ROOM.name,
 		ownerId,
 		members: {
-			create: members
-				.map((member) => {
-					return {
-						userId: member.userId,
-						status: member.status,
-					};
-				})
-				.concat({
-					status: 'activated',
-					userId: ownerId,
-				}),
+			createMany: {
+				data: members
+					.map((member) => {
+						return {
+							userId: member.userId,
+							status: member.status,
+						};
+					})
+					.concat({
+						status: 'activated',
+						userId: ownerId,
+					}),
+				skipDuplicates: true,
+			},
 		},
 	};
 };

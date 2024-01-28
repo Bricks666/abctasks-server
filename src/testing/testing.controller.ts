@@ -4,10 +4,8 @@ import {
 	Put,
 	HttpCode,
 	Post,
-	Query,
 	Response,
-	HttpStatus,
-	Delete
+	HttpStatus
 } from '@nestjs/common';
 import { Response as ExpressResponse } from 'express';
 import { ApiBody, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
@@ -46,6 +44,10 @@ export class TestingController {
 		description:
 			'Login into user account with passed params. If there is not user with passed params, It will be created',
 	})
+	@ApiBody({
+		type: TestingLoginDto,
+		description: 'Data of account for login',
+	})
 	@ApiOkResponse({
 		type: AuthenticationResultDto,
 		description: 'User and auth token',
@@ -74,7 +76,10 @@ export class TestingController {
 	@ApiOperation({
 		summary: 'Logout from current logged in account',
 	})
-	@Delete('/logout')
+	@ApiOkResponse({
+		type: Boolean,
+	})
+	@Put('/logout')
 	async logout(
 		@Response({ passthrough: true, }) res: ExpressResponse
 	): Promise<boolean> {
@@ -104,13 +109,18 @@ export class TestingController {
 	@ApiOperation({
 		summary: 'Remove users via params',
 	})
+	@ApiBody({
+		type: TestingUserDto,
+		description: 'Filter to remove',
+		required: false,
+	})
 	@ApiOkResponse({
 		type: Boolean,
 		description: 'There was any user removed',
 	})
 	@HttpCode(HttpStatus.OK)
-	@Delete('/user')
-	removeUser(@Query() params: TestingUserDto): Promise<boolean> {
+	@Put('/user')
+	removeUser(@Body() params: TestingUserDto): Promise<boolean> {
 		return this.testingService.removeUser(params);
 	}
 
@@ -118,7 +128,7 @@ export class TestingController {
 		summary: 'Get or create room',
 	})
 	@ApiBody({
-		type: TestingUserDto,
+		type: TestingRoomDto,
 		description: 'Filter to select or data to create',
 		required: false,
 	})
@@ -135,13 +145,18 @@ export class TestingController {
 	@ApiOperation({
 		summary: 'Remove rooms via params',
 	})
+	@ApiBody({
+		type: TestingRoomDto,
+		description: 'Filter to remove',
+		required: false,
+	})
 	@ApiOkResponse({
 		type: Boolean,
 		description: 'There was any room removed',
 	})
 	@HttpCode(HttpStatus.OK)
-	@Delete('/room')
-	removeRoom(@Query() params: TestingRoomDto): Promise<boolean> {
+	@Put('/room')
+	removeRoom(@Body() params: TestingRoomDto): Promise<boolean> {
 		return this.testingService.removeRoom(params);
 	}
 
@@ -190,7 +205,7 @@ export class TestingController {
 		summary: 'Get or create member',
 	})
 	@ApiBody({
-		type: TestingUserDto,
+		type: TestingMemberDto,
 		description: 'Filter to select or data to create',
 		required: false,
 	})
@@ -207,13 +222,18 @@ export class TestingController {
 	@ApiOperation({
 		summary: 'Remove members via params',
 	})
+	@ApiBody({
+		type: TestingMemberDto,
+		description: 'Filter to remove',
+		required: false,
+	})
 	@ApiOkResponse({
 		type: Boolean,
 		description: 'There was any member removed',
 	})
 	@HttpCode(HttpStatus.OK)
-	@Delete('/member')
-	removeMember(@Query() params: TestingMemberDto): Promise<MemberDto> {
+	@Put('/member')
+	removeMember(@Body() params: TestingMemberDto): Promise<MemberDto> {
 		return this.testingService.member(params);
 	}
 

@@ -7,6 +7,7 @@ export class TestingLoginDto extends TestingUserDto {
 		type: Boolean,
 		description: 'Should cookie be setup as no session',
 		default: true,
+		required: false,
 	})
 	@IsOptional()
 	@IsBoolean()

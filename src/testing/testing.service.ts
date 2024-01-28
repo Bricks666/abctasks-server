@@ -61,7 +61,7 @@ export class TestingService {
 
 		if (existing) {
 			return this.databaseService.user.update({
-				where,
+				where: convertTestingUserDtoToUniqueUserFilter(existing),
 				data: {
 					...data,
 					password,
@@ -104,7 +104,7 @@ export class TestingService {
 
 		if (existing) {
 			return this.databaseService.room.update({
-				where,
+				where: convertTestingRoomDtoToUniqueRoomFilter(existing),
 				data,
 			});
 		}
@@ -189,7 +189,7 @@ export class TestingService {
 
 		if (existing) {
 			return this.databaseService.member.update({
-				where,
+				where: convertTestingMemberDtoToUniqueMemberFilter(existing),
 				data,
 			});
 		}
