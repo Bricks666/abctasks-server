@@ -9,3 +9,7 @@ export * from './convertTestingRoomDtoToRoomData';
 export * from './convertTestingMemberDtoToMemberFilter';
 export * from './convertTestingMemberDtoToUniqueMemberFilter';
 export * from './convertTestingMemberDtoToMemberData';
+
+export * from './convertTestingTagDtoToTagFilter';
+export * from './convertTestingTagDtoToTagUniqueFilter';
+export * from './convertTestingTagDtoToTagData';

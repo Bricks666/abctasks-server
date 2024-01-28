@@ -29,7 +29,10 @@ import {
 	convertTestingRoomDtoToUniqueRoomFilter,
 	convertTestingMemberDtoToUniqueMemberFilter,
 	convertTestingMemberDtoToMemberData,
-	convertTestingMemberDtoToMemberFilter
+	convertTestingMemberDtoToMemberFilter,
+	convertTestingTagDtoToTagUniqueFilter,
+	convertTestingTagDtoToTagData,
+	convertTestingTagDtoToTagFilter
 } from './lib';
 
 @Injectable()
@@ -125,8 +128,45 @@ export class TestingService {
 		return params as any;
 	}
 
-	tag(params: TestingTagDto): Promise<TagDto> {
-		return params as any;
+	async tag(params: TestingTagDto): Promise<TagDto> {
+		const room = await this.room(params.room);
+
+		const where = convertTestingTagDtoToTagUniqueFilter({ ...params, room, });
+		const data = convertTestingTagDtoToTagData({ ...params, room, });
+
+		const existing = await this.databaseService.tag.findFirst({
+			where,
+		});
+
+		if (existing) {
+			return this.databaseService.tag.update({
+				where: convertTestingTagDtoToTagUniqueFilter({
+					id: existing.id,
+					room: {
+						id: existing.roomId,
+					},
+				}),
+				data,
+			}) as Promise<TagDto>;
+		}
+
+		return this.databaseService.tag.create({
+			data,
+		}) as Promise<TagDto>;
+	}
+
+	async removeTag(params: TestingTagDto): Promise<boolean> {
+		const room = await this.room(params.room);
+		const where = convertTestingTagDtoToTagFilter({
+			...params,
+			room,
+		});
+
+		return this.databaseService.tag
+			.deleteMany({
+				where,
+			})
+			.then(({ count, }) => !!count);
 	}
 
 	async member(params: TestingMemberDto): Promise<MemberDto> {

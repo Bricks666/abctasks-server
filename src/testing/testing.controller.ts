@@ -1,12 +1,13 @@
 import {
 	Body,
 	Controller,
-	Delete,
+	Put,
 	HttpCode,
 	Post,
 	Query,
 	Response,
-	HttpStatus
+	HttpStatus,
+	Delete
 } from '@nestjs/common';
 import { Response as ExpressResponse } from 'express';
 import { ApiBody, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
@@ -149,9 +150,40 @@ export class TestingController {
 		return this.testingService.task(params);
 	}
 
+	@ApiOperation({
+		summary: 'Get or create tag',
+	})
+	@ApiBody({
+		type: TestingTagDto,
+		description: 'Filter to select or data to create',
+		required: false,
+	})
+	@ApiOkResponse({
+		type: TagDto,
+		description: 'Tag with requested params',
+	})
+	@HttpCode(HttpStatus.OK)
 	@Post('/tag')
 	tag(@Body() params: TestingTagDto): Promise<TagDto> {
 		return this.testingService.tag(params);
+	}
+
+	@ApiOperation({
+		summary: 'Remove tag via params',
+	})
+	@ApiBody({
+		type: TestingTagDto,
+		description: 'Filter to remove',
+		required: false,
+	})
+	@ApiOkResponse({
+		type: Boolean,
+		description: 'There was any tag removed',
+	})
+	@HttpCode(HttpStatus.OK)
+	@Put('/tag')
+	removeTag(@Body() params: TestingTagDto): Promise<boolean> {
+		return this.testingService.removeTag(params);
 	}
 
 	@ApiOperation({
