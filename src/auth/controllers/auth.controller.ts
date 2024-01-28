@@ -110,6 +110,7 @@ export class AuthController {
 		type: AuthenticationResultDto,
 		description: 'Данные пользователя и пара токенов',
 	})
+	@DisableIsActivatedCheck()
 	@DisableAuthCheck()
 	@Post('login')
 	async login(

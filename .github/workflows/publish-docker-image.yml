@@ -1,0 +1,44 @@
+name: Docker
+
+on:
+  push:
+    tags: [ 'v*.*.*' ]
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main", "develop" ]
+
+
+jobs:
+  push_to_registry:
+    name: Push Docker image to Docker Hub
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v4
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: bricks667/abctasks-server
+
+      - name: Extract package version
+        run: |
+          echo "TAG=$(jq -r '.version' package.json)" >> $GITHUB_ENV
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: |
+                  ${{ steps.meta.outputs.tags }}
+                  v${{ env.TAG }}
+          labels: ${{ steps.meta.outputs.labels }}

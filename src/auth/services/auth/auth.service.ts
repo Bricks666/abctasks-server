@@ -1,5 +1,4 @@
 import {
-	BadRequestException,
 	ConflictException,
 	ForbiddenException,
 	Injectable,
@@ -78,7 +77,7 @@ export class AuthService {
 		const user = await this.usersService.getInsecure({ email, });
 
 		if (!user.activated) {
-			throw new BadRequestException('User is not activated');
+			throw new ConflictException('User is not activated');
 		}
 
 		const isValidPassword = await compare(password, user.password);
