@@ -5,7 +5,7 @@ import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import * as cookieParser from 'cookie-parser';
 import { AppModule } from '@/app.module';
-import { StandardResponseInterceptor } from '@/shared';
+import { StandardResponseInterceptor, __PROD__ } from '@/shared';
 import { ORIGIN } from '@/const';
 import { DatabaseService } from '@/database';
 
@@ -32,13 +32,15 @@ async function bootstrap() {
 	app.useGlobalInterceptors(new StandardResponseInterceptor());
 	app.setGlobalPrefix('api');
 
+	const server = __PROD__ ? 'https://abctasks.ru' : `http://localhost:${PORT}`;
+
 	const config = new DocumentBuilder()
 		.setTitle('Документация по API сервера "Task manager"')
 		.setDescription('Документация по API приложения дел')
 		.setVersion('1.0.0')
 		.addCookieAuth(process.env.COOKIE_NAME)
 		.addBearerAuth()
-		.addServer(`http://localhost:${PORT}`)
+		.addServer(server)
 		.build();
 
 	const document = SwaggerModule.createDocument(app, config);

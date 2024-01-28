@@ -1,8 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import { Prisma } from '@prisma/client';
 import { DatabaseService } from '@/database/database.service';
-import { SECURITY_USER_SELECT } from '@/users/repositories';
 import { RoomInvitationDto } from '../../dto';
+import { invitationSelect } from '../configs';
 import {
 	AnswerRoomInvitationParams,
 	CreateRoomInvitationParams,
@@ -12,18 +11,6 @@ import {
 	GetRoomInvitationsParams,
 	RemoveRoomInvitationParams
 } from './types';
-
-const select = {
-	id: true,
-	inviter: {
-		select: SECURITY_USER_SELECT,
-	},
-	room: true,
-	user: {
-		select: SECURITY_USER_SELECT,
-	},
-	status: true,
-} satisfies Prisma.RoomInvitationSelect;
 
 @Injectable()
 export class RoomInvitationsRepository {
@@ -42,7 +29,7 @@ export class RoomInvitationsRepository {
 					isNot: null,
 				},
 			},
-			select,
+			select: invitationSelect,
 		});
 	}
 
@@ -55,7 +42,7 @@ export class RoomInvitationsRepository {
 			where: {
 				id,
 			},
-			select,
+			select: invitationSelect,
 		});
 	}
 
@@ -70,7 +57,7 @@ export class RoomInvitationsRepository {
 				userId,
 				status: 'sended',
 			},
-			select,
+			select: invitationSelect,
 		});
 	}
 
@@ -85,7 +72,7 @@ export class RoomInvitationsRepository {
 					roomId,
 					status: 'sended',
 				},
-				select,
+				select: invitationSelect,
 			})
 			.then((value) => value ?? null);
 	}
@@ -99,7 +86,7 @@ export class RoomInvitationsRepository {
 				userId,
 				inviterId,
 			},
-			select,
+			select: invitationSelect,
 		});
 	}
 

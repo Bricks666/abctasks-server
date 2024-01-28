@@ -17,33 +17,42 @@ import { MailModule } from '@/mail/mail.module';
 import { TokensModule } from '@/tokens/tokens.module';
 import { MembersModule } from '@/members/members.module';
 import { InvitationsModule } from '@/room-invitations/invitations.module';
+import { __TESTING__ } from '@/shared';
+import { TestingModule } from '@/testing/testing.module';
+
+const modules = [
+	CacheModule.register<RedisClientOptions>({
+		store: redisStore as unknown as CacheStore,
+		isGlobal: true,
+		max: 50,
+		ttl: 10,
+		url: process.env.REDIS_URL,
+	}),
+	ConfigModule.forRoot({
+		envFilePath: '.env',
+	}),
+	DatabaseModule.forRoot({}),
+	AuthModule,
+	UsersModule,
+	RoomsModule,
+	TasksModule,
+	ActivitiesModule,
+	MembersModule,
+	ProgressModule,
+	CommentsModule,
+	MailModule,
+	TagsModule,
+	TokensModule,
+	InvitationsModule,
+	TestingModule
+];
+
+if (__TESTING__) {
+	modules.push(TestingModule);
+}
 
 @Module({
-	imports: [
-		CacheModule.register<RedisClientOptions>({
-			store: redisStore as unknown as CacheStore,
-			isGlobal: true,
-			max: 50,
-			ttl: 10,
-			url: process.env.REDIS_URL,
-		}),
-		ConfigModule.forRoot({
-			envFilePath: '.env',
-		}),
-		DatabaseModule.forRoot({}),
-		AuthModule,
-		UsersModule,
-		RoomsModule,
-		TasksModule,
-		ActivitiesModule,
-		MembersModule,
-		ProgressModule,
-		CommentsModule,
-		MailModule,
-		TagsModule,
-		TokensModule,
-		InvitationsModule
-	],
+	imports: modules,
 	providers: [
 		{
 			provide: APP_GUARD,

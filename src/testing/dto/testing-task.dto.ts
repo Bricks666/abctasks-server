@@ -1,75 +1,87 @@
-import { Task as TaskModel, TaskStatus } from '@prisma/client';
+import { ApiProperty } from '@nestjs/swagger';
+import { TaskStatus } from '@prisma/client';
 import {
-	IsISO8601,
-	IsEnum,
 	IsNumber,
-	IsOptional,
+	IsObject,
 	IsString,
 	MaxLength,
-	IsObject
+	IsOptional,
+	IsEnum,
+	IsISO8601
 } from 'class-validator';
-import { ApiProperty } from '@nestjs/swagger';
-import { TagDto } from '@/tags/dto';
-import { SecurityUserDto } from '@/users/dto';
+import { TestingTagDto } from './testing-tag.dto';
+import { TestingUserDto } from './testing-user.dto';
+import { TestingRoomDto } from './testing-room.dto';
 
-export class TaskDto implements Omit<TaskModel, 'tagIds' | 'authorId'> {
+export class TestingTaskDto {
 	@ApiProperty({
 		type: Number,
 		description: 'Id задачи',
 		example: 1,
+		required: false,
 	})
 	@IsNumber()
-	declare id: number;
+	@IsOptional()
+	declare id?: number;
 
 	@ApiProperty({
-		type: Number,
+		type: TestingRoomDto,
 		description: 'Id комнаты',
-		example: 1,
+		required: false,
 	})
-	@IsNumber()
-	declare roomId: number;
+	@IsObject()
+	@IsOptional()
+	declare room?: TestingRoomDto;
 
 	@ApiProperty({
-		type: TagDto,
+		type: TestingTagDto,
 		isArray: true,
 		description: 'Tags',
+		required: false,
 	})
+	@IsOptional()
 	@IsObject({
 		each: true,
 	})
-	declare tags: TagDto[];
+	declare tags?: TestingTagDto[];
 
 	@ApiProperty({
-		type: SecurityUserDto,
-		description: 'Автор',
+		type: TestingUserDto,
+		description: 'Author id',
+		required: false,
 	})
 	@IsObject()
-	declare author: SecurityUserDto;
+	@IsOptional()
+	declare author?: TestingUserDto;
 
 	@ApiProperty({
 		type: String,
 		description: 'Заголовок задачи',
 		example: 'Некоторый заголовок задачи',
+		required: false,
 	})
 	@IsString()
 	@MaxLength(32)
-	declare title: string;
+	@IsOptional()
+	declare title?: string;
 
 	@ApiProperty({
 		type: String,
 		description: 'Текст задачи',
 		example: 'Текс текст текст',
 		nullable: true,
+		required: false,
 	})
 	@IsOptional()
 	@IsString()
 	@MaxLength(255)
-	declare description: string;
+	declare description?: string;
 
 	@ApiProperty({
 		enum: ['done', 'ready', 'review', 'in progress'],
 		description: 'Статус задачи',
 		example: 'done',
+		required: false,
 	})
 	@IsEnum({
 		done: 'done',
@@ -77,21 +89,26 @@ export class TaskDto implements Omit<TaskModel, 'tagIds' | 'authorId'> {
 		review: 'review',
 		ready: 'ready',
 	})
-	declare status: TaskStatus;
+	@IsOptional()
+	declare status?: TaskStatus;
 
 	@ApiProperty({
 		type: String,
 		description: 'Дата создания задачи',
 		example: new Date('2022-07-07'),
+		required: false,
 	})
 	@IsISO8601()
-	declare createdAt: Date;
+	@IsOptional()
+	declare createdAt?: Date;
 
 	@ApiProperty({
 		type: String,
 		description: 'Дата обновления',
 		example: new Date('2022-07-07'),
+		required: false,
 	})
 	@IsISO8601()
-	declare updatedAt: Date;
+	@IsOptional()
+	declare updatedAt?: Date;
 }
