@@ -3,6 +3,7 @@ import { Prisma } from '@prisma/client';
 import { DatabaseService } from '@/database/database.service';
 import { SECURITY_USER_SELECT } from '@/users/repositories';
 import { TaskDto } from '../../dto';
+import { convertTaskRecordToTaskDto } from '../lib';
 import {
 	CreateParams,
 	GetAllParams,
@@ -57,7 +58,7 @@ export class TaskRepository {
 			select,
 		});
 
-		return tasks.map(TaskRepository.map);
+		return tasks.map(convertTaskRecordToTaskDto);
 	}
 
 	async getOne(params: GetOneParams): Promise<TaskDto | null> {
@@ -68,7 +69,7 @@ export class TaskRepository {
 			select,
 		});
 
-		return task ? TaskRepository.map(task) : null;
+		return task ? convertTaskRecordToTaskDto(task) : null;
 	}
 
 	async create(params: CreateParams): Promise<TaskDto> {
@@ -85,7 +86,7 @@ export class TaskRepository {
 			select,
 		});
 
-		return task ? TaskRepository.map(task) : null;
+		return task ? convertTaskRecordToTaskDto(task) : null;
 	}
 
 	async update(params: UpdateParams): Promise<TaskDto> {
@@ -110,7 +111,7 @@ export class TaskRepository {
 			select,
 		});
 
-		return task ? TaskRepository.map(task) : null;
+		return task ? convertTaskRecordToTaskDto(task) : null;
 	}
 
 	async remove(params: RemoveParams): Promise<void> {
@@ -134,15 +135,5 @@ export class TaskRepository {
 				},
 			},
 		});
-	}
-
-	private static map(task: any): TaskDto {
-		const { tags, author, ...rest } = task;
-
-		return {
-			...rest,
-			author: author.user,
-			tags: tags.map((tags) => tags.tag),
-		};
 	}
 }

@@ -19,10 +19,10 @@ export class AuthGuard implements CanActivate {
 	) {}
 
 	async canActivate(context: ExecutionContext) {
-		const noCheck = this.reflector.get(
-			DISABLE_AUTH_CHECK_FLAG,
-			context.getHandler()
-		);
+		const noCheck = this.reflector.getAllAndOverride(DISABLE_AUTH_CHECK_FLAG, [
+			context.getHandler(),
+			context.getClass()
+		]);
 
 		const req: Request = context.switchToHttp().getRequest();
 
