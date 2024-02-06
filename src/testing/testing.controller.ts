@@ -21,8 +21,10 @@ import {
 	DisableIsActivatedCheck
 } from '@/auth';
 import { BASE_COOKIE_OPTIONS, COOKIE_NAME, COOKIE_TIME } from '@/const';
+import { ActivityDto } from '@/activities';
 import { TestingService } from './testing.service';
 import {
+	TestingActivityDto,
 	TestingInvitationDto,
 	TestingLoginDto,
 	TestingMemberDto,
@@ -269,7 +271,7 @@ export class TestingController {
 	}
 
 	@ApiOperation({
-		summary: 'Remove members via params',
+		summary: 'Get or create invitation',
 	})
 	@ApiBody({
 		type: TestingInvitationDto,
@@ -278,7 +280,7 @@ export class TestingController {
 	})
 	@ApiOkResponse({
 		type: RoomInvitationDto,
-		description: 'There was any member removed',
+		description: 'Invitation by params',
 	})
 	@HttpCode(HttpStatus.OK)
 	@Post('/invitation')
@@ -302,5 +304,41 @@ export class TestingController {
 	@Put('/invitation')
 	removeInvitation(@Body() params: TestingInvitationDto): Promise<boolean> {
 		return this.testingService.removeInvitation(params);
+	}
+
+	@ApiOperation({
+		summary: 'Get or create activity',
+	})
+	@ApiBody({
+		type: TestingActivityDto,
+		description: 'Filter to remove',
+		required: false,
+	})
+	@ApiOkResponse({
+		type: ActivityDto,
+		description: 'There was any activity removed',
+	})
+	@HttpCode(HttpStatus.OK)
+	@Post('/activity')
+	activity(@Body() params: TestingActivityDto): Promise<ActivityDto> {
+		return this.testingService.activity(params);
+	}
+
+	@ApiOperation({
+		summary: 'Remove activities via params',
+	})
+	@ApiBody({
+		type: TestingActivityDto,
+		description: 'Filter to remove',
+		required: false,
+	})
+	@ApiOkResponse({
+		type: Boolean,
+		description: 'There was any activities removed',
+	})
+	@HttpCode(HttpStatus.OK)
+	@Put('/activity')
+	removeActivity(@Body() params: TestingActivityDto): Promise<boolean> {
+		return this.testingService.removeActivity(params);
 	}
 }

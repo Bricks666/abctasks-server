@@ -5,3 +5,4 @@ export * from './testing-tag.dto';
 export * from './testing-task.dto';
 export * from './testing-user.dto';
 export * from './testing-login.dto';
+export * from './testing-activity.dto';

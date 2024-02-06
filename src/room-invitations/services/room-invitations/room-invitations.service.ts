@@ -132,7 +132,7 @@ export class RoomInvitationsService {
 			throw new ConflictException('User already exists in room');
 		}
 
-		let invitation: RoomInvitationDto =
+		let invitation: RoomInvitationDto | null =
 			await this.roomInvitationsRepository.getPersonalInvitation({
 				roomId,
 				userId,
@@ -235,10 +235,10 @@ export class RoomInvitationsService {
 		}
 	}
 
-	private validateInvitationStatus(invitation: RoomInvitationDto): void {
-		const isInvited = invitation.status === 'sended';
+	private validateInvitationStatus(invitation: RoomInvitationDto | null): void {
+		const isInvited = invitation?.status === 'sended';
 
-		if (!isInvited) {
+		if (isInvited) {
 			throw new ConflictException('Invitation has been already answered');
 		}
 	}

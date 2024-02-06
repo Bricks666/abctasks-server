@@ -1,5 +1,7 @@
+import { Prisma } from '@prisma/client';
 import { SortQueryDto, Pagination } from '@/shared';
 import { ActivitiesFiltersDto } from '../../dto';
+import { select } from './config';
 
 export interface GetAllByRoomIdParams
 	extends Pagination,
@@ -22,3 +24,7 @@ export interface CreateParams {
 	readonly sphereName: string;
 	readonly actionName: string;
 }
+
+export type ActivityRecord = Prisma.ActivityGetPayload<{
+	select: typeof select;
+}>;

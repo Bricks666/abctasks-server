@@ -22,6 +22,7 @@ const expireInTimeSeconds = 59 * 60 * 1000;
 				});
 
 				const response = await oauth.getAccessToken();
+				oauth.refreshAccessToken();
 
 				return {
 					transport: {
@@ -38,9 +39,13 @@ const expireInTimeSeconds = 59 * 60 * 1000;
 							accessToken: response.token,
 							expires: expireInTimeSeconds,
 							provisionCallback: async (user, renew, cb) => {
-								const response = await oauth.getAccessToken();
+								const response = await oauth.refreshAccessToken();
 
-								cb(null, response.token, expireInTimeSeconds);
+								cb(
+									null,
+									response.credentials.access_token,
+									expireInTimeSeconds
+								);
 							},
 						},
 					},

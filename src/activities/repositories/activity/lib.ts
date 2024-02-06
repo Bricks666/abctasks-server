@@ -1,5 +1,6 @@
 import { Prisma } from '@prisma/client';
-import { ActivitiesFiltersDto } from '../../dto';
+import { ActivitiesFiltersDto, ActivityDto } from '../../dto';
+import { ActivityRecord } from './types';
 
 export const prepareWhere = (
 	filters: ActivitiesFiltersDto
@@ -14,5 +15,16 @@ export const prepareWhere = (
 		sphereId: {
 			in: filters.sphereIds,
 		},
+	};
+};
+
+export const convertActivityRecordToActivityDto = (
+	record: ActivityRecord
+): ActivityDto => {
+	const { room_user, ...rest } = record;
+
+	return {
+		...rest,
+		activist: room_user.user,
 	};
 };
