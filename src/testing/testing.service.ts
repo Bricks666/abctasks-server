@@ -262,12 +262,12 @@ export class TestingService {
 	}
 
 	async member(params: TestingMemberDto = {}): Promise<MemberDto> {
-		const user = await this.user({ id: params.userId, });
-		const room = await this.room({ id: params.roomId, });
+		const user = await this.user(params.user);
+		const room = await this.room(params.room);
 		const where = convertTestingMemberDtoToMemberUniqueFilter({
 			...params,
-			userId: user.id,
-			roomId: room.id,
+			user,
+			room,
 		});
 
 		if (where) {
@@ -282,8 +282,8 @@ export class TestingService {
 
 		const data = convertTestingMemberDtoToMemberData({
 			...params,
-			userId: user.id,
-			roomId: room.id,
+			user,
+			room,
 		});
 
 		return this.databaseService.member.create({

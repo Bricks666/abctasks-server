@@ -4,13 +4,13 @@ import { TestingMemberDto } from '../dto';
 export const convertTestingMemberDtoToMemberUniqueFilter = (
 	data: TestingMemberDto
 ): Prisma.MemberWhereUniqueInput | null => {
-	const { roomId, userId, } = data;
+	const { room, user, } = data;
 
-	return roomId && userId
+	return room.id && user.id
 		? {
 			roomId_userId: {
-				roomId,
-				userId,
+				roomId: room.id,
+				userId: user.id,
 			},
 		  }
 		: null;

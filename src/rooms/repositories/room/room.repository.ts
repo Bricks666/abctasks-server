@@ -27,6 +27,9 @@ export class RoomRepository {
 					},
 				},
 			},
+			orderBy: {
+				updatedAt: 'desc',
+			},
 		});
 	}
 

@@ -16,8 +16,8 @@ services:
     ports:
       - 5433:5432
     restart: always
-    volumes:
-      - db-data:/var/lib/postgresql/data
+    # volumes:
+    #   - db-data:/var/lib/postgresql/data
     env_file:
       - .env.production
     environment:
@@ -37,5 +37,5 @@ services:
       always
     container_name: cache
 volumes:
-  db-data:
+  # db-data:
   redis-data:

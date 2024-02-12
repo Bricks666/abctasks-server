@@ -12,7 +12,7 @@ export const convertTestingRoomDtoToRoomData = (
 		members
 			? members.map((member) => {
 				return {
-					userId: member.userId,
+					userId: member.user.id,
 					status: member.status,
 				};
 			  })

@@ -6,7 +6,7 @@ export const convertTestingRoomDtoToRoomFilter = (
 ): Prisma.RoomWhereInput => {
 	const { description, id, name, ownerId, members = [], } = params;
 
-	const userIds = members.map((member) => member.userId);
+	const userIds = members.map((member) => member.user.id);
 
 	const statuses = members.map((member) => member.status);
 

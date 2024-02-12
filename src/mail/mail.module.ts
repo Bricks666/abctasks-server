@@ -22,7 +22,6 @@ const expireInTimeSeconds = 59 * 60 * 1000;
 				});
 
 				const response = await oauth.getAccessToken();
-				oauth.refreshAccessToken();
 
 				return {
 					transport: {
@@ -36,10 +35,16 @@ const expireInTimeSeconds = 59 * 60 * 1000;
 							clientId: process.env.EMAIL_CLIENT_ID,
 							clientSecret: process.env.EMAIL_CLIENT_SECRET,
 							refreshToken: process.env.EMAIL_REFRESH_TOKEN,
-							accessToken: response.token,
+							accessToken: (response as any).token,
 							expires: expireInTimeSeconds,
 							provisionCallback: async (user, renew, cb) => {
 								const response = await oauth.refreshAccessToken();
+
+								if (response.credentials.refresh_token) {
+									oauth.setCredentials({
+										refresh_token: response.credentials.refresh_token,
+									});
+								}
 
 								cb(
 									null,
