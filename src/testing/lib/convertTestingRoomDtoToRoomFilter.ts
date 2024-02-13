@@ -15,17 +15,19 @@ export const convertTestingRoomDtoToRoomFilter = (
 		ownerId,
 		description,
 		name,
-		members: {
-			some: {
-				AND: {
-					userId: {
-						in: userIds,
-					},
-					status: {
-						in: statuses,
+		members: members.length
+			? {
+				some: {
+					AND: {
+						userId: {
+							in: userIds,
+						},
+						status: {
+							in: statuses,
+						},
 					},
 				},
-			},
-		},
+			  }
+			: undefined,
 	};
 };
