@@ -238,7 +238,7 @@ export class RoomInvitationsService {
 	private validateInvitationStatus(invitation: RoomInvitationDto | null): void {
 		const isInvited = invitation?.status === 'sended';
 
-		if (isInvited) {
+		if (!isInvited) {
 			throw new ConflictException('Invitation has been already answered');
 		}
 	}

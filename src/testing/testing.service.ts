@@ -67,6 +67,14 @@ export class TestingService {
 		return { user, tokens, };
 	}
 
+	async activateAccountLink(params: TestingUserDto = {}): Promise<string> {
+		const user = await this.user(params);
+
+		const tokens = await this.#generateTokens(user);
+
+		return `${process.env.CLIENT_APP_HOST}/registration/activate?token=${tokens.refreshToken}`;
+	}
+
 	async activity(params: TestingActivityDto = {}): Promise<ActivityDto> {
 		const activist = await this.user(params.activist);
 		const room = await this.room(params.room);
@@ -339,7 +347,7 @@ export class TestingService {
 		});
 	}
 
-	removeInvitation(params: TestingInvitationDto = {}): Promise<boolean> {
+	async removeInvitation(params: TestingInvitationDto = {}): Promise<boolean> {
 		const where = convertTestingInvitationDtoToInvitationFilter(params);
 
 		return this.databaseService.roomInvitation
@@ -347,6 +355,18 @@ export class TestingService {
 				where,
 			})
 			.then(({ count, }) => !!count);
+	}
+
+	async invitationLink(params: TestingInvitationDto = {}): Promise<string> {
+		const invitation = await this.invitation(params);
+
+		const token = await this.tokensService.generateInsecure({
+			roomId: invitation.room.id,
+			userId: invitation.inviter.id,
+			id: invitation.id,
+		});
+
+		return `${process.env.CLIENT_APP_HOST}/rooms/invite?token=${token}`;
 	}
 
 	async #generateTokens(user: UserDto): Promise<TokensDto> {

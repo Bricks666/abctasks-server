@@ -76,6 +76,23 @@ export class TestingController {
 	}
 
 	@ApiOperation({
+		summary: 'Generate link to activate account',
+	})
+	@ApiBody({
+		type: TestingUserDto,
+		description: 'Data of account to activate',
+	})
+	@ApiOkResponse({
+		type: String,
+		description: 'Link to activate account',
+	})
+	@HttpCode(HttpStatus.OK)
+	@Post('/activate-link')
+	async activateAccountLink(@Body() params: TestingUserDto): Promise<string> {
+		return this.testingService.activateAccountLink(params);
+	}
+
+	@ApiOperation({
 		summary: 'Logout from current logged in account',
 	})
 	@ApiOkResponse({
@@ -304,6 +321,23 @@ export class TestingController {
 	@Put('/invitation')
 	removeInvitation(@Body() params: TestingInvitationDto): Promise<boolean> {
 		return this.testingService.removeInvitation(params);
+	}
+
+	@ApiOperation({
+		summary: 'Generate link to invite user',
+	})
+	@ApiBody({
+		type: TestingInvitationDto,
+		description: 'Data of invitation to link',
+	})
+	@ApiOkResponse({
+		type: String,
+		description: 'Link to invite user',
+	})
+	@HttpCode(HttpStatus.OK)
+	@Post('/invitation-link')
+	async invitationLink(@Body() params: TestingInvitationDto): Promise<string> {
+		return this.testingService.invitationLink(params);
 	}
 
 	@ApiOperation({
