@@ -9,8 +9,8 @@ datasource db {
 
 model User {
   id                 Int              @id @default(autoincrement())
-  email              String           @unique() @db.VarChar(32)
-  username           String           @db.VarChar(32)
+  email              String           @unique() @db.VarChar(64)
+  username           String           @db.VarChar(64)
   password           String           @db.VarChar(255)
   photo              String?          @db.VarChar(255)
   activated          Boolean?         @default(false)
@@ -61,7 +61,7 @@ enum RoomInvitationStatus {
 model Room {
   id          Int              @id @default(autoincrement())
   ownerId     Int
-  name        String           @db.VarChar(32)
+  name        String           @db.VarChar(64)
   description String           @db.VarChar(255)
   createdAt   DateTime?        @default(now())
   updatedAt   DateTime?        @updatedAt

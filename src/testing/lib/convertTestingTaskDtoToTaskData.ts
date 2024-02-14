@@ -6,7 +6,6 @@ export const convertTestingTaskDtoToTaskData = (
 	data: TestingTaskDto
 ): Prisma.TaskUncheckedCreateInput => {
 	const {
-		id,
 		title = DEFAULT_TASK.title,
 		description = DEFAULT_TASK.description,
 		status = DEFAULT_TASK.status,
@@ -18,7 +17,6 @@ export const convertTestingTaskDtoToTaskData = (
 	} = data;
 
 	return {
-		id,
 		title,
 		description,
 		status,

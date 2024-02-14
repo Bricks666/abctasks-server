@@ -3,10 +3,12 @@ import { TestingInvitationDto } from '../dto';
 
 export const convertTestingInvitationDtoToInvitationUniqueFilter = (
 	data: TestingInvitationDto
-): Prisma.RoomInvitationWhereUniqueInput => {
+): Prisma.RoomInvitationWhereUniqueInput | null => {
 	const { id, } = data;
 
-	return {
-		id,
-	};
+	return id
+		? {
+			id,
+		  }
+		: null;
 };

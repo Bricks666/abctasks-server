@@ -1,23 +1,25 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { MemberStatus } from '@prisma/client';
-import { IsEnum, IsNumber, IsOptional } from 'class-validator';
+import { IsEnum, IsObject, IsOptional } from 'class-validator';
+import { TestingRoomDto } from './testing-room.dto';
+import { TestingUserDto } from './testing-user.dto';
 
 export class TestingMemberDto {
 	@ApiProperty({
-		type: Number,
+		type: () => TestingRoomDto,
 		required: false,
 	})
-	@IsNumber()
+	@IsObject()
 	@IsOptional()
-	declare roomId?: number;
+	declare room?: TestingRoomDto;
 
 	@ApiProperty({
-		type: Number,
+		type: () => TestingUserDto,
 		required: false,
 	})
-	@IsNumber()
+	@IsObject()
 	@IsOptional()
-	declare userId?: number;
+	declare user?: TestingUserDto;
 
 	@ApiProperty({
 		enum: MemberStatus,

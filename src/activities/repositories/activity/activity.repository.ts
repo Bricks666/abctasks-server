@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { DatabaseService } from '@/database/database.service';
-import { SECURITY_USER_SELECT } from '@/users/repositories';
 import { ActivityDto } from '../../dto';
 import {
 	CreateParams,
@@ -9,22 +8,8 @@ import {
 	GetAllByUserIdParams,
 	GetTotalCountInRoomParams
 } from './types';
-import { prepareWhere } from './lib';
-
-const select = {
-	id: true,
-	roomId: true,
-	room_user: {
-		select: {
-			user: {
-				select: SECURITY_USER_SELECT,
-			},
-		},
-	},
-	sphere: true,
-	action: true,
-	createdAt: true,
-} satisfies Prisma.ActivitySelect;
+import { convertActivityRecordToActivityDto, prepareWhere } from './lib';
+import { select } from './config';
 
 @Injectable()
 export class ActivityRepository {
@@ -55,7 +40,7 @@ export class ActivityRepository {
 			},
 		});
 
-		return activities.map(ActivityRepository.map);
+		return activities.map(convertActivityRecordToActivityDto);
 	}
 
 	async getTotalCountInRoom(
@@ -83,17 +68,10 @@ export class ActivityRepository {
 			},
 			take: limit,
 			skip: offset,
-			include: {
-				sphere: {
-					select: {
-						id: true,
-						name: true,
-					},
-				},
-			},
+			select,
 		});
 
-		return activities.map(ActivityRepository.map);
+		return activities.map(convertActivityRecordToActivityDto);
 	}
 
 	async create(params: CreateParams): Promise<ActivityDto> {
@@ -132,15 +110,6 @@ export class ActivityRepository {
 			select,
 		});
 
-		return ActivityRepository.map(activity);
-	}
-
-	private static map(activity: any): ActivityDto {
-		const { room_user, ...rest } = activity;
-
-		return {
-			...rest,
-			activist: room_user.user,
-		};
+		return convertActivityRecordToActivityDto(activity);
 	}
 }

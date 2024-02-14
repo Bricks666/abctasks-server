@@ -3,10 +3,12 @@ import { TestingTagDto } from '../dto';
 
 export const convertTestingTagDtoToTagUniqueFilter = (
 	data: TestingTagDto
-): Prisma.TagWhereUniqueInput => {
+): Prisma.TagWhereUniqueInput | null => {
 	const { id, } = data;
 
-	return {
-		id,
-	};
+	return id
+		? {
+			id,
+		  }
+		: null;
 };

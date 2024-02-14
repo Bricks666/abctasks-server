@@ -5,11 +5,11 @@ import { DEFAULT_MEMBER } from '../configs';
 export const convertTestingMemberDtoToMemberData = (
 	data: TestingMemberDto
 ): Prisma.MemberUncheckedCreateInput => {
-	const { roomId, status, userId, } = data;
+	const { room, status, user, } = data;
 
 	return {
-		roomId,
-		userId,
+		roomId: room.id,
+		userId: user.id,
 		status: status ?? DEFAULT_MEMBER.status,
 	};
 };

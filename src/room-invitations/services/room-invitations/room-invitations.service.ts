@@ -68,7 +68,7 @@ export class RoomInvitationsService {
 			this.validateInvitationUser(invitation, userId);
 		}
 
-		this.validateInvitationStatus(invitation);
+		this.throwFinishedInvitation(invitation);
 
 		return invitation;
 	}
@@ -132,13 +132,15 @@ export class RoomInvitationsService {
 			throw new ConflictException('User already exists in room');
 		}
 
-		let invitation: RoomInvitationDto =
+		let invitation: RoomInvitationDto | null =
 			await this.roomInvitationsRepository.getPersonalInvitation({
 				roomId,
 				userId,
 			});
 
-		this.validateInvitationStatus(invitation);
+		if (invitation) {
+			this.throwInProcessInvitation(invitation);
+		}
 
 		invitation = await this.roomInvitationsRepository.create({
 			roomId,
@@ -172,7 +174,7 @@ export class RoomInvitationsService {
 
 		if (isPersonal) {
 			this.validateInvitationUser(invitation, userId);
-			this.validateInvitationStatus(invitation);
+			this.throwFinishedInvitation(invitation);
 
 			const approved = await this.roomInvitationsRepository.approve({
 				id: invitation.id,
@@ -205,7 +207,7 @@ export class RoomInvitationsService {
 		}
 
 		this.validateInvitationUser(invitation, userId);
-		this.validateInvitationStatus(invitation);
+		this.throwFinishedInvitation(invitation);
 
 		return this.roomInvitationsRepository.reject({
 			id: invitation.id,
@@ -235,11 +237,19 @@ export class RoomInvitationsService {
 		}
 	}
 
-	private validateInvitationStatus(invitation: RoomInvitationDto): void {
-		const isInvited = invitation.status === 'sended';
+	private throwFinishedInvitation(invitation: RoomInvitationDto | null): void {
+		const isInvited = invitation?.status === 'sended';
 
 		if (!isInvited) {
 			throw new ConflictException('Invitation has been already answered');
+		}
+	}
+
+	private throwInProcessInvitation(invitation: RoomInvitationDto | null): void {
+		const isInvited = invitation?.status === 'sended';
+
+		if (isInvited) {
+			throw new ConflictException('User already has active invitation');
 		}
 	}
 }

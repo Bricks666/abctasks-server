@@ -1,4 +1,5 @@
 import {
+	TestingActivityDto,
 	TestingInvitationDto,
 	TestingMemberDto,
 	TestingRoomDto,
@@ -44,4 +45,12 @@ export const DEFAULT_INVITATION: TestingInvitationDto = {
 	inviter: DEFAULT_USER,
 	room: DEFAULT_ROOM,
 	status: 'sended',
+};
+
+export const DEFAULT_ACTIVITY: TestingActivityDto = {
+	action: 'create',
+	room: DEFAULT_ROOM,
+	activist: DEFAULT_USER,
+	sphere: 'task',
+	createdAt: new Date('2022-07-07'),
 };

@@ -6,26 +6,28 @@ import { DEFAULT_ROOM } from '../configs';
 export const convertTestingRoomDtoToRoomData = (
 	data: TestingRoomDto
 ): Prisma.RoomUncheckedCreateInput => {
-	const { description, id, name, ownerId, members = [], } = data;
+	const { description, name, ownerId, members, } = data;
+
+	const membersData: Prisma.Enumerable<Prisma.MemberCreateManyRoomInput> =
+		members
+			? members.map((member) => {
+				return {
+					userId: member.user.id,
+					status: member.status,
+				};
+			  })
+			: [];
 
 	return {
-		id,
 		description: description ?? DEFAULT_ROOM.description,
 		name: name ?? DEFAULT_ROOM.name,
 		ownerId,
 		members: {
 			createMany: {
-				data: members
-					.map((member) => {
-						return {
-							userId: member.userId,
-							status: member.status,
-						};
-					})
-					.concat({
-						status: 'activated',
-						userId: ownerId,
-					}),
+				data: membersData.concat({
+					status: 'activated',
+					userId: ownerId,
+				}),
 				skipDuplicates: true,
 			},
 		},

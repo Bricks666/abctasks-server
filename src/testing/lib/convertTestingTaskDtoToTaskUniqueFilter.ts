@@ -3,10 +3,12 @@ import { TestingTaskDto } from '../dto';
 
 export const convertTestingTaskDtoToTaskUniqueFilter = (
 	data: TestingTaskDto
-): Prisma.TaskWhereUniqueInput => {
+): Prisma.TaskWhereUniqueInput | null => {
 	const { id, } = data;
 
-	return {
-		id,
-	};
+	return id
+		? {
+			id,
+		  }
+		: null;
 };
