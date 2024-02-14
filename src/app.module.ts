@@ -25,7 +25,7 @@ const modules = [
 		store: redisStore as unknown as CacheStore,
 		isGlobal: true,
 		max: 50,
-		ttl: 10,
+		ttl: 5,
 		url: process.env.REDIS_URL,
 	}),
 	ConfigModule.forRoot({

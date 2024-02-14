@@ -18,7 +18,13 @@ export class RoomsService {
 
 	async getAll(params: GetAllParams): Promise<WithRights<RoomDto>[]> {
 		const { userId, } = params;
-		const pagination = normalizePaginationParams({});
+		const pagination = normalizePaginationParams({
+			/**
+			 * @todo
+			 * Implement real pagination
+			 */
+			count: 125,
+		});
 
 		const rooms = await this.roomsRepository.getAllByUser({
 			...pagination,

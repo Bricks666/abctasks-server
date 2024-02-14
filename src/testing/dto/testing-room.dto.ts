@@ -49,12 +49,12 @@ export class TestingRoomDto {
 	@ApiProperty({
 		example: [],
 		description: 'Описание комнаты',
-		type: OmitType(TestingMemberDto, ['roomId']),
+		type: () => OmitType(TestingMemberDto, ['room']),
 		required: false,
 	})
 	@IsObject({
 		each: true,
 	})
 	@IsOptional()
-	declare members?: Omit<TestingMemberDto, 'roomId'>[];
+	declare members?: Omit<TestingMemberDto, 'room'>[];
 }

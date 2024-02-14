@@ -4,11 +4,11 @@ import { TestingMemberDto } from '../dto';
 export const convertTestingMemberDtoToMemberFilter = (
 	data: TestingMemberDto
 ): Prisma.MemberWhereInput => {
-	const { roomId, status, userId, } = data;
+	const { room, status, user, } = data;
 
 	return {
-		roomId,
 		status,
-		userId,
+		roomId: room.id,
+		userId: user.id,
 	};
 };

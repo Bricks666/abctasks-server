@@ -14,22 +14,28 @@ import { TokensService } from '@/tokens/tokens.service';
 import { taskSelect } from '@/tasks/repositories';
 import { invitationSelect } from '@/room-invitations/repositories';
 import {
+	ActivityDto,
+	activitySelect,
+	convertActivityRecordToActivityDto
+} from '@/activities';
+import {
 	TestingUserDto,
 	TestingRoomDto,
 	TestingTaskDto,
 	TestingTagDto,
 	TestingMemberDto,
 	TestingInvitationDto,
-	TestingLoginDto
+	TestingLoginDto,
+	TestingActivityDto
 } from './dto';
 import {
 	convertTestingRoomDtoToRoomData,
 	convertTestingRoomDtoToRoomFilter,
 	convertTestingUserDtoToUserData,
-	convertTestingUserDtoToUniqueUserFilter,
+	convertTestingUserDtoToUserUniqueFilter,
 	convertTestingUserDtoToUserFilter,
-	convertTestingRoomDtoToUniqueRoomFilter,
-	convertTestingMemberDtoToUniqueMemberFilter,
+	convertTestingRoomDtoToRoomUniqueFilter,
+	convertTestingMemberDtoToMemberUniqueFilter,
 	convertTestingMemberDtoToMemberData,
 	convertTestingMemberDtoToMemberFilter,
 	convertTestingTagDtoToTagUniqueFilter,
@@ -41,12 +47,9 @@ import {
 	convertTestingInvitationDtoToInvitationUniqueFilter,
 	convertTestingInvitationDtoToInvitationData,
 	convertTestingInvitationDtoToInvitationFilter,
-	convertTestingUserDtoToUserUpdate,
-	convertTestingRoomDtoToRoomUpdate,
-	convertTestingTaskDtoToTaskUpdate,
-	convertTestingTagDtoToTagUpdate,
-	convertTestingMemberDtoToMemberUpdate,
-	convertTestingInvitationDtoToInvitationUpdate
+	convertTestingActivityDtoToActivityUniqueFilter,
+	convertTestingActivityDtoToActivityData,
+	convertTestingActivityDtoToActivityFilter
 } from './lib';
 
 @Injectable()
@@ -64,21 +67,66 @@ export class TestingService {
 		return { user, tokens, };
 	}
 
+	async activateAccountLink(params: TestingUserDto = {}): Promise<string> {
+		const user = await this.user(params);
+
+		const tokens = await this.#generateTokens(user);
+
+		return `${process.env.CLIENT_APP_HOST}/registration/activate?token=${tokens.refreshToken}`;
+	}
+
+	async activity(params: TestingActivityDto = {}): Promise<ActivityDto> {
+		const activist = await this.user(params.activist);
+		const room = await this.room(params.room);
+		const where = convertTestingActivityDtoToActivityUniqueFilter(params);
+
+		if (where) {
+			const existing = await this.databaseService.activity.findUnique({
+				where,
+				select: activitySelect,
+			});
+
+			if (existing) {
+				return convertActivityRecordToActivityDto(existing);
+			}
+		}
+
+		const data = convertTestingActivityDtoToActivityData({
+			...params,
+			room,
+			activist,
+		});
+		return this.databaseService.activity
+			.create({
+				data,
+				select: activitySelect,
+			})
+			.then(convertActivityRecordToActivityDto);
+	}
+
+	async removeActivity(params: TestingActivityDto = {}): Promise<boolean> {
+		const where = convertTestingActivityDtoToActivityFilter(params);
+
+		return this.databaseService.activity
+			.deleteMany({ where, })
+			.then(({ count, }) => !!count);
+	}
+
 	async user(params: TestingUserDto = {}): Promise<UserDto> {
-		const where = convertTestingUserDtoToUniqueUserFilter(params);
+		const where = convertTestingUserDtoToUserUniqueFilter(params);
+
+		if (where) {
+			const existing = await this.databaseService.user.findFirst({
+				where,
+			});
+
+			if (existing) {
+				return existing;
+			}
+		}
+
 		const data = convertTestingUserDtoToUserData(params);
 		const password = await hash(data.password, Number(process.env.ROUND_COUNT));
-
-		const existing = await this.databaseService.user.findFirst({
-			where,
-		});
-
-		if (existing) {
-			return this.databaseService.user.update({
-				where: convertTestingUserDtoToUniqueUserFilter(existing),
-				data: convertTestingUserDtoToUserUpdate({ ...data, password, }),
-			});
-		}
 
 		return this.databaseService.user.create({
 			data: {
@@ -100,20 +148,20 @@ export class TestingService {
 
 	async room(params: TestingRoomDto = {}): Promise<RoomDto> {
 		const user = await this.user({ id: params.ownerId, });
-		const where = convertTestingRoomDtoToUniqueRoomFilter({
+
+		const where = convertTestingRoomDtoToRoomUniqueFilter({
 			...params,
 			ownerId: user.id,
 		});
 
-		const existing = await this.databaseService.room.findFirst({
-			where,
-		});
-
-		if (existing) {
-			return this.databaseService.room.update({
-				where: convertTestingRoomDtoToUniqueRoomFilter(existing),
-				data: convertTestingRoomDtoToRoomUpdate(params),
+		if (where) {
+			const existing = await this.databaseService.room.findUnique({
+				where,
 			});
+
+			if (existing) {
+				return existing;
+			}
 		}
 
 		const data = convertTestingRoomDtoToRoomData({
@@ -149,18 +197,15 @@ export class TestingService {
 			tags,
 		});
 
-		const existing = await this.databaseService.task.findFirst({
-			where,
-		});
+		if (where) {
+			const existing = await this.databaseService.task.findFirst({
+				where,
+				select: taskSelect,
+			});
 
-		if (existing) {
-			return this.databaseService.task
-				.update({
-					where: convertTestingTaskDtoToTaskUniqueFilter(existing),
-					data: convertTestingTaskDtoToTaskUpdate(params),
-					select: taskSelect,
-				})
-				.then(convertTaskRecordToTaskDto);
+			if (existing) {
+				return convertTaskRecordToTaskDto(existing);
+			}
 		}
 
 		const data = convertTestingTaskDtoToTaskData({
@@ -193,20 +238,14 @@ export class TestingService {
 
 		const where = convertTestingTagDtoToTagUniqueFilter({ ...params, room, });
 
-		const existing = await this.databaseService.tag.findFirst({
-			where,
-		});
+		if (where) {
+			const existing = await this.databaseService.tag.findUnique({
+				where,
+			});
 
-		if (existing) {
-			return this.databaseService.tag.update({
-				where: convertTestingTagDtoToTagUniqueFilter({
-					id: existing.id,
-					room: {
-						id: existing.roomId,
-					},
-				}),
-				data: convertTestingTagDtoToTagUpdate(params),
-			}) as Promise<TagDto>;
+			if (existing) {
+				return existing as TagDto;
+			}
 		}
 
 		const data = convertTestingTagDtoToTagData({ ...params, room, });
@@ -231,29 +270,28 @@ export class TestingService {
 	}
 
 	async member(params: TestingMemberDto = {}): Promise<MemberDto> {
-		const user = await this.user({ id: params.userId, });
-		const room = await this.room({ id: params.roomId, });
-		const where = convertTestingMemberDtoToUniqueMemberFilter({
+		const user = await this.user(params.user);
+		const room = await this.room(params.room);
+		const where = convertTestingMemberDtoToMemberUniqueFilter({
 			...params,
-			userId: user.id,
-			roomId: room.id,
+			user,
+			room,
 		});
 
-		const existing = await this.databaseService.member.findUnique({
-			where,
-		});
-
-		if (existing) {
-			return this.databaseService.member.update({
-				where: convertTestingMemberDtoToUniqueMemberFilter(existing),
-				data: convertTestingMemberDtoToMemberUpdate(params),
+		if (where) {
+			const existing = await this.databaseService.member.findUnique({
+				where,
 			});
+
+			if (existing) {
+				return existing;
+			}
 		}
 
 		const data = convertTestingMemberDtoToMemberData({
 			...params,
-			userId: user.id,
-			roomId: room.id,
+			user,
+			room,
 		});
 
 		return this.databaseService.member.create({
@@ -285,16 +323,15 @@ export class TestingService {
 			room,
 		});
 
-		const existing = await this.databaseService.roomInvitation.findFirst({
-			where,
-		});
-
-		if (existing) {
-			return this.databaseService.roomInvitation.update({
-				where: convertTestingInvitationDtoToInvitationUniqueFilter(existing),
-				data: convertTestingInvitationDtoToInvitationUpdate(params),
+		if (where) {
+			const existing = await this.databaseService.roomInvitation.findFirst({
+				where,
 				select: invitationSelect,
 			});
+
+			if (existing) {
+				return existing;
+			}
 		}
 
 		const data = convertTestingInvitationDtoToInvitationData({
@@ -310,7 +347,7 @@ export class TestingService {
 		});
 	}
 
-	removeInvitation(params: TestingInvitationDto = {}): Promise<boolean> {
+	async removeInvitation(params: TestingInvitationDto = {}): Promise<boolean> {
 		const where = convertTestingInvitationDtoToInvitationFilter(params);
 
 		return this.databaseService.roomInvitation
@@ -318,6 +355,18 @@ export class TestingService {
 				where,
 			})
 			.then(({ count, }) => !!count);
+	}
+
+	async invitationLink(params: TestingInvitationDto = {}): Promise<string> {
+		const invitation = await this.invitation(params);
+
+		const token = await this.tokensService.generateInsecure({
+			roomId: invitation.room.id,
+			userId: invitation.inviter.id,
+			id: invitation.id,
+		});
+
+		return `${process.env.CLIENT_APP_HOST}/rooms/invite?token=${token}`;
 	}
 
 	async #generateTokens(user: UserDto): Promise<TokensDto> {
