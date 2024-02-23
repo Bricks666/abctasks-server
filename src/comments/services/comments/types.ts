@@ -1,7 +1,7 @@
-import { PaginationQueryDto } from '@/shared';
+import { PaginatedRequestDto } from '@/shared';
 import { CreateCommentDto, UpdateCommentDto } from '../../dto';
 
-export interface GetAllParams extends PaginationQueryDto {
+export interface GetAllParams extends PaginatedRequestDto {
 	readonly roomId: number;
 	readonly taskId: number;
 }

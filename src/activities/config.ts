@@ -1,11 +1,11 @@
-export enum ActivityActionCodes {
-	CREATE = 'create',
-	UPDATE = 'update',
-	REMOVE = 'remove',
-}
+export const ActivityActionCodes = {
+	CREATE: 'create',
+	UPDATE: 'update',
+	REMOVE: 'remove',
+} as const;
 
-export enum ActivitySphereCodes {
-	TASK = 'task',
-	TAG = 'tag',
-	COMMENT = 'comment',
-}
+export const ActivitySphereCodes = {
+	TASK: 'task',
+	TAG: 'tag',
+	COMMENT: 'comment',
+} as const;

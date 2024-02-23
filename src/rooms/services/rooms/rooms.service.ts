@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { WithRights } from '@/rooms/types';
-import { normalizePaginationParams } from '@/shared';
+import { normalizePaginatedRequest } from '@/shared';
 import { RoomDto } from '../../dto';
 import { RoomRepository } from '../../repositories';
 import {
@@ -18,7 +18,7 @@ export class RoomsService {
 
 	async getAll(params: GetAllParams): Promise<WithRights<RoomDto>[]> {
 		const { userId, } = params;
-		const pagination = normalizePaginationParams({
+		const pagination = normalizePaginatedRequest({
 			/**
 			 * @todo
 			 * Implement real pagination

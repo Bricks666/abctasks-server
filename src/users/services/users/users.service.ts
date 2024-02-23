@@ -4,7 +4,7 @@ import {
 	NotFoundException
 } from '@nestjs/common';
 import { hash } from 'bcrypt';
-import { normalizePaginationParams } from '@/shared';
+import { normalizePaginatedRequest } from '@/shared';
 import { SecurityUserDto, UserDto } from '../../dto';
 import { UserRepository } from '../../repositories';
 import {
@@ -23,7 +23,7 @@ export class UsersService {
 
 	async getAll(params: GetAllParams): Promise<SecurityUserDto[]> {
 		const { page, count, ...rest } = params;
-		const { limit, offset, } = normalizePaginationParams({ page, count, });
+		const { limit, offset, } = normalizePaginatedRequest({ page, count, });
 
 		return this.usersRepository.getAll({ ...rest, limit, offset, });
 	}

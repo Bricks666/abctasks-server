@@ -21,7 +21,7 @@ import {
 	DisableIsActivatedCheck
 } from '@/auth';
 import { BASE_COOKIE_OPTIONS, COOKIE_NAME, COOKIE_TIME } from '@/const';
-import { ActivityDto } from '@/activities';
+import { Activity } from '@/activities';
 import { TestingService } from './testing.service';
 import {
 	TestingActivityDto,
@@ -349,12 +349,12 @@ export class TestingController {
 		required: false,
 	})
 	@ApiOkResponse({
-		type: ActivityDto,
+		type: Activity,
 		description: 'There was any activity removed',
 	})
 	@HttpCode(HttpStatus.OK)
 	@Post('/activity')
-	activity(@Body() params: TestingActivityDto): Promise<ActivityDto> {
+	activity(@Body() params: TestingActivityDto): Promise<Activity> {
 		return this.testingService.activity(params);
 	}
 

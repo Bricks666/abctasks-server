@@ -14,7 +14,7 @@ import { TokensService } from '@/tokens/tokens.service';
 import { taskSelect } from '@/tasks/repositories';
 import { invitationSelect } from '@/room-invitations/repositories';
 import {
-	ActivityDto,
+	Activity,
 	activitySelect,
 	convertActivityRecordToActivityDto
 } from '@/activities';
@@ -75,7 +75,7 @@ export class TestingService {
 		return `${process.env.CLIENT_APP_HOST}/registration/activate?token=${tokens.refreshToken}`;
 	}
 
-	async activity(params: TestingActivityDto = {}): Promise<ActivityDto> {
+	async activity(params: TestingActivityDto = {}): Promise<Activity> {
 		const activist = await this.user(params.activist);
 		const room = await this.room(params.room);
 		const where = convertTestingActivityDtoToActivityUniqueFilter(params);

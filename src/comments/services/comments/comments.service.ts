@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { normalizePaginationParams } from '@/shared';
+import { normalizePaginatedRequest } from '@/shared';
 import { CommentDto } from '../../dto';
 import { CommentRepository } from '../../repositories';
 import {
@@ -17,7 +17,7 @@ export class CommentsService {
 	async getAll(params: GetAllParams): Promise<CommentDto[]> {
 		const { roomId, taskId, count, page, } = params;
 
-		const pagination = normalizePaginationParams({ count, page, });
+		const pagination = normalizePaginatedRequest({ count, page, });
 		return this.commentsRepository.getAll({ roomId, taskId, ...pagination, });
 	}
 

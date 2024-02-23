@@ -1,6 +1,6 @@
 import { Controller, Get } from '@nestjs/common';
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { ActivityActionDto } from '../dto';
+import { ActivityAction } from '../entities';
 import { ActivityActionsService } from '../services';
 
 @ApiTags('События активностей')
@@ -11,14 +11,14 @@ export class ActivityActionsController {
 	) {}
 
 	@ApiOperation({
-		summary: 'Все события активностей',
+		summary: 'All activity actions',
 	})
 	@ApiOkResponse({
-		type: ActivityActionDto,
+		type: ActivityAction,
 		isArray: true,
 	})
 	@Get('/all')
-	getAll(): Promise<ActivityActionDto[]> {
+	getAll(): Promise<ActivityAction[]> {
 		return this.activityActionsService.getAll();
 	}
 }

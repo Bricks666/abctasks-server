@@ -1,6 +1,6 @@
 import { Controller, Get } from '@nestjs/common';
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { ActivitySphereDto } from '../dto';
+import { ActivitySphere } from '../entities';
 import { ActivitySpheresService } from '../services';
 
 @ApiTags('Сферы активностей')
@@ -14,11 +14,11 @@ export class ActivitySpheresController {
 		summary: 'Все сферы активностей',
 	})
 	@ApiOkResponse({
-		type: ActivitySphereDto,
+		type: ActivitySphere,
 		isArray: true,
 	})
 	@Get('/all')
-	getAll(): Promise<ActivitySphereDto[]> {
+	getAll(): Promise<ActivitySphere[]> {
 		return this.activitySpheresService.getAll();
 	}
 }

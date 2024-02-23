@@ -16,7 +16,7 @@ import {
 	ApiParam,
 	ApiTags
 } from '@nestjs/swagger';
-import { IntParam, PaginationQueryDto } from '@/shared';
+import { IntParam, PaginatedRequestDto } from '@/shared';
 import { Auth, CurrentUser } from '@/auth/lib';
 import { IsMember } from '@/members/lib';
 import { ActivitiesService } from '@/activities/services';
@@ -55,7 +55,7 @@ export class CommentsController {
 	async getAll(
 		@IntParam('taskId') taskId: number,
 		@IntParam('roomId') roomId: number,
-		@Query() query: PaginationQueryDto
+		@Query() query: PaginatedRequestDto
 	): Promise<CommentDto[]> {
 		return this.commentsService.getAll({ roomId, taskId, ...query, });
 	}

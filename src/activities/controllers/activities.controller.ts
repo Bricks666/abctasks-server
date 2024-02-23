@@ -3,29 +3,46 @@ import { ApiExtraModels, ApiOperation, ApiTags } from '@nestjs/swagger';
 import {
 	ApiPaginatedResponse,
 	IntParam,
-	PaginationResponseDto
+	PaginatedRequestDto,
+	SortedRequestDto
 } from '@/shared';
-import { ActivityDto, GetActivitiesQueryDto } from '../dto';
+import { Activity } from '../entities';
 import { ActivitiesService } from '../services';
+import {
+	ActivitiesFiltersRequestDto,
+	GetAllActivitiesByRoomIdResponseDto
+} from './contracts';
+import {
+	convertGetAllActivitiesByRoomIdRequestDto,
+	convertGetAllActivitiesByRoomIdResponseDto
+} from './lib';
 
-@ApiTags('Активности')
-@ApiExtraModels(PaginationResponseDto, ActivityDto)
+@ApiTags('Activities')
+@ApiExtraModels(GetAllActivitiesByRoomIdResponseDto)
 @Controller('activities')
 export class ActivitiesController {
 	constructor(private readonly activitiesService: ActivitiesService) {}
 
 	@ApiOperation({
-		summary: 'Получение активностей в комнате',
+		summary: 'Take activities from room',
 	})
-	@ApiPaginatedResponse(ActivityDto)
+	@ApiPaginatedResponse(Activity)
 	@Get('/:roomId')
-	getAll(
+	async getAll(
 		@IntParam('roomId') roomId: number,
-		@Query() query: GetActivitiesQueryDto
-	): Promise<PaginationResponseDto<ActivityDto>> {
-		return this.activitiesService.getAllByRoomId({
-			...query,
-			roomId,
-		});
+		@Query() filtersDto: ActivitiesFiltersRequestDto,
+		@Query() paginationDto: PaginatedRequestDto,
+		@Query() sortDto: SortedRequestDto
+	): Promise<GetAllActivitiesByRoomIdResponseDto> {
+		const response = await this.activitiesService.getAllByRoomId(
+			convertGetAllActivitiesByRoomIdRequestDto(
+				roomId,
+				filtersDto,
+				paginationDto,
+				sortDto
+			)
+		);
+
+		return convertGetAllActivitiesByRoomIdResponseDto(response);
 	}
 }
