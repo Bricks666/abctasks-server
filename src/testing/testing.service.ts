@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 
 import { hash } from 'bcrypt';
-import { DatabaseService } from '@/database';
+import { PrismaDatabaseService } from '@bricks-ether/server-utils/nestjs';
 import { MemberDto } from '@/members/dto';
 import { RoomInvitationDto } from '@/room-invitations/dto';
 import { RoomDto } from '@/rooms';
@@ -55,7 +55,7 @@ import {
 @Injectable()
 export class TestingService {
 	constructor(
-		private readonly databaseService: DatabaseService,
+		private readonly databaseService: PrismaDatabaseService,
 		private readonly tokensService: TokensService
 	) {}
 

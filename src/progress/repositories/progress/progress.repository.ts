@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { Prisma, TaskStatus } from '@prisma/client';
-import { DatabaseService } from '@/database/database.service';
+import { PrismaDatabaseService } from '@bricks-ether/server-utils/nestjs';
 import { map } from '@/shared';
 import { TagDto } from '@/tags/dto';
 import { ProgressDto, ProgressQueryResult } from '../../dto';
@@ -8,7 +8,7 @@ import { GetAllParams } from './types';
 
 @Injectable()
 export class ProgressRepository {
-	constructor(private readonly databaseService: DatabaseService) {}
+	constructor(private readonly databaseService: PrismaDatabaseService) {}
 
 	async getAll(params: GetAllParams): Promise<ProgressDto[]> {
 		const { roomId, } = params;
