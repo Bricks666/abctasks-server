@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { DatabaseService } from '@/database/database.service';
+import { PrismaDatabaseService } from '@bricks-ether/server-utils/nestjs';
 import {
 	ActivityRecord,
 	CreateActivityQuery,
@@ -14,7 +14,7 @@ import {
 
 @Injectable()
 export class ActivityRepository {
-	constructor(private readonly databaseService: DatabaseService) {}
+	constructor(private readonly databaseService: PrismaDatabaseService) {}
 
 	async getAllByRoomId(
 		query: GetAllActivitiesByRoomIdQuery

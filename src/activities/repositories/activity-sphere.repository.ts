@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { DatabaseService } from '@/database/database.service';
+import { PrismaDatabaseService } from '@bricks-ether/server-utils/nestjs';
 import {
 	convertCreateActivitySphereQuery,
 	convertGetOneActivitySphereQuery,
@@ -13,7 +13,7 @@ import {
 
 @Injectable()
 export class ActivitySphereRepository {
-	constructor(private readonly databaseService: DatabaseService) {}
+	constructor(private readonly databaseService: PrismaDatabaseService) {}
 
 	async getAll(): Promise<ActivitySphereRecord[]> {
 		return this.databaseService.activitySphere.findMany(
