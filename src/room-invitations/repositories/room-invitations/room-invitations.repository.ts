@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { DatabaseService } from '@/database/database.service';
+import { PrismaDatabaseService } from '@bricks-ether/server-utils/nestjs';
 import { RoomInvitationDto } from '../../dto';
 import { invitationSelect } from '../configs';
 import {
@@ -14,7 +14,7 @@ import {
 
 @Injectable()
 export class RoomInvitationsRepository {
-	constructor(private readonly databaseService: DatabaseService) {}
+	constructor(private readonly databaseService: PrismaDatabaseService) {}
 
 	async getAllActive(
 		params: GetRoomInvitationsParams

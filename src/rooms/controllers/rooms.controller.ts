@@ -5,7 +5,6 @@ import {
 	Body,
 	Put,
 	Delete,
-	CacheInterceptor,
 	UseInterceptors
 } from '@nestjs/common';
 import {
@@ -17,6 +16,7 @@ import {
 	ApiParam,
 	ApiTags
 } from '@nestjs/swagger';
+import { CacheInterceptor } from '@nestjs/cache-manager';
 import { Auth, CurrentUser } from '@/auth/lib';
 import { SecurityUserDto } from '@/users/dto';
 import { IntParam } from '@/shared';
@@ -41,6 +41,7 @@ export class RoomsController {
 		description: 'Все комнаты, в которых состоит пользователь',
 	})
 	@Get('/')
+	@UseInterceptors(CacheInterceptor)
 	async getAll(
 		@CurrentUser() user: SecurityUserDto
 	): Promise<WithRights<RoomDto>[]> {

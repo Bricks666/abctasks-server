@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
-import { DatabaseService } from '@/database/database.service';
+import { PrismaDatabaseService } from '@bricks-ether/server-utils/nestjs';
 import { SECURITY_USER_SELECT } from '@/users/repositories';
 import { TaskDto } from '../../dto';
 import { convertTaskRecordToTaskDto } from '../lib';
@@ -36,7 +36,7 @@ const select = {
 
 @Injectable()
 export class TaskRepository {
-	constructor(private readonly databaseService: DatabaseService) {}
+	constructor(private readonly databaseService: PrismaDatabaseService) {}
 
 	async getAll(params: GetAllParams): Promise<TaskDto[]> {
 		const { roomId, by, type = 'asc', ...filters } = params;

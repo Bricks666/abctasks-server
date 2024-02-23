@@ -6,7 +6,7 @@ export class TokensService {
 	constructor(private readonly jwtService: JwtService) {}
 
 	generateInsecure(
-		payload: string | Buffer | object,
+		payload: Buffer | object,
 		duration?: string | number
 	): Promise<string> {
 		const params: JwtSignOptions = {
@@ -27,7 +27,7 @@ export class TokensService {
 	}
 
 	generateSecure(
-		payload: string | Buffer | object,
+		payload: Buffer | object,
 		duration: string | number
 	): Promise<string> {
 		return this.jwtService.signAsync(payload, {

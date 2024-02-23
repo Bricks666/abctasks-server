@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { Prisma, User as UserModel } from '@prisma/client';
-import { DatabaseService } from '@/database/database.service';
+import { PrismaDatabaseService } from '@bricks-ether/server-utils/nestjs';
 import { SecurityUserDto } from '../../dto';
 import { SECURITY_USER_SELECT } from './config';
 import {
@@ -15,7 +15,7 @@ import {
 
 @Injectable()
 export class UserRepository {
-	constructor(private readonly databaseService: DatabaseService) {}
+	constructor(private readonly databaseService: PrismaDatabaseService) {}
 
 	async getAll(params: GetAllParams): Promise<SecurityUserDto[]> {
 		const { username, limit, offset, } = params;

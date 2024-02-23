@@ -1,11 +1,11 @@
 import { Injectable } from '@nestjs/common';
-import { DatabaseService } from '@/database/database.service';
+import { PrismaDatabaseService } from '@bricks-ether/server-utils/nestjs';
 import { ActivityActionDto } from '../../dto';
 import { CreateParams, GetOneParams } from './types';
 
 @Injectable()
 export class ActivityActionRepository {
-	constructor(private readonly databaseService: DatabaseService) {}
+	constructor(private readonly databaseService: PrismaDatabaseService) {}
 
 	async getAll(): Promise<ActivityActionDto[]> {
 		return this.databaseService.activityAction.findMany();
