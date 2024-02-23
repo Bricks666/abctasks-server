@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { DatabaseService } from '@/database';
+import { PrismaDatabaseService } from '@bricks-ether/server-utils/nestjs';
 import { RoomDto } from '../../dto';
 import {
 	CreateParams,
@@ -11,7 +11,7 @@ import {
 
 @Injectable()
 export class RoomRepository {
-	constructor(private readonly databaseService: DatabaseService) {}
+	constructor(private readonly databaseService: PrismaDatabaseService) {}
 
 	async getAllByUser(params: GetAllByUserParams): Promise<RoomDto[]> {
 		const { limit, offset, userId, } = params;

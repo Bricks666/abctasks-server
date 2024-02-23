@@ -7,14 +7,10 @@ import * as cookieParser from 'cookie-parser';
 import { AppModule } from '@/app.module';
 import { StandardResponseInterceptor, __PROD__ } from '@/shared';
 import { ORIGIN } from '@/const';
-import { DatabaseService } from '@/database';
 
 async function bootstrap() {
 	const { PORT, } = process.env;
 	const app = await NestFactory.create(AppModule);
-
-	const prismaService = app.get(DatabaseService);
-	await prismaService.enableShutdownHooks(app);
 
 	app.use(cookieParser());
 	app.enableCors({
@@ -49,6 +45,7 @@ async function bootstrap() {
 	/**
 	 * Для преобразования BigInt в JSON
 	 */
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	(BigInt.prototype as any).toJSON = function () {
 		return Number(this);
 	};

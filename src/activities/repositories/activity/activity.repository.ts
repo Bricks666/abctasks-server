@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
-import { DatabaseService } from '@/database/database.service';
+import { PrismaDatabaseService } from '@bricks-ether/server-utils/nestjs';
 import { ActivityDto } from '../../dto';
 import {
 	CreateParams,
@@ -13,7 +13,7 @@ import { select } from './config';
 
 @Injectable()
 export class ActivityRepository {
-	constructor(private readonly databaseService: DatabaseService) {}
+	constructor(private readonly databaseService: PrismaDatabaseService) {}
 
 	async getAllByRoomId(params: GetAllByRoomIdParams): Promise<ActivityDto[]> {
 		const {

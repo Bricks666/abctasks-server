@@ -3,7 +3,6 @@ import {
 	Get,
 	Delete,
 	NotFoundException,
-	CacheInterceptor,
 	UseInterceptors
 } from '@nestjs/common';
 import {
@@ -12,6 +11,7 @@ import {
 	ApiOperation,
 	ApiTags
 } from '@nestjs/swagger';
+import { CacheInterceptor } from '@nestjs/cache-manager';
 import { Auth, CurrentUser } from '@/auth/lib';
 import { SecurityUserDto } from '@/users/dto';
 import { IntParam } from '@/shared';
