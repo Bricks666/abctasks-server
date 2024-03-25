@@ -5,7 +5,8 @@ import {
 	Body,
 	Put,
 	Delete,
-	UseInterceptors
+	UseInterceptors,
+	Inject
 } from '@nestjs/common';
 import {
 	ApiBody,
@@ -16,7 +17,7 @@ import {
 	ApiParam,
 	ApiTags
 } from '@nestjs/swagger';
-import { CacheInterceptor } from '@nestjs/cache-manager';
+import { CACHE_MANAGER, Cache, CacheInterceptor } from '@nestjs/cache-manager';
 import { Auth, CurrentUser } from '@/auth/lib';
 import { SecurityUserDto } from '@/users/dto';
 import { IntParam } from '@/shared';
@@ -25,12 +26,16 @@ import { RoomsService } from '../services';
 import { CreateRoomDto, RoomDto, UpdateRoomDto } from '../dto';
 import { IsOwner } from '../lib';
 import { WithRights } from '../types';
+import { getUserRoomsCacheKey } from './lib';
 
 @ApiTags('Комнаты')
 @Controller('rooms')
 @Auth()
 export class RoomsController {
-	constructor(private readonly roomsService: RoomsService) {}
+	constructor(
+		private readonly roomsService: RoomsService,
+		@Inject(CACHE_MANAGER) private readonly cacheManager: Cache
+	) {}
 
 	@ApiOperation({
 		summary: 'Возврат всех комнат авторизованного пользователя',
@@ -41,12 +46,24 @@ export class RoomsController {
 		description: 'Все комнаты, в которых состоит пользователь',
 	})
 	@Get('/')
-	@UseInterceptors(CacheInterceptor)
 	async getAll(
 		@CurrentUser() user: SecurityUserDto
 	): Promise<WithRights<RoomDto>[]> {
 		const { id, } = user;
-		return this.roomsService.getAll({ userId: id, });
+
+		const cacheKey = getUserRoomsCacheKey(id);
+
+		let rooms = await this.cacheManager.get<WithRights<RoomDto>[]>(cacheKey);
+
+		if (rooms) {
+			return rooms;
+		}
+
+		rooms = await this.roomsService.getAll({ userId: id, });
+
+		await this.cacheManager.set(cacheKey, rooms, +process.env.CACHE_TTL);
+
+		return rooms;
 	}
 
 	@ApiOperation({
