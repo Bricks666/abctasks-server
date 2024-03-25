@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { DatabaseService } from '@/database';
+import { PrismaDatabaseService } from '@bricks-ether/server-utils/nestjs';
 import { SECURITY_USER_SELECT } from '@/users/repositories';
 import { SecurityUserDto } from '@/users/dto';
 import {
@@ -12,7 +12,7 @@ import {
 
 @Injectable()
 export class MembersRepository {
-	constructor(private readonly databaseService: DatabaseService) {}
+	constructor(private readonly databaseService: PrismaDatabaseService) {}
 
 	async getAllActivated(params: GetMembersParams): Promise<SecurityUserDto[]> {
 		const { roomId, } = params;

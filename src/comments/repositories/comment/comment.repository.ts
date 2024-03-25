@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
-import { DatabaseService } from '@/database/database.service';
+import { PrismaDatabaseService } from '@bricks-ether/server-utils/nestjs';
 import { SECURITY_USER_SELECT } from '@/users/repositories';
 import { CommentDto } from '../../dto';
 import {
@@ -29,7 +29,7 @@ const select = {
 
 @Injectable()
 export class CommentRepository {
-	constructor(private readonly databaseService: DatabaseService) {}
+	constructor(private readonly databaseService: PrismaDatabaseService) {}
 
 	async getAll(params: GetAllParams): Promise<CommentDto[]> {
 		const { limit, offset, roomId, taskId, } = params;
@@ -91,6 +91,7 @@ export class CommentRepository {
 		});
 	}
 
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	private static map(comment: any): CommentDto {
 		const { author, ...rest } = comment;
 

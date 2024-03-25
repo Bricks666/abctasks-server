@@ -1,6 +1,5 @@
 import {
 	Body,
-	CacheInterceptor,
 	Controller,
 	Get,
 	Put,
@@ -15,6 +14,7 @@ import {
 	ApiOkResponse,
 	ApiNotFoundResponse
 } from '@nestjs/swagger';
+import { CacheInterceptor } from '@nestjs/cache-manager';
 import { GetUsersQueryDto, SecurityUserDto } from '@/users/dto';
 import { Auth } from '@/auth/lib';
 import { IntParam } from '@/shared';

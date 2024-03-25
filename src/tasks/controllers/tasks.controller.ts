@@ -6,7 +6,6 @@ import {
 	Put,
 	Body,
 	HttpStatus,
-	CacheInterceptor,
 	UseInterceptors,
 	Query
 } from '@nestjs/common';
@@ -19,6 +18,7 @@ import {
 	ApiNotFoundResponse,
 	ApiCreatedResponse
 } from '@nestjs/swagger';
+import { CacheInterceptor } from '@nestjs/cache-manager';
 import {
 	ActivitiesService,
 	ActivitySphereCodes,

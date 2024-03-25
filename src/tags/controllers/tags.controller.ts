@@ -1,6 +1,5 @@
 import {
 	Body,
-	CacheInterceptor,
 	Controller,
 	Delete,
 	Get,
@@ -17,6 +16,7 @@ import {
 	ApiParam,
 	ApiTags
 } from '@nestjs/swagger';
+import { CacheInterceptor } from '@nestjs/cache-manager';
 import { ActivitiesService } from '@/activities/services';
 import { ActivityActionCodes, ActivitySphereCodes } from '@/activities/config';
 import { IsMember } from '@/members/lib';
