@@ -1,6 +1,13 @@
 import { Transform } from 'class-transformer';
 
-export const NumberTransform = (defaultValue?: number[] | number) => {
+export interface NumberTransformParams {
+	readonly defaultValue?: number | number[];
+	readonly singleValueAsArray?: boolean;
+}
+
+export const NumberTransform = (params: NumberTransformParams = {}) => {
+	const { defaultValue, singleValueAsArray = false, } = params;
+
 	return Transform((property) => {
 		const { value, } = property;
 
@@ -18,7 +25,10 @@ export const NumberTransform = (defaultValue?: number[] | number) => {
 
 		const numbers = value.split(',');
 
-		if (numbers.length > 1) {
+		const multipleValues = numbers.length > 1;
+		const singleArrayedValue = numbers.length === 1 && singleValueAsArray;
+
+		if (multipleValues || singleArrayedValue) {
 			return numbers.map(Number);
 		}
 
