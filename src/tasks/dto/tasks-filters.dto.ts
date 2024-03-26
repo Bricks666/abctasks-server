@@ -12,7 +12,7 @@ export class TasksFiltersDto {
 	})
 	@IsNumber({}, { each: true, })
 	@IsOptional()
-	@NumberTransform()
+	@NumberTransform({ singleValueAsArray: true, })
 	declare readonly authorIds?: number[];
 
 	@ApiProperty({
@@ -24,7 +24,7 @@ export class TasksFiltersDto {
 	})
 	@IsNumber({}, { each: true, })
 	@IsOptional()
-	@NumberTransform()
+	@NumberTransform({ singleValueAsArray: true, })
 	declare readonly tagIds?: number[];
 
 	@ApiProperty({

@@ -12,7 +12,7 @@ export class ActivitiesFiltersDto {
 	})
 	@IsNumber({}, { each: true, })
 	@IsOptional()
-	@NumberTransform()
+	@NumberTransform({ singleValueAsArray: true, })
 	declare activistIds?: number[];
 
 	@ApiProperty({
@@ -24,7 +24,7 @@ export class ActivitiesFiltersDto {
 	})
 	@IsNumber({}, { each: true, })
 	@IsOptional()
-	@NumberTransform()
+	@NumberTransform({ singleValueAsArray: true, })
 	declare sphereIds?: number[];
 
 	@ApiProperty({
@@ -36,7 +36,7 @@ export class ActivitiesFiltersDto {
 	})
 	@IsNumber({}, { each: true, })
 	@IsOptional()
-	@NumberTransform()
+	@NumberTransform({ singleValueAsArray: true, })
 	declare actionIds?: number[];
 
 	@ApiProperty({
